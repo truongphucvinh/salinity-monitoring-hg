@@ -1,0 +1,1 @@
+export const INVALID_CREDDENTIAL = "Tên tài khoản hoặc mật khẩu không đúng" 
