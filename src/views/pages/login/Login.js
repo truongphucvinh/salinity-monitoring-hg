@@ -15,8 +15,27 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
-
+import { useMutation } from '@tanstack/react-query'
+import { loginAuth } from 'src/services/authentication-services'
+import * as CryptoJS from 'crypto-js'
 const Login = () => {
+  const secretKey = process.env.AUTH_TOKEN || 'oda_dev'
+  const onLogin = useMutation({
+    mutationFn: (user) => loginAuth(user),
+    onSuccess: (res) => {
+      if (res.data.success) {
+        localStorage.setItem('_accessToken', res.data.accessToken)
+      } else {
+        console.log(res.data)
+      }
+    },
+    onError: (error) => {
+      console.log(error)
+    },
+  })
+  const onFinish = (values) => {
+    values.password = CryptoJS.AES.encrypt(values.password || '', secretKey)
+  }
   return (
     <div className="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
