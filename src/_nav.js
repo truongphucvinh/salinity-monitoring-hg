@@ -17,6 +17,16 @@ import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
 const _nav = [
   {
+    component:  CNavItem,
+    name: 'Station',
+    to: '/station-list',
+    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+    badge: {
+      color: 'info',
+      text: 'NEW',
+    },
+  },
+  {
     component: CNavItem,
     name: 'Dashboard',
     to: '/dashboard',
@@ -226,33 +236,33 @@ const _nav = [
       },
     ],
   },
-  {
-    component: CNavGroup,
-    name: 'Notifications',
-    icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Alerts',
-        to: '/notifications/alerts',
-      },
-      {
-        component: CNavItem,
-        name: 'Badges',
-        to: '/notifications/badges',
-      },
-      {
-        component: CNavItem,
-        name: 'Modal',
-        to: '/notifications/modals',
-      },
-      {
-        component: CNavItem,
-        name: 'Toasts',
-        to: '/notifications/toasts',
-      },
-    ],
-  },
+  // {
+  //   component: CNavGroup,
+  //   name: 'Notifications',
+  //   icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
+  //   items: [
+  //     {
+  //       component: CNavItem,
+  //       name: 'Alerts',
+  //       to: '/notifications/alerts',
+  //     },
+  //     {
+  //       component: CNavItem,
+  //       name: 'Badges',
+  //       to: '/notifications/badges',
+  //     },
+  //     {
+  //       component: CNavItem,
+  //       name: 'Modal',
+  //       to: '/notifications/modals',
+  //     },
+  //     {
+  //       component: CNavItem,
+  //       name: 'Toasts',
+  //       to: '/notifications/toasts',
+  //     },
+  //   ],
+  // },
   {
     component: CNavItem,
     name: 'Widgets',

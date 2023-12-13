@@ -1,0 +1,144 @@
+@import '../../../../scss/custom';
+.station {
+    &__heading {
+        display: flex;
+        justify-content: space-between;
+        &__title {
+            font: {
+                size: 20px;
+                weight: bold;
+            }
+        }
+        &__add-new-station-btn {
+            @include button(170px, 50px, $dark-blue);
+        }
+    }
+    &__list {
+        width: 100%;
+        margin-top: 25px;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        &__item {
+            background-color: white;
+            padding: 20px;
+            min-width: 300px;
+            height: 150px;
+            position: relative;
+            border-radius: 3px;
+            display: inline-block;
+            &__name {
+                font: {
+                    size: 17px;
+                    weight: bold;
+                }
+            }
+            &__status {
+                display: flex;
+                align-items: center;
+                div {
+                    height: 10px;
+                    width: 10px;
+                    background-color: $green;
+                    border-radius: 50%;
+                    margin-left: 14px;
+                    margin-right: 5px;
+                    margin-top: 3px;
+                }
+            }
+            &__action {
+                display: flex;
+                position: absolute;
+                bottom: 20px;
+                right: 20px;
+                &__detail-btn, &__more-btn {
+                    cursor: pointer;
+                    text-align: center;
+                    border-radius: 2px;
+                }
+                &__detail-btn {
+                    transition: all 0.3s ease;
+                    padding: 0 10px;
+                    font-size: 13px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    &:hover {
+                        background-color: rgba(0, 0, 0, 0.05);
+                        transition: all 0.3s ease;
+                    }
+                }
+                &__more-btn {
+                    margin-right: 10px;
+                }
+            }
+            transition: all 0.3s ease;
+            &:hover {
+                @extend %shadow;
+                transition: all 0.3s ease;
+            }
+        }
+    }
+}
+
+.update-station-status {
+    width: 192px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.station-creation {
+    width: 100%;
+    &__title {
+        font: {
+            size: 20px;
+            weight: bold;
+        }
+        padding: 20px;
+        padding-bottom: 0;
+    }
+    &__form {
+        padding: 20px;
+        padding-top: 10px;
+        label {
+            display: block;
+        }
+        input, select {
+            width: 100%;
+            margin-top: 7px;
+            height: 40px;
+            border: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+            padding: 0 5px;
+            transition: all 0.3s ease;
+            &:focus {
+                padding: 0 10px;
+                outline: none;
+                @extend %shadow;
+                transition: all 0.3s ease;
+            }
+        }
+        &__name, &__description, &__sensor-selection {
+            margin-top: 20px;
+        }
+    }
+    &__action {
+        background-color: rgba(0, 0, 0, 0.08);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: right;
+        margin-top: 15px;
+        &__cancel-btn {
+            margin-right: 10px;
+            @include button(100px, 40px, white);
+            color: $dark-blue;
+            &:hover {
+                filter: brightness(98%);
+            }
+        }
+        &__creation-btn {
+            @include button(120px, 40px, $dark-blue);
+        }
+    }
+}
