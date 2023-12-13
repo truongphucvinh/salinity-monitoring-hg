@@ -1,5 +1,7 @@
 import React, { useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import * as icon from '@coreui/icons'
+import CIcon from '@coreui/icons-react'
 import {
   CButton,
   CCard,
@@ -17,11 +19,10 @@ import {
   CToast,
   CToaster
 } from '@coreui/react'
-import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 import { loginAuth } from 'src/services/authentication-services'
 import * as CryptoJS from 'crypto-js'
-import {INVALID_CREDDENTIAL} from "../../../errors/LoginErrors"
+import {INVALID_CREDENTIAL} from "../../../errors/LoginErrors"
 const Login = () => {
   // Login data
   const loginData = {
@@ -41,22 +42,30 @@ const Login = () => {
       return {...prev, password: value}
     })
   }
+  // Login Validation - Fix here tomorrow
+  const [validated, setValidated] = useState(false)
   // Login Redirect
   let navigate = useNavigate() 
   // Login logic
   const secretKey = process.env.AUTH_TOKEN || 'oda_dev'
-  const onFinish = () => {
-    const loginRequest = {
-      username: username,
-      password: CryptoJS.AES.encrypt(password || '', secretKey).toString()
+  const onFinish = (e) => {
+    const form = e.currentTarget
+    if (form.checkValidity() === true) {
+      const loginRequest = {
+        username: username,
+        password: CryptoJS.AES.encrypt(password || '', secretKey).toString()
+      }
+      loginAuth(loginRequest)
+      .then(res => {
+        localStorage.setItem("_authenticatedUser", JSON.stringify(res?.data?.data))
+        navigate('/dashboard')
+      }).catch(err => {
+        addToast(exampleToast)
+      })
+    }else {
+      e.preventDefault()
+      e.stopPropagation()
     }
-    loginAuth(loginRequest)
-    .then(res => {
-      localStorage.setItem("_authenticatedUser", JSON.stringify(res?.data?.data))
-      navigate('/dashboard')
-    }).catch(err => {
-      addToast(exampleToast)
-    })
   }
   // Login Toast
   const [toast, addToast] = useState(0)
@@ -64,21 +73,10 @@ const Login = () => {
   const exampleToast = (
     <CToast>
       <CToastHeader closeButton>
-        <svg
-          className="rounded me-2"
-          width="20"
-          height="20"
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="xMidYMid slice"
-          focusable="false"
-          role="img"
-        >
-          <rect width="100%" height="100%" fill="#007aff"></rect>
-        </svg>
-        <div className="fw-bold me-auto">Xác thực</div>
-        <small>0 phút trước</small>
+      <CIcon icon={icon.cilXCircle} size="md" style={{'--ci-primary-color': 'red'}} />
+        <div className="fw-bold me-auto px-2">Xác thực</div>
       </CToastHeader>
-      <CToastBody>{INVALID_CREDDENTIAL}</CToastBody>
+      <CToastBody>{INVALID_CREDENTIAL}</CToastBody>
     </CToast>
   )
   return (
@@ -90,7 +88,7 @@ const Login = () => {
             <CCardGroup>
               <CCard className="p-4">
                 <CCardBody>
-                  <CForm onSubmit={onFinish}>
+                  <CForm noValidate validated={validated} onSubmit={(e) => onFinish(e)}>
                     <h1>Đăng nhập</h1>
                     <p className="text-body-secondary">Xác thực tài khoản của bạn</p>
                     <CInputGroup className="mb-3">
@@ -98,6 +96,8 @@ const Login = () => {
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
                       <CFormInput placeholder="Tên đăng nhập" autoComplete="username"
+                        feedbackInvalid="Vui lòng điền tên đăng nhập"
+                        required
                         value={username}
                         onChange={(e) => handleSetUsername(e.target.value)}
                       />
@@ -109,39 +109,26 @@ const Login = () => {
                       <CFormInput
                         type="password"
                         placeholder="Mật khẩu"
+                        required
+                        feedbackInvalid="Vui lòng điền mật khẩu"
                         autoComplete="current-password"
                         value={password}
                         onChange={(e) => handleSetPassword(e.target.value)}
                       />
                     </CInputGroup>
                     <CRow>
-                      <CCol xs={6}>
+                      <CCol xs>
                         <CButton color="primary"  className="px-4" type='submit'>
                           Đăng nhập
                         </CButton>
                       </CCol>
-                      <CCol xs={6} className="text-right">
-                        <CButton color="link" className="px-0">
+                      {/* <CCol xs={6} className="text-right">
+                        <CButton color="link" className="px-0 w-100" style={{'textAlign': 'right'}}>
                           Quên mật khẩu?
                         </CButton>
-                      </CCol>
+                      </CCol> */}
                     </CRow>
                   </CForm>
-                </CCardBody>
-              </CCard>
-              <CCard className="text-white bg-primary py-5" style={{ width: '44%' }}>
-                <CCardBody className="text-center">
-                  <div>
-                    <h2>Đăng ký</h2>
-                    <p>
-                      Hãy tạo một hồ sơ mới để sử dụng các dịch vụ của chúng tôi.
-                    </p>
-                    <Link to="/register">
-                      <CButton color="primary" className="mt-3" active tabIndex={-1}>
-                        Đăng ký tại đây!
-                      </CButton>
-                    </Link>
-                  </div>
                 </CCardBody>
               </CCard>
             </CCardGroup>
