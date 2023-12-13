@@ -1,4 +1,6 @@
 import axios from 'axios'
+
+
 const AUTH_API_URL = process.env.AUTH_HOST_API_URL || 'http://dev.iotlab.net.vn:5000'
 const authApi = axios.create({
     baseURL:`${AUTH_API_URL}/api/v1`,
@@ -7,8 +9,11 @@ const authApi = axios.create({
         'Content-Type': 'application/json'
     }
 })
-authApi.interceptors.request.use((config) => {
-    config.headers['Authorization'] = localStorage.getItem('_accessToken')
-    return config
-})
-export { authApi }
+const setAuthApiHeader = () => {
+    authApi.interceptors.request.use((config) => {
+        const accessToken = JSON.parse(localStorage.getItem('_authenticatedUser'))?.accessToken
+        config.headers['Authorization'] = accessToken
+        return config
+    })
+}
+export { authApi, setAuthApiHeader }

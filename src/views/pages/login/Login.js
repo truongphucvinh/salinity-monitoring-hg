@@ -23,6 +23,7 @@ import { cilLockLocked, cilUser } from '@coreui/icons'
 import { loginAuth } from 'src/services/authentication-services'
 import * as CryptoJS from 'crypto-js'
 import {INVALID_CREDENTIAL} from "../../../errors/LoginErrors"
+import { setAuthApiHeader } from 'src/services/global-axios'
 const Login = () => {
   // Login data
   const loginData = {
@@ -58,6 +59,7 @@ const Login = () => {
       loginAuth(loginRequest)
       .then(res => {
         localStorage.setItem("_authenticatedUser", JSON.stringify(res?.data?.data))
+        localStorage.setItem("_isAuthenticated", JSON.stringify(true))
         navigate('/dashboard')
       }).catch(err => {
         addToast(exampleToast)
@@ -73,7 +75,7 @@ const Login = () => {
   const exampleToast = (
     <CToast>
       <CToastHeader closeButton>
-      <CIcon icon={icon.cilXCircle} size="md" style={{'--ci-primary-color': 'red'}} />
+      <CIcon icon={icon.cilXCircle} style={{'--ci-primary-color': 'red'}} />
         <div className="fw-bold me-auto px-2">Xác thực</div>
       </CToastHeader>
       <CToastBody>{INVALID_CREDENTIAL}</CToastBody>
