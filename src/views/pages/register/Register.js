@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   CButton,
   CCard,
@@ -15,6 +15,38 @@ import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 
 const Register = () => {
+  // Register data
+  const registerData = {
+    username: '',
+    password: '',
+    confirm: '',
+    email: ''
+  }
+  const [registerState, setRegisterState] = useState(registerData)
+  const {username, password, confirm, email} = registerState
+  const handleSetUsername = (value) => {
+    setRegisterState((prev) => {
+      return {...prev, username: value}
+    })
+  }
+  const handleSetPassword = (value) => {
+    setRegisterState((prev) => {
+      return {...prev, password: value}
+    })
+  }
+  const handleSetConfirm = (value) => {
+    setRegisterState((prev) => {
+      return {...prev, confirm: value}
+    })
+  }
+  const handleSetEmail = (value) => {
+    setRegisterState((prev) => {
+      return {...prev, email: value}
+    })
+  }
+  // Register Logic
+  
+
   return (
     <div className="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
@@ -23,17 +55,23 @@ const Register = () => {
             <CCard className="mx-4">
               <CCardBody className="p-4">
                 <CForm>
-                  <h1>Register</h1>
-                  <p className="text-body-secondary">Create your account</p>
+                  <h1>Đăng ký</h1>
+                  <p className="text-body-secondary">Tạo tài khoản mới</p>
                   <CInputGroup className="mb-3">
                     <CInputGroupText>
                       <CIcon icon={cilUser} />
                     </CInputGroupText>
-                    <CFormInput placeholder="Username" autoComplete="username" />
+                    <CFormInput placeholder="Tên đăng nhập" autoComplete="username" 
+                      onChange={e => handleSetUsername(e.target.value)}
+                      value={username}
+                    />
                   </CInputGroup>
                   <CInputGroup className="mb-3">
                     <CInputGroupText>@</CInputGroupText>
-                    <CFormInput placeholder="Email" autoComplete="email" />
+                    <CFormInput placeholder="Email" autoComplete="email" 
+                      onChange={e => handleSetEmail(e.target.value)}
+                      value={email}
+                    />
                   </CInputGroup>
                   <CInputGroup className="mb-3">
                     <CInputGroupText>
@@ -41,8 +79,10 @@ const Register = () => {
                     </CInputGroupText>
                     <CFormInput
                       type="password"
-                      placeholder="Password"
+                      placeholder="Mật khẩu"
                       autoComplete="new-password"
+                      onChange={e => handleSetPassword(e.target.value)}
+                      value={password}
                     />
                   </CInputGroup>
                   <CInputGroup className="mb-4">
@@ -51,12 +91,14 @@ const Register = () => {
                     </CInputGroupText>
                     <CFormInput
                       type="password"
-                      placeholder="Repeat password"
+                      placeholder="Nhập lại mật khẩu"
                       autoComplete="new-password"
+                      onChange={e => handleSetConfirm(e.target.value)}
+                      value={confirm}
                     />
                   </CInputGroup>
                   <div className="d-grid">
-                    <CButton color="success">Create Account</CButton>
+                    <CButton color="success" type='submit'>Tạo tài khoản</CButton>
                   </div>
                 </CForm>
               </CCardBody>
