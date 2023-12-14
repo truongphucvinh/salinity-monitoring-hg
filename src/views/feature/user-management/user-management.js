@@ -32,7 +32,6 @@ const UserManagement = () => {
 
     // User Management Data
     const [listUsers, setListUsers] = useState([])
-    // Pagination
     
     // Call inital APIs
     useEffect(() => {
@@ -80,23 +79,60 @@ const UserManagement = () => {
             setFilteredUsers(listUsers)
             if (username) {
                 setFilteredUsers(prev => {
-                    return prev.filter(user => user?.username.includes(username.trim()))
+                    return prev.filter(user => user?.username?.includes(username.trim()))
                 })
             }
             if (email) {
                 setFilteredUsers(prev => {
-                    return prev.filter(user => user?.email.includes(email.trim()))
+                    return prev.filter(user => user?.email?.includes(email.trim()))
                 })
             }
             if (fullName) {
+                console.log();
                 setFilteredUsers(prev => {
-                    return prev.filter(user => user?.fullName.includes(fullName.trim()))
+                    return prev.filter(user => user?.fullName?.includes(fullName.trim()))
                 })
             }
+        }else {
+            onReset()
         }
     }
     const onReset = () => {
         setFilteredUsers(listUsers)
+    }
+    // Pagination + Filtering
+    const showFilteredTable = (filteredUsers, duration) => {
+        return (
+            <CTable bordered align="middle" className="mb-0 border" hover responsive>
+                <CTableHead className="text-nowrap">
+                  <CTableRow>
+                    <CTableHeaderCell className="bg-body-tertiary">STT</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary">Tên tài khoản</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary">Email</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary">Họ và tên</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary">Thao tác</CTableHeaderCell>
+                  </CTableRow>
+                </CTableHead>
+                <CTableBody>
+                    {
+                        filteredUsers.map((user, index) => {
+                            return (
+                                <CTableRow key={user._id}>
+                                    <CTableDataCell>{index + 1 + duration}</CTableDataCell>
+                                    <CTableDataCell>{user?.username}</CTableDataCell>
+                                    <CTableDataCell>{user?.email}</CTableDataCell>
+                                    <CTableDataCell>{user?.fullName}</CTableDataCell>
+                                    <CTableDataCell>
+                                        <CIcon icon={cilPencil} className="text-success mx-1" role="button"/>
+                                        <CIcon icon={cilTrash} className="text-danger" role="button"/>
+                                    </CTableDataCell>
+                                </CTableRow>    
+                            )
+                        })
+                    }
+                </CTableBody>
+              </CTable>
+        )
     }
 
 
@@ -118,7 +154,7 @@ const UserManagement = () => {
                         </CCol>
                         <CCol xs={3}>
                             <CFormInput
-                                type="email"
+                                type="text"
                                 placeholder="Email"
                                 onChange={(e) => handleSetEmail(e.target.value)}
                                 aria-describedby="exampleFormControlInputHelpInline"
@@ -143,39 +179,7 @@ const UserManagement = () => {
                     </CRow>
               </CForm>
               <br />
-              <CTable bordered align="middle" className="mb-0 border" hover responsive>
-                <CTableHead className="text-nowrap">
-                  <CTableRow>
-                    <CTableHeaderCell className="bg-body-tertiary">STT</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary">Tên tài khoản</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary">Email</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary">Họ và tên</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary">Thao tác</CTableHeaderCell>
-                  </CTableRow>
-                </CTableHead>
-                <CTableBody>
-                    {
-                        filteredUsers.map((user, index) => {
-                            return (
-                                <CTableRow key={user._id}>
-                                    <CTableDataCell>{index + 1}</CTableDataCell>
-                                    <CTableDataCell>{user?.username}</CTableDataCell>
-                                    <CTableDataCell>{user?.email}</CTableDataCell>
-                                    <CTableDataCell>{user?.fullName}</CTableDataCell>
-                                    <CTableDataCell>
-                                        <CIcon icon={cilPencil} className="text-success mx-1" role="button"/>
-                                        <CIcon icon={cilTrash} className="text-danger" role="button"/>
-                                    </CTableDataCell>
-                                </CTableRow>    
-                            )
-                        })
-                    }
-                </CTableBody>
-              </CTable>
-              <br />
-              {
-                filteredUsers.length > 10 ? <CustomPagination listItems={filteredUsers}/> : ""
-              }
+              <CustomPagination listItems={filteredUsers} showData={showFilteredTable} />
             </CCardBody>
           </CCard>
         </CCol>
