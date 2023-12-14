@@ -15,7 +15,8 @@ import {
     CFormInput,
     CForm,
     CPagination,
-    CPaginationItem
+    CPaginationItem,
+    CFormSelect
   } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -25,18 +26,22 @@ import {
     cilReload,
     cilPlus
   } from '@coreui/icons'
-import { getAllUsers } from "src/services/authentication-services"
+import { getAllDomains, getAllRoles, getAllUsers } from "src/services/authentication-services"
 import { setAuthApiHeader } from "src/services/global-axios"
 import CustomPagination, {currentPageData} from "src/views/customs/my-pagination"
+import CustomModal from "src/views/customs/my-modal"
 
 const UserManagement = () => {
 
     // User Management Data
     const [listUsers, setListUsers] = useState([])
+    const [listDomains, setListDomains] = useState([])
+    const [listRoles, setListRoles] = useState([])
     
     // Call inital APIs
     useEffect(() => {
         if (JSON.parse(localStorage.getItem("_isAuthenticated"))) {
+            // Setting up access token
             setAuthApiHeader()
             getAllUsers()
             .then(res => {
@@ -46,6 +51,24 @@ const UserManagement = () => {
                 setFilteredUsers(users)
             })
             .catch(err => {
+                // Do nothing
+            })
+            
+            getAllDomains()
+            .then(res => {
+                const domains = res?.data?.data?.result
+                setListDomains(domains)
+            })
+            .catch(err => {
+                // Do nothing
+            })
+
+            getAllRoles()
+            .then((res) => {
+                const roles = res?.data?.data?.result
+                setListRoles(roles)
+            })
+            .catch((err) => {
                 // Do nothing
             })
         }
@@ -107,11 +130,11 @@ const UserManagement = () => {
             <CTable bordered align="middle" className="mb-0 border" hover responsive>
                 <CTableHead className="text-nowrap">
                   <CTableRow>
-                    <CTableHeaderCell className="bg-body-tertiary">STT</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary">Tên tài khoản</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary">Email</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary">Họ và tên</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary">Thao tác</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Tên tài khoản</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Email</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Họ và tên</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Thao tác</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -135,7 +158,83 @@ const UserManagement = () => {
               </CTable>
         )
     }
-
+    // Adding Modal
+    const [addVisible, setAddVisible] = useState(false)
+    const addForm = (
+            <CForm>
+                <CRow>
+                    <CCol lg={12}>
+                        <CFormInput
+                            className="mb-4"
+                            type="text"
+                            placeholder="Tên tài khoản"
+                            onChange={(e) => handleSetUsername(e.target.value)}
+                            aria-describedby="exampleFormControlInputHelpInline"
+                        />
+                    </CCol>
+                </CRow>
+                <CRow>
+                    <CCol lg={12}>
+                        <CFormInput
+                            className="mb-4"
+                            type="password"
+                            placeholder="Mật khẩu"
+                            onChange={(e) => handleSetUsername(e.target.value)}
+                            aria-describedby="exampleFormControlInputHelpInline"
+                        />
+                    </CCol>
+                </CRow>
+                
+                <CRow>
+                    <CCol lg={12}>
+                        <CFormInput
+                            className="mb-4"
+                            type="text"
+                            placeholder="Họ và tên"
+                            onChange={(e) => handleSetUsername(e.target.value)}
+                            aria-describedby="exampleFormControlInputHelpInline"
+                        />
+                    </CCol>
+                </CRow>
+                <CRow>
+                    <CCol lg={12}>
+                        <CFormInput
+                            className="mb-4"
+                            type="email"
+                            placeholder="Email"
+                            onChange={(e) => handleSetUsername(e.target.value)}
+                            aria-describedby="exampleFormControlInputHelpInline"
+                        />
+                    </CCol>
+                </CRow>
+                <CRow>
+                    <CCol lg={12}>
+                        <CFormSelect aria-label="Default select example" className="mb-4" required>
+                            <option defaultChecked>Tổ chức</option>
+                            {
+                                listDomains.map((domain) => {
+                                    return  <option key={domain?._id} value={domain?._id}>{domain?.name}</option>
+                                })
+                            }
+                        </CFormSelect>
+                    </CCol>
+                </CRow>
+                <CRow>
+                    <CCol lg={12}>
+                        <CFormSelect aria-label="Default select example" className="mb-4" required>
+                            <option defaultChecked>Vai trò</option>
+                            {
+                                listRoles.map((role) => {
+                                    return  <option key={role?._id} value={role?._id}>{role?.name}</option>
+                                })
+                            }
+                        </CFormSelect>
+                    </CCol>
+                </CRow>
+                <CRow>
+                    <CCol lg={12} className="d-flex justify-content-end"><CButton type="submit" color="primary">Hoàn tất</CButton></CCol>
+                </CRow>
+            </CForm>)
 
     return (
         <CRow>
@@ -143,6 +242,7 @@ const UserManagement = () => {
           <CCard className="mb-4">
             <CCardHeader>Danh sách người dùng</CCardHeader>
             <CCardBody>
+                <CustomModal visible={addVisible} title={'Thêm người dùng'} body={addForm} setVisible={(value) => setAddVisible(value)}/>
                 <CForm onSubmit={onFilter}>
                     <CRow>
                         <CCol md={12} lg={3}>
@@ -185,7 +285,7 @@ const UserManagement = () => {
               <br />
               <CRow>
                 <CCol xs={12}>
-                    <CButton type="button" color="primary">Thêm <CIcon icon={cilPlus}/></CButton>
+                    <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>
                 </CCol>
               </CRow>
               <br />
