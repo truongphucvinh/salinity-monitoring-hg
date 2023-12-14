@@ -22,7 +22,8 @@ import {
     cilPencil,
     cilTrash,
     cilMagnifyingGlass,
-    cilReload
+    cilReload,
+    cilPlus
   } from '@coreui/icons'
 import { getAllUsers } from "src/services/authentication-services"
 import { setAuthApiHeader } from "src/services/global-axios"
@@ -144,40 +145,49 @@ const UserManagement = () => {
             <CCardBody>
                 <CForm onSubmit={onFilter}>
                     <CRow>
-                        <CCol xs={3}>
+                        <CCol md={12} lg={3}>
                             <CFormInput
+                                className="mb-2"
                                 type="text"
                                 placeholder="Tên tài khoản"
                                 onChange={(e) => handleSetUsername(e.target.value)}
                                 aria-describedby="exampleFormControlInputHelpInline"
                             />
                         </CCol>
-                        <CCol xs={3}>
+                        <CCol md={12} lg={3}>
                             <CFormInput
+                                className="mb-2"
                                 type="text"
                                 placeholder="Email"
                                 onChange={(e) => handleSetEmail(e.target.value)}
                                 aria-describedby="exampleFormControlInputHelpInline"
                             />
                         </CCol>
-                        <CCol xs={3}>
+                        <CCol md={12} lg={3}>
                             <CFormInput
+                                className="mb-2"
                                 type="text"
                                 placeholder="Họ và tên"
                                 onChange={(e) => handleSetFullName(e.target.value)}
                                 aria-describedby="exampleFormControlInputHelpInline"
                             />
                         </CCol>
-                        <CCol xs={3}>
-                            <CButton color="primary" type="submit">
+                        <CCol md={12} lg={3}>
+                            <CButton color="primary" className="me-2 " type="submit">
                                 <CIcon icon={cilMagnifyingGlass} className="text-white"/>                             
                             </CButton>
-                            <CButton color="success" className="mx-2" onClick={onReset}>
+                            <CButton color="success" onClick={onReset}>
                                 <CIcon icon={cilReload} className="text-white"/>   
                             </CButton>
                         </CCol>
                     </CRow>
               </CForm>
+              <br />
+              <CRow>
+                <CCol xs={12}>
+                    <CButton type="button" color="primary">Thêm <CIcon icon={cilPlus}/></CButton>
+                </CCol>
+              </CRow>
               <br />
               <CustomPagination listItems={filteredUsers} showData={showFilteredTable} />
             </CCardBody>
