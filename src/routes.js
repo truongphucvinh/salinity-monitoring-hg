@@ -49,9 +49,11 @@ const Modals = React.lazy(() => import('./views/notifications/modals/Modals'))
 const Toasts = React.lazy(() => import('./views/notifications/toasts/Toasts'))
 
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
+const UserManagement = React.lazy(() => import('./views/feature/user-management/user-management'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
+  { path: '/user-management', name: 'Quản lý người dùng', element: UserManagement },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },
