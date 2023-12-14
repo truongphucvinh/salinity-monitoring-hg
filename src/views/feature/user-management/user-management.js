@@ -13,7 +13,9 @@ import {
     CTableDataCell,
     CButton,
     CFormInput,
-    CForm
+    CForm,
+    CPagination,
+    CPaginationItem
   } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -24,12 +26,14 @@ import {
   } from '@coreui/icons'
 import { getAllUsers } from "src/services/authentication-services"
 import { setAuthApiHeader } from "src/services/global-axios"
-
+import CustomPagination, {currentPageData} from "src/views/customs/my-pagination"
 
 const UserManagement = () => {
 
     // User Management Data
     const [listUsers, setListUsers] = useState([])
+    // Pagination
+    
     // Call inital APIs
     useEffect(() => {
         if (JSON.parse(localStorage.getItem("_isAuthenticated"))) {
@@ -46,6 +50,7 @@ const UserManagement = () => {
             })
         }
     },[])
+
     // Searching data
     const [filteredUsers, setFilteredUsers] = useState([])
     const initSearch = {
@@ -71,25 +76,29 @@ const UserManagement = () => {
         })
     }
     const onFilter = () => {
-        if (username) {
-            setFilteredUsers(prev => {
-                return prev.filter(user => user?.username === username.trim())
-            })
-        }
-        if (email) {
-            setFilteredUsers(prev => {
-                return prev.filter(user => user?.email === email.trim())
-            })
-        }
-        if (fullName) {
-            setFilteredUsers(prev => {
-                return prev.filter(user => user?.fullName === fullName.trim())
-            })
+        if (username || email || fullName) {
+            setFilteredUsers(listUsers)
+            if (username) {
+                setFilteredUsers(prev => {
+                    return prev.filter(user => user?.username.includes(username.trim()))
+                })
+            }
+            if (email) {
+                setFilteredUsers(prev => {
+                    return prev.filter(user => user?.email.includes(email.trim()))
+                })
+            }
+            if (fullName) {
+                setFilteredUsers(prev => {
+                    return prev.filter(user => user?.fullName.includes(fullName.trim()))
+                })
+            }
         }
     }
     const onReset = () => {
         setFilteredUsers(listUsers)
     }
+
 
     return (
         <CRow>
@@ -163,6 +172,10 @@ const UserManagement = () => {
                     }
                 </CTableBody>
               </CTable>
+              <br />
+              {
+                filteredUsers.length > 10 ? <CustomPagination listItems={filteredUsers}/> : ""
+              }
             </CCardBody>
           </CCard>
         </CCol>
