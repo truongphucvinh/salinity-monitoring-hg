@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import {
     CCard,
     CCardBody,
@@ -14,8 +14,7 @@ import {
     CButton,
     CFormInput,
     CForm,
-    CPagination,
-    CPaginationItem,
+    CToaster,
     CFormSelect
   } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
@@ -26,10 +25,12 @@ import {
     cilReload,
     cilPlus
   } from '@coreui/icons'
-import { getAllDomains, getAllRoles, getAllUsers } from "src/services/authentication-services"
+import { createUser, getAllDomains, getAllRoles, getAllUsers } from "src/services/authentication-services"
 import { setAuthApiHeader } from "src/services/global-axios"
 import CustomPagination, {currentPageData} from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
+import createToast from "src/views/customs/my-toast"
+import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 
 const UserManagement = () => {
 
@@ -37,6 +38,7 @@ const UserManagement = () => {
     const [listUsers, setListUsers] = useState([])
     const [listDomains, setListDomains] = useState([])
     const [listRoles, setListRoles] = useState([])
+    const [isReset, setIsReset] = useState(false)
     
     // Call inital APIs
     useEffect(() => {
@@ -72,7 +74,7 @@ const UserManagement = () => {
                 // Do nothing
             })
         }
-    },[])
+    },[isReset])
 
     // Searching data
     const [filteredUsers, setFilteredUsers] = useState([])
@@ -124,6 +126,11 @@ const UserManagement = () => {
     const onReset = () => {
         setFilteredUsers(listUsers)
     }
+    // Toast
+    const [toast, addToast] = useState(0)
+    const toaster = useRef()
+
+
     // Pagination + Filtering
     const showFilteredTable = (filteredUsers, duration) => {
         return (
@@ -159,16 +166,84 @@ const UserManagement = () => {
         )
     }
     // Adding Modal
+    const addData = {
+        addUsername: '',
+        addPassword: '',
+        addFullname: '',
+        addEmail: '',
+        addDomainId: '',
+        addRoleId: ''
+    }
+    const [addState, setAddState] = useState(addData)
+    const { addUsername, addPassword, addFullname, addEmail, addDomainId, addRoleId } = addState
+    const handleSetAddUsername = (value) => {
+        setAddState(prev => {
+            return { ...prev, addUsername: value }
+        })
+    }
+    const handleSetAddPassword = (value) => {
+        setAddState(prev => {
+            return { ...prev, addPassword: value }
+        })
+    }
+    const handleSetAddFullname = (value) => {
+        setAddState(prev => {
+            return { ...prev, addFullname: value }
+        })
+    }
+    const handleSetAddEmail = (value) => {
+        setAddState(prev => {
+            return { ...prev, addEmail: value }
+        })
+    }
+    const handleSetAddDomainId = (value) => {
+        setAddState(prev => {
+            return { ...prev, addDomainId: value }
+        })
+    }
+    const handleSetAddRoleId = (value) => {
+        setAddState(prev => {
+            return { ...prev, addRoleId: value }
+        })
+    }
+    const createNewUser = () => {
+        const user = {
+            username: addUsername,
+            fullName: addFullname,
+            password: addPassword,
+            email: addEmail,
+            domain: addDomainId,
+            role: addRoleId
+        }
+        createUser(user)
+        .then(res => {
+            setAddVisible(false)
+            setIsReset(prev => {return !prev.isReset})
+            addToast(createToast({
+                title: 'Thêm người dùng',
+                content: 'Thêm người dùng thành công',
+                icon: createSuccessIcon()
+            }))
+        })
+        .catch(err => {
+            addToast(createToast({
+                title: 'Thêm người dùng',
+                content: 'Thêm người dùng không thành công',
+                icon: createFailIcon()
+            }))
+        })
+    }
+
     const [addVisible, setAddVisible] = useState(false)
     const addForm = (
-            <CForm>
+            <CForm onSubmit={createNewUser}>
                 <CRow>
                     <CCol lg={12}>
                         <CFormInput
                             className="mb-4"
                             type="text"
                             placeholder="Tên tài khoản"
-                            onChange={(e) => handleSetUsername(e.target.value)}
+                            onChange={(e) => handleSetAddUsername(e.target.value)}
                             aria-describedby="exampleFormControlInputHelpInline"
                         />
                     </CCol>
@@ -179,19 +254,18 @@ const UserManagement = () => {
                             className="mb-4"
                             type="password"
                             placeholder="Mật khẩu"
-                            onChange={(e) => handleSetUsername(e.target.value)}
+                            onChange={(e) => handleSetAddPassword(e.target.value)}
                             aria-describedby="exampleFormControlInputHelpInline"
                         />
                     </CCol>
                 </CRow>
-                
                 <CRow>
                     <CCol lg={12}>
                         <CFormInput
                             className="mb-4"
                             type="text"
                             placeholder="Họ và tên"
-                            onChange={(e) => handleSetUsername(e.target.value)}
+                            onChange={(e) => handleSetAddFullname(e.target.value)}
                             aria-describedby="exampleFormControlInputHelpInline"
                         />
                     </CCol>
@@ -202,14 +276,14 @@ const UserManagement = () => {
                             className="mb-4"
                             type="email"
                             placeholder="Email"
-                            onChange={(e) => handleSetUsername(e.target.value)}
+                            onChange={(e) => handleSetAddEmail(e.target.value)}
                             aria-describedby="exampleFormControlInputHelpInline"
                         />
                     </CCol>
                 </CRow>
                 <CRow>
                     <CCol lg={12}>
-                        <CFormSelect aria-label="Default select example" className="mb-4" required>
+                        <CFormSelect aria-label="Default select example" className="mb-4" onChange={(e) => handleSetAddDomainId(e.target.value)} required>
                             <option defaultChecked>Tổ chức</option>
                             {
                                 listDomains.map((domain) => {
@@ -221,7 +295,7 @@ const UserManagement = () => {
                 </CRow>
                 <CRow>
                     <CCol lg={12}>
-                        <CFormSelect aria-label="Default select example" className="mb-4" required>
+                        <CFormSelect aria-label="Default select example" className="mb-4" onChange={(e) => handleSetAddRoleId(e.target.value)} required>
                             <option defaultChecked>Vai trò</option>
                             {
                                 listRoles.map((role) => {
@@ -232,14 +306,17 @@ const UserManagement = () => {
                     </CCol>
                 </CRow>
                 <CRow>
-                    <CCol lg={12} className="d-flex justify-content-end"><CButton type="submit" color="primary">Hoàn tất</CButton></CCol>
+                    <CCol lg={12} className="d-flex justify-content-end">
+                        <CButton type="submit" color="primary">Hoàn tất</CButton>
+                    </CCol>
                 </CRow>
             </CForm>)
-
+ 
     return (
         <CRow>
         <CCol xs>
           <CCard className="mb-4">
+            <CToaster ref={toaster} push={toast} placement="top-end" />
             <CCardHeader>Danh sách người dùng</CCardHeader>
             <CCardBody>
                 <CustomModal visible={addVisible} title={'Thêm người dùng'} body={addForm} setVisible={(value) => setAddVisible(value)}/>
