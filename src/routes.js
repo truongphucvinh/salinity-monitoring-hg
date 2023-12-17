@@ -50,9 +50,11 @@ const Toasts = React.lazy(() => import('./views/notifications/toasts/Toasts'))
 
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 const UserManagement = React.lazy(() => import('./views/feature/user-management/user-management'))
+const DamManagement = React.lazy(() => import('./views/feature/dam-management/dam-management'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
+  { path: '/dam-management', name: 'Quản lý đặp ngăn mặn', element: DamManagement },  
   { path: '/user-management', name: 'Quản lý người dùng', element: UserManagement },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
