@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useLayoutEffect } from 'react'
 import * as React from 'react';
 import './StationList.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -20,8 +20,39 @@ import Backdrop from '@mui/material/Backdrop';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 
+//select chip
+import { useTheme } from '@mui/material/styles';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
 
+//select chip
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+// const MenuProps = {
+//   PaperProps: {
+//     style: {
+//       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+//       width: 250,
+//     },
+//   },
+// };
+
+const names = [
+  'Oliver Hansen',
+  'Van Henry',
+  'April Tucker',
+  'Ralph Hubbard',
+  'Omar Alexander',
+  'Carlos Abbott',
+  'Miriam Wagner',
+  'Bradley Wilkerson',
+  'Virginia Andrews',
+  'Kelly Snyder',
+];
 
 const StationList = () => {
     
@@ -48,6 +79,27 @@ const StationList = () => {
     width: 450,
     bgcolor: 'background.paper',
     p: 0,
+    select: {
+      '.MuiOutlinedInput-notchedOutline': {
+        border: 'none',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.5)',
+        borderRadius: '0px',
+        borderColor: 'rgba(0, 0, 0, 0.5)'
+      },
+      '&:hover .MuiOutlinedInput-notchedOutline': {
+        border: 'none',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.5)',
+        borderColor: 'rgba(0, 0, 0, 0.5)'
+        
+      },
+      '&:focus .MuiOutlinedInput-notchedOutline': {
+        outline: 'none',
+        borderColor: 'rgba(0, 0, 0, 0.5)'
+      },
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        borderColor: 'rgba(0, 0, 0, 0.5)',
+      },
+    },
   };
 
   const [stationList, setStationList] = useState([
@@ -81,10 +133,51 @@ const StationList = () => {
     },
   ]);
 
+  //select chip
+  const theme = useTheme();
+  const [personName, setPersonName] = React.useState([]);
+
+  const handleChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setPersonName(
+      // On autofill we get a stringified value.
+      typeof value === 'string' ? value.split(',') : value,
+    );
+  };
+
+
+  const [station, setStation] = useState({
+    stationName: '',
+    stationDescription: ''
+  })
+
+  useLayoutEffect(() => {
+
+  })
+
+  //truyen du lieu giua 2 sibling, use context; singleton 
+  //useRef, useMemo, react memo, useCallback
+
+  useEffect(() => {
+
+  }, [])
+
   const handelSubmit = (e) => {
     e.preventDefault();
     const data = new FormData(e.target);
     console.log("form: ", Object.fromEntries(data.entries()));
+    console.log("target: ", e.target);
+    console.log("person name: ", personName);
+  }
+
+  const handleChangeForm = (e) => {
+    setStation(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }))
+    console.log("handelChangeInput: ", station);
   }
 
     return (
@@ -214,19 +307,37 @@ const StationList = () => {
                     <div className="station-creation__form">
                       <div className="station-creation__form__name">
                         <label htmlFor="name">Tên</label>
-                        <input id='name' name="name" type="text" />
+                        <input id='name' name="stationName" type="text" onChange={handleChangeForm} />
                       </div>
                       <div className="station-creation__form__description">
                         <label htmlFor="description">Mô tả</label>
-                        <input id='description' name="description" type="text" />
+                        <input id='description' name="stationDescription" type="text" onChange={handleChangeForm} />
                       </div>
                       <div className="station-creation__form__sensor-selection">
                         <label htmlFor="sensor">Cảm biến</label>
-                        <select name="" id="">
-                          <option value="">123abc</option>
-                          <option value="">123abc</option>
-                          <option value="">123abc</option>
-                        </select>
+                        <FormControl sx={{ m: 1, width: 410 }}>
+                          {/* <InputLabel id="demo-multiple-name-label">Name</InputLabel> */}
+                          <Select
+                            labelId="demo-multiple-name-label"
+                            id="demo-multiple-name"
+                            multiple
+                            value={personName}
+                            onChange={handleChange}
+                            sx={style.select}
+                            input={<OutlinedInput label="Name" />}
+                            // MenuProps={MenuProps}
+                          >
+                            {names.map((name) => (
+                              <MenuItem
+                                key={name}
+                                value={name}
+                                // style={getStyles(name, personName, theme)}
+                              >
+                                {name}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
                       </div>
                     </div>
                     <div className="station-creation__action">
@@ -241,6 +352,10 @@ const StationList = () => {
                 </Box>
               </Fade>
             </Modal>
+
+            {/* sensor list modal */}
+            
+
 
         </>
     )

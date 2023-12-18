@@ -104,7 +104,7 @@
         label {
             display: block;
         }
-        input, select {
+        input, select, Select {
             width: 100%;
             margin-top: 7px;
             height: 40px;
@@ -140,5 +140,34 @@
         &__creation-btn {
             @include button(120px, 40px, $dark-blue);
         }
+    }
+}
+
+.css-1c8mypd-MuiFormControl-root {
+    width: 300px !important;
+    padding: 0;
+    margin: 0 !important;
+    border: none !important; 
+}
+
+.css-ppxnyn-MuiFormControl-root {
+    margin: 0 !important;
+}
+
+.css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input .css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input .css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+    margin: 0;
+    border: none !important;
+}
+
+#demo-multiple-name {
+    border: none !important;
+    outline: none !important;
+}
+
+.css-9ddj71-MuiInputBase-root-MuiOutlinedInput-root {
+    border: none !important;
+    outline: none !important;
+    &:focus {
+        outline: none !important;
     }
 }

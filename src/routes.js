@@ -50,6 +50,7 @@ const Toasts = React.lazy(() => import('./views/notifications/toasts/Toasts'))
 
 //sensor
 const StationList = React.lazy(() => import('./views/feature/sensor-view/station-list/StationList'))
+const StationDetail = React.lazy(() => import('./views/feature/sensor-view/station-detail/StationDetail'))
 
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
@@ -98,7 +99,9 @@ const routes = [
   { path: '/notifications/modals', name: 'Modals', element: Modals },
   { path: '/notifications/toasts', name: 'Toasts', element: Toasts },
   { path: '/widgets', name: 'Widgets', element: Widgets },
+
   { path: '/station-list', name: 'StationList', element: StationList },
+  { path: '/station-detail', name: 'StationDetail', element: StationDetail}
 ]
 
 export default routes
