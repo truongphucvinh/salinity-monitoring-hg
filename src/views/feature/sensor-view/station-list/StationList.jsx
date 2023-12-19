@@ -27,19 +27,20 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
+//service
+import multiDataStream from 'src/services/multi-data-stream';
+import stationService from 'src/services/station';
+import thingService from 'src/services/thing'
+import { Accordion } from '@mui/material';
+
+//bootstrap
+import { Spinner } from 'react-bootstrap';
+
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
 
 //select chip
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
-// const MenuProps = {
-//   PaperProps: {
-//     style: {
-//       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-//       width: 250,
-//     },
-//   },
-// };
 
 const names = [
   'Oliver Hansen',
@@ -102,36 +103,7 @@ const StationList = () => {
     },
   };
 
-  const [stationList, setStationList] = useState([
-    {
-      name: 'Tram so 1',
-      status: true
-    },
-    {
-      name: 'Tram so 2',
-      status: true
-    },
-    {
-      name: 'Tram so 3',
-      status: true
-    },
-    {
-      name: 'Tram so 4',
-      status: true
-    },
-    {
-      name: 'Tram so 5',
-      status: true
-    },
-    {
-      name: 'Tram so 6',
-      status: true
-    },
-    {
-      name: 'Tram so 7',
-      status: true
-    },
-  ]);
+  const [stationList, setStationList] = useState([]);
 
   //select chip
   const theme = useTheme();
@@ -148,10 +120,20 @@ const StationList = () => {
   };
 
 
-  const [station, setStation] = useState({
-    stationName: '',
-    stationDescription: ''
+  const [newStation, setNewStation] = useState({
+    name: '',
+    description: '',
+    node: 'test node',
+    status: 'Active'
   })
+  const [newThing, setNewThing] = useState({
+    name: '',
+    description: '',
+    locationId: 0
+  })
+  const [stationCreationLoading, setStationCreationLoading] = useState(false);
+  const [stationListLoading, setStationListLoading] = useState(true);
+  const [stationListChange, setStationListChange] = useState(false);
 
   useLayoutEffect(() => {
 
@@ -161,23 +143,57 @@ const StationList = () => {
   //useRef, useMemo, react memo, useCallback
 
   useEffect(() => {
+    setStationListLoading (true);
+    stationService.getStationList()
+      .then((res) => {
+        setStationList(res);
+      })
+      .then(() => {
+        setStationListLoading(false);
+      })
+      .catch((error) => {
+        console.log("error: ", error);
+      })
+  }, [stationListChange])
 
-  }, [])
-
-  const handelSubmit = (e) => {
-    e.preventDefault();
-    const data = new FormData(e.target);
-    console.log("form: ", Object.fromEntries(data.entries()));
-    console.log("target: ", e.target);
-    console.log("person name: ", personName);
-  }
-
-  const handleChangeForm = (e) => {
-    setStation(prev => ({
+  const handleChangeStationCreationForm = (e) => {
+    setNewStation(prev => ({
       ...prev,
       [e.target.name]: e.target.value
     }))
-    console.log("handelChangeInput: ", station);
+  }
+
+  const handelCreateStation = (e) => {
+    e.preventDefault();
+    setStationCreationLoading(true);
+    //create thing
+    newThing.name = newStation.name;
+    newThing.description = newStation.description;
+
+    console.log("new thing: ", newThing);
+
+    thingService.createThing(newThing)
+      .then((res) => {
+        //create station
+        stationService.createStation(res.data.id, newStation)
+        .then((resStation) => {
+          console.log("station res: ", resStation);
+          
+          //link sensor here
+          //...
+        })
+        .then(() => {
+          setStationCreationLoading(false);
+          handleCloseCreateStationModal();
+          setStationListChange(!stationListChange);
+        })
+        .catch((error) => {
+          console.log("station error: ", error);
+        })
+      })
+      .catch((error) => {
+        console.log("thing error: ", error);
+      })
   }
 
     return (
@@ -185,7 +201,13 @@ const StationList = () => {
             <div className="station">
                 <div className="station__heading">
                     <div className="station__heading__title">
-                        Danh sách trạm đo mặn
+                        Danh sách trạm đo mặn  
+                        {
+                          stationListLoading && 
+                          <Spinner animation="border" role="status" style={{height: '15px', width: '15px', color: 'black', marginLeft: '10px'}}>
+                            <span className="visually-hidden">Loading...</span>
+                          </Spinner>
+                        }
                     </div>
                     <div className="station__heading__add-new-station-btn" onClick={handleOpenCreateStationModal}>
                         Thêm trạm mới
@@ -193,15 +215,17 @@ const StationList = () => {
                 </div>
                 <div className="station__list">
                     {
-                      stationList.map((station, index) => {
+                      !stationListLoading && stationList.map((station, index) => {
                         return <div key={index} className="station__list__item">
                         <div className="station__list__item__name">
-                            { station.name}
+                            { station.station.name}
                         </div>
                         <div className="station__list__item__status">
                             <span>Trang thai: </span>
                             <div></div>
-                            <span>Dang hoat dong</span>
+                            {
+                              station.station.status ? <span>Đang hoạt động</span> : <span>Trạm đang khóa</span>
+                            }
                         </div>
                         <div className="station__list__item__action">
                             <div className="station__list__item__action__more-btn">
@@ -300,18 +324,18 @@ const StationList = () => {
             >
               <Fade in={openCreateStationModal}>
                 <Box sx={style}>
-                  <form className="station-creation" onSubmit={handelSubmit}>
+                  <form className="station-creation" onSubmit={handelCreateStation}>
                     <div className="station-creation__title">
                       Thêm trạm đo mặn
                     </div>
                     <div className="station-creation__form">
                       <div className="station-creation__form__name">
                         <label htmlFor="name">Tên</label>
-                        <input id='name' name="stationName" type="text" onChange={handleChangeForm} />
+                        <input id='name' name="name" type="text" onChange={handleChangeStationCreationForm} />
                       </div>
                       <div className="station-creation__form__description">
                         <label htmlFor="description">Mô tả</label>
-                        <input id='description' name="stationDescription" type="text" onChange={handleChangeForm} />
+                        <input id='description' name="description" type="text" onChange={handleChangeStationCreationForm} />
                       </div>
                       <div className="station-creation__form__sensor-selection">
                         <label htmlFor="sensor">Cảm biến</label>
@@ -345,7 +369,14 @@ const StationList = () => {
                         Hủy
                       </div>
                       <button className="station-creation__action__creation-btn">
-                        Tạo trạm
+                        {
+                          stationCreationLoading ? 
+                          <Spinner animation="border" role="status" style={{height: '15px', width: '15px', color: 'white'}}>
+                            <span className="visually-hidden">Loading...</span>
+                          </Spinner>
+                          :
+                          <span>Tạo trạm</span>
+                        }
                       </button>
                     </div>
                   </form>
@@ -354,9 +385,9 @@ const StationList = () => {
             </Modal>
 
             {/* sensor list modal */}
-            
 
 
+            {/*  */}
         </>
     )
        

@@ -11,6 +11,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendar } from "@fortawesome/free-regular-svg-icons";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
 //chart
 import { CCard, CCardBody, CCol, CCardHeader, CRow } from '@coreui/react'
@@ -114,46 +115,36 @@ const StationDetail = () => {
                 </div>
             </div>
             <div className="station-detail__date-selection">
-                {/* <input type="date" name="" id="" />
-                <input type="date" name="" id="" /> */}
-                {/* <label htmlFor="">Khoảng thời gian</label> */}
-                <div className="station-detail__date-selection__show-by">
-                    {/* <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={age}
-                        label="Age"
-                        onChange={handleChange}
-                    >
-                        <MenuItem value={10}>Ten</MenuItem>
-                        <MenuItem value={20}>Twenty</MenuItem>
-                        <MenuItem value={30}>Thirty</MenuItem>
-                    </Select> */}
-                    Hiển thị theo 
-                    <select name="" id="">
-                        <option value="">ngày</option>
-                        <option value="">ngày</option>
-                        <option value="">ngày</option>
-                    </select>
+                <div className="station-detail__date-selection__left">
+                    <div className="station-detail__date-selection__show-by">
+                        Hiển thị theo 
+                        <select name="" id="">
+                            <option value="">giờ</option>
+                            <option value="">ngày</option>
+                            <option value="">tuần</option>
+                        </select>
+                    </div>
+                    <div className="station-detail__date-selection__period">
+                        <FontAwesomeIcon icon={faCalendar} style={{height: '20px', width: '20px'}}/>
+                        <DatePicker
+                            selectsRange={true}
+                            startDate={startDate}
+                            endDate={endDate}
+                            onChange={(update) => {
+                                setDateRange(update);
+                            }}
+                            isClearable={false}
+                        />
+                    </div>
+                    <div className="station-detail__date-selection__filter-btn">
+                        Lọc
+                    </div>
+                    </div>
+                    <div className="station-detail__date-selection__download-btn">
+                        <FontAwesomeIcon icon={faDownload}/>        
+                        <span>Tải xuống excel</span>
+                    </div>
                 </div>
-                <div className="station-detail__date-selection__period">
-                    <FontAwesomeIcon icon={faCalendar} style={{height: '20px', width: '20px'}}/>
-                    <DatePicker
-                        selectsRange={true}
-                        startDate={startDate}
-                        endDate={endDate}
-                        onChange={(update) => {
-                            setDateRange(update);
-                        }}
-                        isClearable={false}
-                    />
-                </div>
-                
-                <div className="station-detail__date-selection__filter-btn">
-                    Lọc
-                </div>
-            </div>
-            
             <div className="station-detail__content">
                 <div className="station-detail__content__table">
                     <table>
@@ -184,41 +175,17 @@ const StationDetail = () => {
                     </table>
                 </div>
                 <div className="station-detail__content__chart">
-                    <div className="station-detail__content__chart__title">
-                        Biểu đồ độ mặn
+                    <div className="station-detail__content__chart__heading">
+                        <div className="station-detail__content__chart__heading__title">
+                            Biểu đồ độ mặn
+                        </div>
+                        <div className="station-detail__content__chart__heading__download-btn">
+                            <FontAwesomeIcon icon={faDownload}/>        
+                            {/* <span>Tải xuống</span> */}
+                        </div>
                     </div>
                     <div className="station-detail__content__chart__chart">
-                    <Line options={options} data={data} />
-                    {/* <CCol xs={6}> */}
-                        {/* <CCard className="mb-4"> */}
-                        {/* <CCardHeader>Line Chart</CCardHeader> */}
-                            {/* <CCardBody> */}
-                                {/* <CChartLine
-                                data={{
-                                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                                    datasets: [
-                                    {
-                                        label: 'My First dataset',
-                                        backgroundColor: 'rgba(220, 220, 220, 0.2)',
-                                        borderColor: 'rgba(220, 220, 220, 1)',
-                                        pointBackgroundColor: 'rgba(220, 220, 220, 1)',
-                                        pointBorderColor: '#fff',
-                                        data: [random(), random(), random(), random(), random(), random(), random()],
-                                    },
-                                    {
-                                        label: 'My Second dataset',
-                                        backgroundColor: 'rgba(151, 187, 205, 0.2)',
-                                        borderColor: 'rgba(151, 187, 205, 1)',
-                                        pointBackgroundColor: 'rgba(151, 187, 205, 1)',
-                                        pointBorderColor: '#fff',
-                                        data: [random(), random(), random(), random(), random(), random(), random()],
-                                    },
-                                    ],
-                                }}
-                                /> */}
-                            {/* </CCardBody>
-                            </CCard>
-                        </CCol> */}
+                        <Line options={options} data={data}/>
                     </div>
                 </div>
             </div>

@@ -14,11 +14,15 @@
     &__date-selection {
         margin-top: 20px;
         display: flex;
+        justify-content: space-between;
         align-items: center;
         padding: 15px;
         background-color: white;
         @extend %shadow;
         border-radius: 3px;
+        &__left {
+            display: flex;
+        }
         &__period {            
             margin-left: 20px;
             display: flex;
@@ -28,6 +32,7 @@
             border: 1px solid rgba(0, 0, 0, 0.5);
             border-radius: 3px;
             width: 270px;
+            position: relative;
             .react-datepicker__close-icon {
                 display: none !important;
             }
@@ -70,6 +75,12 @@
             margin-left: 20px;
             @include button(100px, 40px, $dark-blue);
         }
+        &__download-btn  {
+            cursor: pointer;
+            span {
+                margin-left: 8px;
+            }
+        }
     }
     &__content {
         width: 100%;
@@ -102,13 +113,15 @@
         }
         &__chart {
             width: 69%;
-            // border: 1px solid red;
             background-color: white;
-            &__title {
-                padding: 10px;
-                // background-color: rgba(0, 0, 0, 0.1);
-                font: {
-                    weight: bold;
+            &__heading {
+                display: flex;
+                justify-content: space-between;
+                padding: 20px;
+                &__title {
+                    font: {
+                        weight: bold;
+                    }
                 }
             }
             &__chart {
