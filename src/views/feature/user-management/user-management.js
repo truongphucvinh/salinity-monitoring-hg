@@ -38,10 +38,9 @@ const UserManagement = () => {
     const [listUsers, setListUsers] = useState([])
     const [listDomains, setListDomains] = useState([])
     const [listRoles, setListRoles] = useState([])
-    const [isReset, setIsReset] = useState(false)
     
     // Call inital APIs
-    useEffect(() => {
+    const rebaseAllData = () => {
         if (JSON.parse(localStorage.getItem("_isAuthenticated"))) {
             // Setting up access token
             setAuthApiHeader()
@@ -74,7 +73,10 @@ const UserManagement = () => {
                 // Do nothing
             })
         }
-    },[isReset])
+    }
+    useEffect(() => {
+       rebaseAllData()
+    },[])
 
     // Searching data
     const [filteredUsers, setFilteredUsers] = useState([])
@@ -232,25 +234,32 @@ const UserManagement = () => {
             }
             createUser(user)
             .then(res => {
-                setAddVisible(false)
-                setIsReset(prev => {return !prev.isReset})
-                addToast(createToast({
-                    title: 'Thêm người dùng',
-                    content: 'Thêm người dùng thành công',
-                    icon: createSuccessIcon()
-                }))
-                setValidated(false)
+                if (res?.data?.success)  {
+                    setAddVisible(false)
+                    rebaseAllData()
+                    addToast(createToast({
+                        title: 'Thêm người dùng',
+                        content: 'Thêm người dùng thành công',
+                        icon: createSuccessIcon()
+                    }))
+                    setValidated(false)
+                }else {
+                    addToast(createToast({
+                        title: 'Thêm người dùng',
+                        content: res?.data?.message,
+                        icon: createFailIcon()
+                    }))
+                }
             })
             .catch(err => {
                 addToast(createToast({
                     title: 'Thêm người dùng',
-                    content: 'Thêm người dùng không thành công',
+                    content: "Thêm người dùng không thành công",
                     icon: createFailIcon()
                 }))
             })  
         }
         setValidated(true)
-        
     }
 
     const [addVisible, setAddVisible] = useState(false)

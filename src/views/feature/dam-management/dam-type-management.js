@@ -27,15 +27,15 @@ import {
   } from '@coreui/icons'
 import { createUser, getAllDomains, getAllRoles, getAllUsers } from "src/services/authentication-services"
 import { setAuthApiHeader } from "src/services/global-axios"
-import CustomPagination, {currentPageData} from "src/views/customs/my-pagination"
+import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 
-const DamManagement = () => {
+const DamTypeManagement = () => {
 
     // User Management Data
-    const [listUsers, setListUsers] = useState([])
+    const [listDamTypes, setlistDamTypes] = useState([])
     const [listDomains, setListDomains] = useState([])
     const [listRoles, setListRoles] = useState([])
     const [isReset, setIsReset] = useState(false)
@@ -49,7 +49,7 @@ const DamManagement = () => {
             .then(res => {
                 // Install filter users here
                 const users = res?.data?.data?.result
-                setListUsers(users)
+                setlistDamTypes(users)
                 setFilteredUsers(users)
             })
             .catch(err => {
@@ -102,7 +102,7 @@ const DamManagement = () => {
     }
     const onFilter = () => {
         if (username || email || fullName) {
-            setFilteredUsers(listUsers)
+            setFilteredUsers(listDamTypes)
             if (username) {
                 setFilteredUsers(prev => {
                     return prev.filter(user => user?.username?.includes(username.trim()))
@@ -124,7 +124,7 @@ const DamManagement = () => {
         }
     }
     const onReset = () => {
-        setFilteredUsers(listUsers)
+        setFilteredUsers(listDamTypes)
     }
     // Toast
     const [toast, addToast] = useState(0)
@@ -417,4 +417,4 @@ const DamManagement = () => {
     )
 }
 
-export default DamManagement
+export default DamTypeManagement
