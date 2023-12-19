@@ -25,9 +25,9 @@ import {
     cilReload,
     cilPlus
   } from '@coreui/icons'
-import { createUser, getAllDomains, getAllRoles, getAllUsers } from "src/services/authentication-services"
+import { createUser, getAllDomains, getAllRoles, getAllUsers, getUserById, updateUser } from "src/services/authentication-services"
 import { setAuthApiHeader } from "src/services/global-axios"
-import CustomPagination, {currentPageData} from "src/views/customs/my-pagination"
+import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
@@ -156,7 +156,11 @@ const UserManagement = () => {
                                     <CTableDataCell>{user?.email}</CTableDataCell>
                                     <CTableDataCell>{user?.fullName}</CTableDataCell>
                                     <CTableDataCell>
-                                        <CIcon icon={cilPencil} className="text-success mx-1" role="button"/>
+                                        <CIcon icon={cilPencil} onClick={() => {
+                                            setUpdateVisible(true)
+                                            handleSetUpdateId(user?._id)
+                                            getUserDataById()
+                                        }} className="text-success mx-1" role="button"/>
                                         <CIcon icon={cilTrash} className="text-danger" role="button"/>
                                     </CTableDataCell>
                                 </CTableRow>    
@@ -178,15 +182,7 @@ const UserManagement = () => {
     }
     const [addState, setAddState] = useState(addData)
     const { addUsername, addPassword, addFullname, addEmail, addDomainId, addRoleId } = addState
-    const [validated, setValidated] = useState(false)
-    const handleSubmit = (event) => {
-        const form = event.currentTarget
-        if (form.checkValidity() === false) {
-            event.preventDefault()
-            event.stopPropagation()
-        }
-        setValidated(true)
-    }
+    const [addValidated, setAddValidated] = useState(false)
     const handleSetAddUsername = (value) => {
         setAddState(prev => {
             return { ...prev, addUsername: value }
@@ -242,7 +238,7 @@ const UserManagement = () => {
                         content: 'Thêm người dùng thành công',
                         icon: createSuccessIcon()
                     }))
-                    setValidated(false)
+                    setAddValidated(false)
                 }else {
                     addToast(createToast({
                         title: 'Thêm người dùng',
@@ -258,8 +254,10 @@ const UserManagement = () => {
                     icon: createFailIcon()
                 }))
             })  
+            // To reset all add state
+            setAddState(addData)
         }
-        setValidated(true)
+        setAddValidated(true)
     }
 
     const [addVisible, setAddVisible] = useState(false)
@@ -267,7 +265,7 @@ const UserManagement = () => {
             <CForm 
                 onSubmit={e => createNewUser(e)} 
                 noValidate
-                validated={validated}
+                validated={addValidated}
             >
                 <CRow>
                     <CCol lg={12}>
@@ -277,6 +275,7 @@ const UserManagement = () => {
                             placeholder="Tên tài khoản"
                             feedbackInvalid="Chưa nhập tên tài khoản!"
                             onChange={(e) => handleSetAddUsername(e.target.value)}
+                            value={addUsername}
                             aria-describedby="exampleFormControlInputHelpInline"
                             required
                         />
@@ -290,6 +289,7 @@ const UserManagement = () => {
                             placeholder="Mật khẩu"
                             feedbackInvalid="Chưa nhập mật khẩu!"
                             onChange={(e) => handleSetAddPassword(e.target.value)}
+                            value={addPassword}
                             aria-describedby="exampleFormControlInputHelpInline"
                             required
                         />
@@ -303,6 +303,7 @@ const UserManagement = () => {
                             placeholder="Họ và tên"
                             feedbackInvalid="Chưa nhập họ và tên!"
                             onChange={(e) => handleSetAddFullname(e.target.value)}
+                            value={addFullname}
                             aria-describedby="exampleFormControlInputHelpInline"
                             required
                         />
@@ -316,6 +317,7 @@ const UserManagement = () => {
                             placeholder="Email"
                             feedbackInvalid="Chưa nhập Email!"
                             onChange={(e) => handleSetAddEmail(e.target.value)}
+                            value={addEmail}
                             aria-describedby="exampleFormControlInputHelpInline"
                             required
                         />
@@ -328,6 +330,7 @@ const UserManagement = () => {
                             className="mt-4" 
                             onChange={(e) => handleSetAddDomainId(e.target.value)} 
                             required
+                            value={addDomainId}
                             feedbackInvalid="Chưa chọn tổ chức!"
                         >
                             <option selected="" value="">Tổ chức</option>
@@ -344,7 +347,8 @@ const UserManagement = () => {
                         <CFormSelect 
                             aria-label="Default select example" 
                             className="mt-4"
-                            onChange={(e) => handleSetAddRoleId(e.target.value)} 
+                            onChange={(e) => handleSetAddRoleId(e.target.value)}
+                            value={addRoleId}
                             required
                             feedbackInvalid="Chưa chọn vai trò!"
                         >
@@ -364,6 +368,243 @@ const UserManagement = () => {
                 </CRow>
             </CForm>)
  
+    // Updating Model
+    const updateData = {
+        updateId: '',
+        updateUsername: '',
+        updatePassword: '',
+        updateFullname: '',
+        updateEmail: '',
+        updateDomainId: '',
+        updateRoleId: ''
+    }
+    const [updateState, setUpdateState] = useState(updateData)
+    const { updateId, updateUsername, updatePassword, updateFullname, updateEmail, updateDomainId, updateRoleId } = updateState
+    const [updateValidated, setUpdateValidated] = useState(false)
+    const getUserDataById = () => {
+        if (updateId) {
+            getUserById(updateId)
+            .then(res => {
+                if (res?.data.success) {
+                    const user = res?.data?.data
+                    setUpdateState(prev => {
+                        return {
+                            ...prev, 
+                            updateUsername: user.username,
+                            updateFullname: user.fullName,
+                            updateEmail: user.email,
+                            updateDomainId: user?.permission?.domain,
+                            updateRoleId: user?.permission?.role
+                        }
+                    })
+                }else {
+                    addToast(createToast({
+                        title: 'Cập nhật người dùng',
+                        content: res?.data.message,
+                        icon: createFailIcon()
+                    }))
+                }
+            })
+            .catch(err => {
+                addToast(createToast({
+                    title: 'Cập nhật người dùng',
+                    content: "Thông tin người dùng không đúng",
+                    icon: createFailIcon()
+                }))
+            })
+        }
+    }
+    const handleSetUpdateId = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateId: value }
+        })
+    }
+    const handleSetUpdateUsername = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateUsername: value }
+        })
+    }
+    const handleSetUpdatePassword = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updatePassword: value }
+        })
+    }
+    const handleSetUpdateFullname = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateFullname: value }
+        })
+    }
+    const handleSetUpdateEmail = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateEmail: value }
+        })
+    }
+    const handleSetUpdateDomainId = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateDomainId: value }
+        })
+    }
+    const handleSetUpdateRoleId = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateRoleId: value }
+        })
+    }
+    const updateAUser = (e) => {
+        // validation
+        const form = e.currentTarget
+        if (form.checkValidity() === false) {
+            e.preventDefault()
+            e.stopPropagation()
+        } else {
+            const user = {
+                username: updateUsername,
+                fullName: updateFullname,
+                password: updatePassword,
+                email: updateEmail,
+                domain: updateDomainId,
+                role: updateRoleId
+            }
+            updateUser(user, updateId)
+            .then(res => {
+                if (res?.data?.success)  {
+                    setUpdateVisible(false)
+                    rebaseAllData()
+                    addToast(createToast({
+                        title: 'Cập nhật người dùng',
+                        content: 'Cập nhật người dùng thành công',
+                        icon: createSuccessIcon()
+                    }))
+                    setUpdateValidated(false)
+                }else {
+                    addToast(createToast({
+                        title: 'Cập nhật người dùng',
+                        content: res?.data?.message,
+                        icon: createFailIcon()
+                    }))
+                }
+
+            })
+            .catch(err => {
+                addToast(createToast({
+                    title: 'Cập nhật người dùng',
+                    content: "Cập nhật người dùng không thành công",
+                    icon: createFailIcon()
+                }))
+            })  
+            // To reset all update state
+            setUpdateState(updateData)
+        }
+        setUpdateValidated(true)
+    }
+
+    const [updateVisible, setUpdateVisible] = useState(false)
+    const updateForm = (
+            <CForm 
+                onSubmit={e => updateAUser(e)} 
+                noValidate
+                validated={updateValidated}
+            >
+                <CRow>
+                    <CCol lg={12}>
+                        <CFormInput
+                            className="mt-4"
+                            type="text"
+                            placeholder="Tên tài khoản"
+                            feedbackInvalid="Chưa nhập tên tài khoản!"
+                            onChange={(e) => handleSetUpdateUsername(e.target.value)}
+                            value={updateUsername}
+                            aria-describedby="exampleFormControlInputHelpInline"
+                            required
+                        />
+                    </CCol>
+                </CRow>
+                <CRow>
+                    <CCol lg={12}>
+                        <CFormInput
+                            className="mt-4"
+                            type="password"
+                            placeholder="Mật khẩu"
+                            feedbackInvalid="Chưa nhập mật khẩu!"
+                            onChange={(e) => handleSetUpdatePassword(e.target.value)}
+                            value={updatePassword}
+                            aria-describedby="exampleFormControlInputHelpInline"
+                            required
+                        />
+                    </CCol>
+                </CRow>
+                <CRow>
+                    <CCol lg={12}>
+                        <CFormInput
+                            className="mt-4"
+                            type="text"
+                            placeholder="Họ và tên"
+                            feedbackInvalid="Chưa nhập họ và tên!"
+                            onChange={(e) => handleSetUpdateFullname(e.target.value)}
+                            value={updateFullname}
+                            aria-describedby="exampleFormControlInputHelpInline"
+                            required
+                        />
+                    </CCol>
+                </CRow>
+                <CRow>
+                    <CCol lg={12}>
+                        <CFormInput
+                            className="mt-4"
+                            type="email"
+                            placeholder="Email"
+                            feedbackInvalid="Chưa nhập Email!"
+                            onChange={(e) => handleSetUpdateEmail(e.target.value)}
+                            value={updateEmail}
+                            aria-describedby="exampleFormControlInputHelpInline"
+                            required
+                        />
+                    </CCol>
+                </CRow>
+                <CRow>
+                    <CCol lg={12}>
+                        <CFormSelect
+                            aria-label="Default select example" 
+                            className="mt-4" 
+                            onChange={(e) => handleSetUpdateDomainId(e.target.value)} 
+                            value={updateDomainId}
+                            required
+                            feedbackInvalid="Chưa chọn tổ chức!"
+                        >
+                            <option selected="" value="">Tổ chức</option>
+                            {
+                                listDomains.map((domain) => {
+                                    return  <option key={domain?._id} value={domain?._id}>{domain?.name}</option>
+                                })
+                            }
+                        </CFormSelect>
+                    </CCol>
+                </CRow>
+                <CRow>
+                    <CCol lg={12}>
+                        <CFormSelect 
+                            aria-label="Default select example" 
+                            className="mt-4"
+                            onChange={(e) => handleSetUpdateRoleId(e.target.value)} 
+                            value={updateRoleId}
+                            required
+                            feedbackInvalid="Chưa chọn vai trò!"
+                        >
+                            <option selected="" value="" >Vai trò</option>
+                            {
+                                listRoles.map((role) => {
+                                    return  <option key={role?._id} value={role?._id}>{role?.name}</option>
+                                })
+                            }
+                        </CFormSelect>
+                    </CCol>
+                </CRow>
+                <CRow>
+                    <CCol lg={12} className="d-flex justify-content-end">
+                        <CButton type="submit" className="mt-4" color="primary">Hoàn tất</CButton>
+                    </CCol>
+                </CRow>
+            </CForm>)
+
     return (
         <CRow>
         <CCol xs>
@@ -372,6 +613,8 @@ const UserManagement = () => {
             <CCardHeader>Danh sách người dùng</CCardHeader>
             <CCardBody>
                 <CustomModal visible={addVisible} title={'Thêm người dùng'} body={addForm} setVisible={(value) => setAddVisible(value)}/>
+                <CustomModal visible={updateVisible} title={'Cập nhật người dùng'} body={updateForm} setVisible={(value) => setUpdateVisible(value)}/>
+
                 <CForm onSubmit={onFilter}>
                     <CRow>
                         <CCol md={12} lg={3}>
@@ -414,7 +657,7 @@ const UserManagement = () => {
               <br />
               <CRow>
                 <CCol xs={12}>
-                    <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>
+                    <CButton type="button" color="primary" onClick={() => setUpdateVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>
                 </CCol>
               </CRow>
               <br />

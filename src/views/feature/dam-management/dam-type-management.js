@@ -177,14 +177,6 @@ const DamTypeManagement = () => {
     const [addState, setAddState] = useState(addData)
     const { addUsername, addPassword, addFullname, addEmail, addDomainId, addRoleId } = addState
     const [validated, setValidated] = useState(false)
-    const handleSubmit = (event) => {
-        const form = event.currentTarget
-        if (form.checkValidity() === false) {
-            event.preventDefault()
-            event.stopPropagation()
-        }
-        setValidated(true)
-    }
     const handleSetAddUsername = (value) => {
         setAddState(prev => {
             return { ...prev, addUsername: value }
