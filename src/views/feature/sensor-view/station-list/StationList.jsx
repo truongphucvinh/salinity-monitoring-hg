@@ -36,6 +36,9 @@ import { Accordion } from '@mui/material';
 //bootstrap
 import { Spinner } from 'react-bootstrap';
 
+//delete station
+import { CModal, CButton, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react';
+
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
 
 //select chip
@@ -60,6 +63,8 @@ const StationList = () => {
   //menu
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+
+  const [stationIsSelected, setStationIsSelected] = useState();
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -134,6 +139,20 @@ const StationList = () => {
   const [stationCreationLoading, setStationCreationLoading] = useState(false);
   const [stationListLoading, setStationListLoading] = useState(true);
   const [stationListChange, setStationListChange] = useState(false);
+
+  //delete station
+  const [deletionConfirm, setDeletionConfirm] = useState(false)
+
+  const handelVisibleDeletionConfirm = (stationInfo) => {
+    setDeletionConfirm(!deletionConfirm);
+    setAnchorEl(null);
+  }
+
+  //xoa station
+  const [stationDeletionLoading, setStationDeletionLoading] = useState(false);
+  const handleDeleteStation = (stationId) => {
+    console.log("stationid: ", stationId);
+  }
 
   useLayoutEffect(() => {
 
@@ -228,7 +247,7 @@ const StationList = () => {
                             }
                         </div>
                         <div className="station__list__item__action">
-                            <div className="station__list__item__action__more-btn">
+                            <div className="station__list__item__action__more-btn" onClick={() => setStationIsSelected(station)}>
                                 
                                  {/* menu */}
                                  <Tooltip title="">
@@ -259,7 +278,7 @@ const StationList = () => {
               id="account-menu"
               open={open}
               onClose={handleClose}
-              // onClick={handleClose}
+              
               PaperProps={{
                 elevation: 0,
                 sx: {
@@ -297,11 +316,11 @@ const StationList = () => {
                 
               </MenuItem>
               <Divider />
-              <MenuItem>
+              <MenuItem onClick={handleClose}>
                 Chỉnh sửa
               </MenuItem>
               <Divider />
-              <MenuItem>
+              <MenuItem onClick={() => handelVisibleDeletionConfirm("abc")}>
                 Xóa trạm
               </MenuItem>
               <Divider />
@@ -387,7 +406,27 @@ const StationList = () => {
             {/* sensor list modal */}
 
 
-            {/*  */}
+            {/* confirm delete station */}
+    <CModal
+      backdrop="static"
+      visible={deletionConfirm}
+      onClose={() => setDeletionConfirm(false)}
+      aria-labelledby="StaticBackdropExampleLabel"
+    >
+      <div className="deletion-station-confirm">
+        <div className="deletion-station-confirm__body">
+            Xóa trạm <b>{ stationIsSelected?.station?.name }</b>?
+        </div>
+        <div className="deletion-station-confirm__action">
+          <div className="deletion-station-confirm__action__cancel-btn" onClick={() => setDeletionConfirm(false)}>
+            Hủy
+          </div>
+          <div className="deletion-station-confirm__action__accept-btn" onClick={() => handleDeleteStation(stationIsSelected?.station?.id)}>
+            Xóa trạm
+          </div>
+        </div>
+      </div>
+    </CModal>
         </>
     )
        

@@ -177,3 +177,34 @@
     border-width: thin;
     position: relative;
 }
+
+//modal
+.modal-content {
+    border: none;
+    border-radius: 1px;
+}
+.deletion-station-confirm {
+    &__body {
+        padding: 20px;
+        height: 100px;
+    }
+    &__action {
+        display: flex;
+        justify-content: right;
+        padding: 15px 20px;
+        background-color: rgba(0, 0, 0, 0.08);
+        &__cancel-btn, &__accept-btn {
+        }
+        &__accept-btn {
+            @include button(100px, 40px, $red);
+        }
+        &__cancel-btn {
+            margin-right: 10px;
+            @include button(100px, 40px, white);
+            color: $dark-blue;
+            &:hover {
+                filter: brightness(98%);
+            }
+        }
+    }
+}
