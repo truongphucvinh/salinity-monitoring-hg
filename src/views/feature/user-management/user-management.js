@@ -15,7 +15,8 @@ import {
     CFormInput,
     CForm,
     CToaster,
-    CFormSelect
+    CFormSelect,
+    CSpinner
   } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -156,11 +157,7 @@ const UserManagement = () => {
                                     <CTableDataCell>{user?.email}</CTableDataCell>
                                     <CTableDataCell>{user?.fullName}</CTableDataCell>
                                     <CTableDataCell>
-                                        <CIcon icon={cilPencil} onClick={() => {
-                                            setUpdateVisible(true)
-                                            handleSetUpdateId(user?._id)
-                                            getUserDataById()
-                                        }} className="text-success mx-1" role="button"/>
+                                        <CIcon icon={cilPencil} onClick={() => openUpdateModal(user?._id)} className="text-success mx-1" role="button"/>
                                         <CIcon icon={cilTrash} className="text-danger" role="button"/>
                                     </CTableDataCell>
                                 </CTableRow>    
@@ -381,9 +378,9 @@ const UserManagement = () => {
     const [updateState, setUpdateState] = useState(updateData)
     const { updateId, updateUsername, updatePassword, updateFullname, updateEmail, updateDomainId, updateRoleId } = updateState
     const [updateValidated, setUpdateValidated] = useState(false)
-    const getUserDataById = () => {
-        if (updateId) {
-            getUserById(updateId)
+    const getUserDataById = (userId) => {
+        if (userId) {
+            getUserById(userId)
             .then(res => {
                 if (res?.data.success) {
                     const user = res?.data?.data
@@ -418,6 +415,11 @@ const UserManagement = () => {
         setUpdateState(prev => {
             return { ...prev, updateId: value }
         })
+    }
+    const openUpdateModal = (userId) => {
+        handleSetUpdateId(userId)
+        getUserDataById(userId)
+        setUpdateVisible(true)
     }
     const handleSetUpdateUsername = (value) => {
         setUpdateState(prev => {
@@ -498,7 +500,9 @@ const UserManagement = () => {
     }
 
     const [updateVisible, setUpdateVisible] = useState(false)
-    const updateForm = (
+    const updateForm = (isLoaded) => { return (
+    <>
+        {  isLoaded ? 
             <CForm 
                 onSubmit={e => updateAUser(e)} 
                 noValidate
@@ -514,7 +518,6 @@ const UserManagement = () => {
                             onChange={(e) => handleSetUpdateUsername(e.target.value)}
                             value={updateUsername}
                             aria-describedby="exampleFormControlInputHelpInline"
-                            required
                         />
                     </CCol>
                 </CRow>
@@ -528,7 +531,6 @@ const UserManagement = () => {
                             onChange={(e) => handleSetUpdatePassword(e.target.value)}
                             value={updatePassword}
                             aria-describedby="exampleFormControlInputHelpInline"
-                            required
                         />
                     </CCol>
                 </CRow>
@@ -542,7 +544,6 @@ const UserManagement = () => {
                             onChange={(e) => handleSetUpdateFullname(e.target.value)}
                             value={updateFullname}
                             aria-describedby="exampleFormControlInputHelpInline"
-                            required
                         />
                     </CCol>
                 </CRow>
@@ -552,11 +553,10 @@ const UserManagement = () => {
                             className="mt-4"
                             type="email"
                             placeholder="Email"
-                            feedbackInvalid="Chưa nhập Email!"
+                            feedbackInvalid="Chưa nhập email hoặc chưa đúng định dạng @..."
                             onChange={(e) => handleSetUpdateEmail(e.target.value)}
                             value={updateEmail}
                             aria-describedby="exampleFormControlInputHelpInline"
-                            required
                         />
                     </CCol>
                 </CRow>
@@ -567,7 +567,6 @@ const UserManagement = () => {
                             className="mt-4" 
                             onChange={(e) => handleSetUpdateDomainId(e.target.value)} 
                             value={updateDomainId}
-                            required
                             feedbackInvalid="Chưa chọn tổ chức!"
                         >
                             <option selected="" value="">Tổ chức</option>
@@ -586,7 +585,6 @@ const UserManagement = () => {
                             className="mt-4"
                             onChange={(e) => handleSetUpdateRoleId(e.target.value)} 
                             value={updateRoleId}
-                            required
                             feedbackInvalid="Chưa chọn vai trò!"
                         >
                             <option selected="" value="" >Vai trò</option>
@@ -603,7 +601,10 @@ const UserManagement = () => {
                         <CButton type="submit" className="mt-4" color="primary">Hoàn tất</CButton>
                     </CCol>
                 </CRow>
-            </CForm>)
+            </CForm> : <CSpinner />
+        }
+    </>
+) }
 
     return (
         <CRow>
@@ -613,7 +614,7 @@ const UserManagement = () => {
             <CCardHeader>Danh sách người dùng</CCardHeader>
             <CCardBody>
                 <CustomModal visible={addVisible} title={'Thêm người dùng'} body={addForm} setVisible={(value) => setAddVisible(value)}/>
-                <CustomModal visible={updateVisible} title={'Cập nhật người dùng'} body={updateForm} setVisible={(value) => setUpdateVisible(value)}/>
+                <CustomModal visible={updateVisible} title={'Cập nhật người dùng'} body={updateForm(updateUsername)} setVisible={(value) => setUpdateVisible(value)}/>
 
                 <CForm onSubmit={onFilter}>
                     <CRow>
@@ -657,7 +658,7 @@ const UserManagement = () => {
               <br />
               <CRow>
                 <CCol xs={12}>
-                    <CButton type="button" color="primary" onClick={() => setUpdateVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>
+                    <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>
                 </CCol>
               </CRow>
               <br />
