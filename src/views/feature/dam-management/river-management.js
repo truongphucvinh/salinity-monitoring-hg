@@ -30,34 +30,34 @@ import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
-import { createDamType, deleteDamType, getAllDamTypes, getDamTypeById, updateDamType } from "src/services/dam-services"
+import { createDamType, createRiver, deleteDamType, deleteRiver, getAllDamTypes, getAllRivers, getDamRiverById, getDamTypeById, getRiverById, updateDamType, updateRiver } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
 
-const DamTypeManagement = () => {
+const RiverManagement = () => {
 
     // Dam Type Management
-    const [listDamTypes, setListDamTypes] = useState([])
-    const [isLoadedDamTypes, setIsLoadedDamTypes] = useState(false)
-    const handleSetIsLoadedDamTypes = (value) => {
-        setIsLoadedDamTypes(prev => {
-            return { ...prev, isLoadedDamTypes: value }
+    const [listRivers, setListRivers] = useState([])
+    const [isLoadedRivers, setIsLoadedRivers] = useState(false)
+    const handleSetIsLoadedRivers = (value) => {
+        setIsLoadedRivers(prev => {
+            return { ...prev, isLoadedRivers: value }
         })
     }
     useEffect(() => {
-        handleSetIsLoadedDamTypes(true)
-    }, [listDamTypes])
+        handleSetIsLoadedRivers(true)
+    }, [listRivers])
     
     // Call inital APIs
     const rebaseAllData = () => {
         if (JSON.parse(localStorage.getItem("_isAuthenticated"))) {
             // Setting up access token
             setAuthApiHeader()
-            getAllDamTypes()
+            getAllRivers()
             .then(res => {
                 // Install filter users here
-                const damTypes = res?.data
-                setListDamTypes(damTypes)
-                setFilteredDamTypes(damTypes)
+                const rivers = res?.data
+                setListRivers(rivers)
+                setFilteredRivers(rivers)
             })
             .catch(err => {
                 // Do nothing
@@ -69,34 +69,34 @@ const DamTypeManagement = () => {
     },[])
 
     // Searching data
-    const [filteredDamTypes, setFilteredDamTypes] = useState([])
+    const [filteredRivers, setFilteredRivers] = useState([])
     const initSearch = {
-        damTypeName: "",
-        damTypeDescription: ""
+        riverName: "",
+        riverLocation: ""
     }
     const [searchState, setSearchState] = useState(initSearch)
-    const {damTypeName, damTypeDescription} = searchState
-    const handleSetDamTypeName = (value) => {
+    const {riverName, riverLocation} = searchState
+    const handleSetRiverName = (value) => {
         setSearchState(prev => {
-            return {...prev, damTypeName: value}
+            return {...prev, riverName: value}
         })
     }
-    const handleSetDamTypeDescription = (value) => {
+    const handleSetRiverLocation = (value) => {
         setSearchState(prev => {
-            return {...prev, damTypeDescription: value}
+            return {...prev, riverLocation: value}
         })
     }
     const onFilter = () => {
-        if (damTypeName || damTypeDescription) {
-            setFilteredDamTypes(listDamTypes)
-            if (damTypeName) {
-                setFilteredDamTypes(prev => {
-                    return prev.filter(damType => damType?.damTypeName?.includes(damTypeName.trim()))
+        if (riverName || riverLocation) {
+            setFilteredRivers(listRivers)
+            if (riverName) {
+                setFilteredRivers(prev => {
+                    return prev.filter(river => river?.riverName?.includes(riverName.trim()))
                 })
             }
-            if (damTypeDescription) {
-                setFilteredDamTypes(prev => {
-                    return prev.filter(damType => damType?.damTypeDescription?.includes(damTypeDescription.trim()))
+            if (riverLocation) {
+                setFilteredRivers(prev => {
+                    return prev.filter(river => river?.riverLocation?.includes(riverLocation.trim()))
                 })
             }
         }else {
@@ -104,7 +104,7 @@ const DamTypeManagement = () => {
         }
     }
     const onReset = () => {
-        setFilteredDamTypes(listDamTypes)
+        setFilteredRivers(listRivers)
     }
     // Toast
     const [toast, addToast] = useState(0)
@@ -112,7 +112,7 @@ const DamTypeManagement = () => {
 
 
     // Pagination + Filtering
-    const showFilteredTable = (filteredDamTypes, duration, isLoaded) => {
+    const showFilteredTable = (filteredRivers, duration, isLoaded) => {
         return (
             <>
                 {
@@ -121,22 +121,22 @@ const DamTypeManagement = () => {
                 <CTableHead className="text-nowrap">
                   <CTableRow>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Tên loại đập</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '50%'}}>Mô tả</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Tên sông, kênh, rạch</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '50%'}}>Vị trí</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Thao tác</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
                     {
-                        filteredDamTypes?.length !== 0 ? filteredDamTypes.map((damType, index) => {
+                        filteredRivers?.length !== 0 ? filteredRivers.map((river, index) => {
                             return (
-                                <CTableRow key={damType?.damTypeId}>
+                                <CTableRow key={river?.riverId}>
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
-                                    <CTableDataCell>{damType?.damTypeName}</CTableDataCell>
-                                    <CTableDataCell>{damType?.damTypeDescription}</CTableDataCell>
+                                    <CTableDataCell>{river?.riverName}</CTableDataCell>
+                                    <CTableDataCell>{river?.riverLocation}</CTableDataCell>
                                     <CTableDataCell>
-                                        <CIcon icon={cilPencil} onClick={() => openUpdateModal(damType?.damTypeId)} className="text-success mx-1" role="button"/>
-                                        <CIcon icon={cilTrash} onClick={() => openDeleteModal(damType?.damTypeId)}  className="text-danger" role="button"/>
+                                        <CIcon icon={cilPencil} onClick={() => openUpdateModal(river?.riverId)} className="text-success mx-1" role="button"/>
+                                        <CIcon icon={cilTrash} onClick={() => openDeleteModal(river?.riverId)}  className="text-danger" role="button"/>
                                     </CTableDataCell>
                                 </CTableRow>    
                             )
@@ -153,49 +153,49 @@ const DamTypeManagement = () => {
     }
     // Adding Modal
     const addData = {
-        addDamTypeName: "",
-        addDamTypeDescription: ""
+        addRiverName: "",
+        addRiverLocation: ""
     }
     const [addState, setAddState] = useState(addData)
-    const { addDamTypeName, addDamTypeDescription } = addState
+    const { addRiverName, addRiverLocation } = addState
     const [addValidated, setAddValidated] = useState(false)
-    const handleSetAddDamTypeName = (value) => {
+    const handleSetAddRiverName = (value) => {
         setAddState(prev => {
-            return { ...prev, addDamTypeName: value }
+            return { ...prev, addRiverName: value }
         })
     }
-    const handleSetAddDamTypeDescription = (value) => {
+    const handleSetAddRiverLocation = (value) => {
         setAddState(prev => {
-            return { ...prev, addDamTypeDescription: value }
+            return { ...prev, addRiverLocation: value }
         })
     }
 
-    const createNewDamType = (e) => {
+    const createNewRiverRecord = (e) => {
         // validation
         const form = e.currentTarget
         if (form.checkValidity() === false) {
             e.preventDefault()
             e.stopPropagation()
         } else {
-            const damType = {
-                damTypeName: addDamTypeName.trim(),
-                damTypeDescription: addDamTypeDescription.trim()
+            const river = {
+                riverName: addRiverName.trim(),
+                riverLocation: addRiverLocation.trim()
             }
-            createDamType(damType)
+            createRiver(river)
             .then(res => {
                 setAddVisible(false)
                 rebaseAllData()
                 addToast(createToast({
-                    title: 'Thêm loại đập',
-                    content: 'Thêm loại đập thành công',
+                    title: 'Thêm sông, kênh, rạch',
+                    content: 'Thêm sông, kênh, rạch thành công',
                     icon: createSuccessIcon()
                 }))
                 setAddValidated(false)
             })
             .catch(err => {
                 addToast(createToast({
-                    title: 'Thêm loại đập',
-                    content: "Thêm loại đập không thành công",
+                    title: 'Thêm sông, kênh, rạch',
+                    content: "Thêm sông, kênh, rạch không thành công",
                     icon: createFailIcon()
                 }))
             })
@@ -206,8 +206,8 @@ const DamTypeManagement = () => {
     const [addVisible, setAddVisible] = useState(false)
     const addForm = () => {
         return <>
-                        <CForm 
-                    onSubmit={e => createNewDamType(e)} 
+                <CForm 
+                    onSubmit={e => createNewRiverRecord(e)} 
                     noValidate
                     validated={addValidated}
                 >
@@ -216,10 +216,10 @@ const DamTypeManagement = () => {
                             <CFormInput
                                 className="mt-4"
                                 type="text"
-                                placeholder="Tên loại đập"
-                                feedbackInvalid="Chưa nhập tên loại đập!"
-                                onChange={(e) => handleSetAddDamTypeName(e.target.value)}
-                                value={addDamTypeName}
+                                placeholder="Tên sông, kênh, rạch"
+                                feedbackInvalid="Chưa nhập tên sông, kênh, rạch!"
+                                onChange={(e) => handleSetAddRiverName(e.target.value)}
+                                value={addRiverName}
                                 aria-describedby="exampleFormControlInputHelpInline"
                                 required
                             />
@@ -230,9 +230,11 @@ const DamTypeManagement = () => {
                             <CFormInput
                                 className="mt-4"
                                 type="text"
-                                placeholder="Mô tả loại đập"
-                                onChange={(e) => handleSetAddDamTypeDescription(e.target.value)}
-                                value={addDamTypeDescription}
+                                placeholder="Mô tả vị trí sông, kênh, rạch"
+                                feedbackInvalid="Chưa nhập vị trí sông, kênh, rạch!"
+                                onChange={(e) => handleSetAddRiverLocation(e.target.value)}
+                                value={addRiverLocation}
+                                required
                                 aria-describedby="exampleFormControlInputHelpInline"
                             />
                         </CCol>
@@ -250,89 +252,89 @@ const DamTypeManagement = () => {
  
     // Updating Model
     const updateData = {
-        updateDamTypeId: '',
-        updateDamTypeName: '',
-        updateDamTypeDescription: ''
+        updateRiverId: '',
+        updateRiverName: '',
+        updateRiverLocation: ''
     }
     const [updateState, setUpdateState] = useState(updateData)
-    const { updateDamTypeId, updateDamTypeName, updateDamTypeDescription } = updateState
+    const { updateRiverId, updateRiverName, updateRiverLocation } = updateState
     const [updateValidated, setUpdateValidated] = useState(false)
-    const getDamTypeDataById = (damTypeId) => {
-        if (damTypeId) {
-            getDamTypeById(damTypeId)
+    const geRiverDataById = (riverId) => {
+        if (riverId) {
+            getRiverById(riverId)
             .then(res => {
-                const damType = res?.data
-                if (damType) {
-                    const updateDamTypeFetchData = {
-                        updateDamTypeId: damType?.damTypeId,
-                        updateDamTypeName: damType?.damTypeName,
-                        updateDamTypeDescription: damType?.damTypeDescription
+                const river = res?.data
+                if (river) {
+                    const updateRiverFetchData = {
+                        updateRiverId: river?.riverId,
+                        updateRiverName: river?.riverName,
+                        updateRiverLocation: river?.riverLocation
                     }
-                    setUpdateState(updateDamTypeFetchData)
+                    setUpdateState(updateRiverFetchData)
                 }else {
                     addToast(createToast({
-                        title: 'Cập nhật loại đập',
-                        content: "Thông tin loại đập không đúng",
+                        title: 'Cập nhật sông, kênh, rạch',
+                        content: "Thông tin sông, kênh, rạch không đúng",
                         icon: createFailIcon()
                     }))
                 }
             })
             .catch(err => {
                 addToast(createToast({
-                    title: 'Cập nhật loại đập',
-                    content: "Thông tin loại đập không đúng",
+                    title: 'Cập nhật sông, kênh, rạch',
+                    content: "Thông tin sông, kênh, rạch không đúng",
                     icon: createFailIcon()
                 }))
             })
         }
     }
-    const handleSetUpdateDamTypeId = (value) => {
+    const handleSetUpdateRiverId = (value) => {
         setUpdateState(prev => {
-            return { ...prev, damTypeId: value }
+            return { ...prev, riverId: value }
         })
     }
-    const openUpdateModal = (damTypeId) => {
-        handleSetUpdateDamTypeId(damTypeId)
-        getDamTypeDataById(damTypeId)
+    const openUpdateModal = (riverId) => {
+        handleSetUpdateRiverId(riverId)
+        geRiverDataById(riverId)
         setUpdateVisible(true)
     }
-    const handleSetUpdateDamTypeName = (value) => {
+    const handleSetUpdateRiverName = (value) => {
         setUpdateState(prev => {
-            return { ...prev, updateDamTypeName: value }
+            return { ...prev, updateRiverName: value }
         })
     }
-    const handleSetUpdateDamTypeDescription = (value) => {
+    const handleSetUpdateRiverLocation = (value) => {
         setUpdateState(prev => {
-            return { ...prev, updateDamTypeDescription: value }
+            return { ...prev, updateRiverLocation: value }
         })
     }
-    const updateADamType = (e) => {
+    const updateARiver = (e) => {
         // validation
         const form = e.currentTarget
         if (form.checkValidity() === false) {
             e.preventDefault()
             e.stopPropagation()
         } else {
-            const damType = {
-                damTypeId: updateDamTypeId,
-                damTypeName: updateDamTypeName,
-                damTypeDescription: updateDamTypeDescription
+            const river = {
+                riverId: updateRiverId,
+                riverName: updateRiverName,
+                riverLocation: updateRiverLocation
             }
-            updateDamType(damType)
+            updateRiver(river)
             .then(res => {
                 setUpdateVisible(false)
                 rebaseAllData()
                 addToast(createToast({
-                    title: 'Cập nhật loại đập',
-                    content: 'Cập nhật loại đập thành công',
+                    title: 'Cập nhật sông, kênh, rạch',
+                    content: 'Cập nhật sông, kênh, rạch thành công',
                     icon: createSuccessIcon()
                 }))
                 setUpdateValidated(false)
             })
             .catch(err => {
                 addToast(createToast({
-                    title: 'Cập nhật loại đập',
-                    content: "Cập nhật loại đập không thành công",
+                    title: 'Cập nhật sông, kênh, rạch',
+                    content: "Cập nhật sông, kênh, rạch không thành công",
                     icon: createFailIcon()
                 }))
             })  
@@ -345,7 +347,7 @@ const DamTypeManagement = () => {
             <>
                 {  isLoaded ? 
                     <CForm 
-                        onSubmit={e => updateADamType(e)} 
+                        onSubmit={e => updateARiver(e)} 
                         noValidate
                         validated={updateValidated}
                     >
@@ -354,9 +356,9 @@ const DamTypeManagement = () => {
                                 <CFormInput
                                     className="mt-4"
                                     type="text"
-                                    placeholder="Tên loại đập"
-                                    onChange={(e) => handleSetUpdateDamTypeName(e.target.value)}
-                                    value={updateDamTypeName}
+                                    placeholder="Tên sông, kênh, rạch"
+                                    onChange={(e) => handleSetUpdateRiverName(e.target.value)}
+                                    value={updateRiverName}
                                     aria-describedby="exampleFormControlInputHelpInline"
                                 />
                             </CCol>
@@ -366,9 +368,9 @@ const DamTypeManagement = () => {
                                 <CFormInput
                                     className="mt-4"
                                     type="text"
-                                    placeholder="Mô tả loại đập"
-                                    onChange={(e) => handleSetUpdateDamTypeDescription(e.target.value)}
-                                    value={updateDamTypeDescription}
+                                    placeholder="Mô tả vị trí sông, kênh, rạch"
+                                    onChange={(e) => handleSetUpdateRiverLocation(e.target.value)}
+                                    value={updateRiverLocation}
                                     aria-describedby="exampleFormControlInputHelpInline"
                                 />
                             </CCol>
@@ -385,39 +387,39 @@ const DamTypeManagement = () => {
     }
 
     // Delete
-    const deleteADamType = (damTypeId) => {
-        if (damTypeId) {
-            deleteDamType(damTypeId)
+    const deleteARiver = (riverId) => {
+        if (riverId) {
+            deleteRiver(riverId)
             .then(res => {
                 setDeleteVisible(false)
                 rebaseAllData()
                 addToast(createToast({
-                    title: 'Xóa loại đập',
-                    content: 'Xóa loại đập thành công',
+                    title: 'Xóa sông, kênh, rạch',
+                    content: 'Xóa sông, kênh, rạch thành công',
                     icon: createSuccessIcon()
                 }))
                 setUpdateValidated(false)
             })
             .catch(err => {
                 addToast(createToast({
-                    title: 'Xóa loại đập',
-                    content: "Xóa loại đập không thành công",
+                    title: 'Xóa sông, kênh, rạch',
+                    content: "Xóa sông, kênh, rạch không thành công",
                     icon: createFailIcon()
                 }))
             })
         }
     }
     const [deleteVisible, setDeleteVisible] = useState(false)
-    const [deleteIdDamTypeId, setDeleteDamTypeId] = useState(0)
-    const deleteForm = (damTypeId) => {
+    const [deleteRiverId, setDeleteRiverId] = useState(0)
+    const deleteForm = (riverId) => {
         return (
             <>
                 {   
-                    damTypeId ? 
-                    <CForm onSubmit={() => deleteADamType(damTypeId)}>
+                    riverId ? 
+                    <CForm onSubmit={() => deleteARiver(riverId)}>
                         <CRow>
                             <CCol md={12}>
-                                <p>Bạn có chắc muốn xóa loại đập này ?</p>
+                                <p>Bạn có chắc muốn xóa sông, kênh, rạch này ?</p>
                             </CCol>
                             <CCol md={12} className="d-flex justify-content-end">
                                 <CButton color="primary" type="submit">Xác nhận</CButton>
@@ -429,8 +431,8 @@ const DamTypeManagement = () => {
             </>
         )
     }
-    const openDeleteModal = (damTypeId) => {
-        setDeleteDamTypeId(damTypeId)
+    const openDeleteModal = (riverId) => {
+        setDeleteRiverId(riverId)
         setDeleteVisible(true)
     }
 
@@ -445,19 +447,19 @@ const DamTypeManagement = () => {
         <CCol xs>
           <CCard className="mb-4">
             <CToaster ref={toaster} push={toast} placement="top-end" />
-            <CCardHeader>Danh sách loại đập</CCardHeader>
+            <CCardHeader>Danh sách sông, kênh, rạch</CCardHeader>
             <CCardBody>
-                <CustomModal visible={addVisible} title={'Thêm loại đập'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
-                <CustomModal visible={updateVisible} title={'Cập nhật loại đập'} body={updateForm(updateDamTypeName)} setVisible={(value) => setUpdateVisible(value)}/>
-                <CustomModal visible={deleteVisible} title={'Xóa người loại đập'} body={deleteForm(deleteIdDamTypeId)} setVisible={(value) => setDeleteVisible(value)}/>
+                <CustomModal visible={addVisible} title={'Thêm sông, kênh, rạch'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
+                <CustomModal visible={updateVisible} title={'Cập nhật sông, kênh, rạch'} body={updateForm(updateRiverName)} setVisible={(value) => setUpdateVisible(value)}/>
+                <CustomModal visible={deleteVisible} title={'Xóa người sông, kênh, rạch'} body={deleteForm(deleteRiverId)} setVisible={(value) => setDeleteVisible(value)}/>
                 <CForm onSubmit={onFilter}>
                     <CRow>
                         <CCol md={12} lg={3}>
                             <CFormInput
                                 className="mb-2"
                                 type="text"
-                                placeholder="Tên loại đập"
-                                onChange={(e) => handleSetDamTypeName(e.target.value)}
+                                placeholder="Tên sông, kênh, rạch"
+                                onChange={(e) => handleSetRiverName(e.target.value)}
                                 aria-describedby="exampleFormControlInputHelpInline"
                             />
                         </CCol>
@@ -465,8 +467,8 @@ const DamTypeManagement = () => {
                             <CFormInput
                                 className="mb-2"
                                 type="text"
-                                placeholder="Mô tả loại đập"
-                                onChange={(e) => handleSetDamTypeDescription(e.target.value)}
+                                placeholder="Mô tả sông, kênh, rạch"
+                                onChange={(e) => handleSetRiverLocation(e.target.value)}
                                 aria-describedby="exampleFormControlInputHelpInline"
                             />
                         </CCol>
@@ -487,7 +489,7 @@ const DamTypeManagement = () => {
                 </CCol>
               </CRow>
               <br />
-              <CustomPagination listItems={filteredDamTypes} showData={showFilteredTable} isLoaded={isLoadedDamTypes} />
+              <CustomPagination listItems={filteredRivers} showData={showFilteredTable} isLoaded={isLoadedRivers} />
             </CCardBody>
           </CCard>
         </CCol>
@@ -495,4 +497,4 @@ const DamTypeManagement = () => {
     )
 }
 
-export default DamTypeManagement
+export default RiverManagement

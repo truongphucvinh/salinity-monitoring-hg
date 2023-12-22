@@ -43,6 +43,7 @@ const UserManagement = () => {
     const secretKey = process.env.AUTH_TOKEN || 'oda_dev'
     
     // Call inital APIs
+    // Filtering all users of our project
     const rebaseAllData = () => {
         if (JSON.parse(localStorage.getItem("_isAuthenticated"))) {
             // Setting up access token
@@ -664,7 +665,7 @@ const UserManagement = () => {
                             </CCol>
                             <CCol md={12} className="d-flex justify-content-end">
                                 <CButton color="primary" type="submit">Xác nhận</CButton>
-                                <CButton color="danger" className="text-white ms-3">Hủy</CButton>
+                                <CButton color="danger" onClick={() => setDeleteVisible(false)} className="text-white ms-3">Hủy</CButton>
                             </CCol>
                         </CRow>
                     </CForm> : <CSpinner />
