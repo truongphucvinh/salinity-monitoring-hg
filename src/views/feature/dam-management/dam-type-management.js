@@ -30,7 +30,7 @@ import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
-import { createDamType, getAllDamTypes, getDamTypeById, updateDamType } from "src/services/dam-services"
+import { createDamType, deleteDamType, getAllDamTypes, getDamTypeById, updateDamType } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
 
 const DamTypeManagement = () => {
@@ -385,24 +385,16 @@ const DamTypeManagement = () => {
     // Delete
     const deleteADamType = (damTypeId) => {
         if (damTypeId) {
-            deleteADamType(damTypeId)
+            deleteDamType(damTypeId)
             .then(res => {
-                // if (res?.data?.success)  {
-                //     setDeleteVisible(false)
-                //     rebaseAllData()
-                //     addToast(createToast({
-                //         title: 'Xóa loại đập',
-                //         content: 'Xóa loại đập thành công',
-                //         icon: createSuccessIcon()
-                //     }))
-                //     setUpdateValidated(false)
-                // }else {
-                //     addToast(createToast({
-                //         title: 'Xóa loại đập',
-                //         content: res?.data?.message,
-                //         icon: createFailIcon()
-                //     }))
-                // }
+                setDeleteVisible(false)
+                rebaseAllData()
+                addToast(createToast({
+                    title: 'Xóa loại đập',
+                    content: 'Xóa loại đập thành công',
+                    icon: createSuccessIcon()
+                }))
+                setUpdateValidated(false)
             })
             .catch(err => {
                 addToast(createToast({
