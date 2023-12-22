@@ -682,6 +682,7 @@ const UserManagement = () => {
         // To reset all add state
         setAddState(addData)
         setUpdateState(updateData)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[addVisible, updateVisible])
 
     return (

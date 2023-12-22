@@ -30,7 +30,7 @@ import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
-import { createDamType, createRiver, deleteDamType, deleteRiver, getAllDamTypes, getAllRivers, getDamRiverById, getDamTypeById, getRiverById, updateDamType, updateRiver } from "src/services/dam-services"
+import { createRiver,  deleteRiver,  getAllRivers,  getRiverById,  updateRiver } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
 
 const RiverManagement = () => {
@@ -440,6 +440,7 @@ const RiverManagement = () => {
         // To reset all add state
         setAddState(addData)
         setUpdateState(updateData)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addVisible, updateVisible])
 
     return (
