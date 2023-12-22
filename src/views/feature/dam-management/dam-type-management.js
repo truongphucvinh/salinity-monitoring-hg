@@ -128,7 +128,7 @@ const DamTypeManagement = () => {
                 </CTableHead>
                 <CTableBody>
                     {
-                        filteredDamTypes.map((damType, index) => {
+                        filteredDamTypes?.length !== 0 ? filteredDamTypes.map((damType, index) => {
                             return (
                                 <CTableRow key={damType?.damTypeId}>
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
@@ -140,7 +140,9 @@ const DamTypeManagement = () => {
                                     </CTableDataCell>
                                 </CTableRow>    
                             )
-                        })
+                        }) : <CTableRow>
+                            <CTableDataCell colSpan={4}><p className="text-center">{'Không có dữ liệu'}</p></CTableDataCell>
+                        </CTableRow>
                     }
                 </CTableBody>
               </CTable>

@@ -151,7 +151,7 @@ const UserManagement = () => {
                 </CTableHead>
                 <CTableBody>
                     {
-                        filteredUsers.map((user, index) => {
+                        filteredUsers?.length !== 0 ? filteredUsers.map((user, index) => {
                             return (
                                 <CTableRow key={user._id}>
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
@@ -164,7 +164,9 @@ const UserManagement = () => {
                                     </CTableDataCell>
                                 </CTableRow>    
                             )
-                        })
+                        }) : <CTableRow>
+                            <CTableDataCell colSpan={4}><p className="text-center">{'Không có dữ liệu'}</p></CTableDataCell>
+                        </CTableRow>
                     }
                 </CTableBody>
               </CTable>
