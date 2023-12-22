@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import * as icon from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import {
@@ -23,7 +23,6 @@ import { cilLockLocked, cilUser } from '@coreui/icons'
 import { loginAuth } from 'src/services/authentication-services'
 import * as CryptoJS from 'crypto-js'
 import {INVALID_CREDENTIAL} from "../../../errors/LoginErrors"
-import { setAuthApiHeader } from 'src/services/global-axios'
 const Login = () => {
   // Login data
   const loginData = {
@@ -67,6 +66,7 @@ const Login = () => {
     }else {
       e.preventDefault()
       e.stopPropagation()
+      setValidated(true)
     }
   }
   // Login Toast
@@ -124,11 +124,6 @@ const Login = () => {
                           Đăng nhập
                         </CButton>
                       </CCol>
-                      {/* <CCol xs={6} className="text-right">
-                        <CButton color="link" className="px-0 w-100" style={{'textAlign': 'right'}}>
-                          Quên mật khẩu?
-                        </CButton>
-                      </CCol> */}
                     </CRow>
                   </CForm>
                 </CCardBody>

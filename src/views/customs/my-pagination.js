@@ -6,7 +6,7 @@ import {
 import CIcon from "@coreui/icons-react"
 import { cilChevronLeft, cilChevronRight } from "@coreui/icons"
 
-const CustomPagination = ({ listItems, showData }) => {
+const CustomPagination = ({ listItems, showData, isLoaded }) => {
 
     // initial data
     const paginationData = {
@@ -32,7 +32,7 @@ const CustomPagination = ({ listItems, showData }) => {
     }, [listItems, active])
     return (
         <>
-            { showData(listItems.slice((active - 1) * itemsPerPage, active * itemsPerPage), (active - 1) * itemsPerPage) }
+            { showData(listItems.slice((active - 1) * itemsPerPage, active * itemsPerPage), (active - 1) * itemsPerPage, isLoaded) }
             <br />
             {
                 listItems?.length > itemsPerPage ? <CPagination aria-label="Page navigation example">
