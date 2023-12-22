@@ -152,11 +152,10 @@ const DamTypeManagement = () => {
     // Adding Modal
     const addData = {
         addDamTypeName: "",
-        addDamTypeDescription: "",
-        addDamTypeLoaded: true
+        addDamTypeDescription: ""
     }
     const [addState, setAddState] = useState(addData)
-    const { addDamTypeName, addDamTypeDescription, addDamTypeLoaded } = addState
+    const { addDamTypeName, addDamTypeDescription } = addState
     const [addValidated, setAddValidated] = useState(false)
     const handleSetAddDamTypeName = (value) => {
         setAddState(prev => {
@@ -168,11 +167,7 @@ const DamTypeManagement = () => {
             return { ...prev, addDamTypeDescription: value }
         })
     }
-    const handleSetAddDamTypeLoaded = (value) => {
-        setAddState(prev => {
-            return { ...prev, addDamTypeLoaded: value }
-        })
-    }
+
     const createNewDamType = (e) => {
         // validation
         const form = e.currentTarget
@@ -201,20 +196,15 @@ const DamTypeManagement = () => {
                     content: "Thêm loại đập không thành công",
                     icon: createFailIcon()
                 }))
-            })  
-            // To reset all add state
-            setAddState(addData)
+            })
         }
         setAddValidated(true)
     }
 
     const [addVisible, setAddVisible] = useState(false)
-    const addForm = (isLoaded) => {
-        return (
-            <>
-                {
-                isLoaded ?
-                <CForm 
+    const addForm = () => {
+        return <>
+                        <CForm 
                     onSubmit={e => createNewDamType(e)} 
                     noValidate
                     validated={addValidated}
@@ -250,10 +240,10 @@ const DamTypeManagement = () => {
                             <CButton type="submit" className="mt-4" color="primary">Hoàn tất</CButton>
                         </CCol>
                     </CRow>
-                </CForm> : <CSpinner />
-                }
-            </>
-            )
+                </CForm> 
+        </>
+
+
     }
  
     // Updating Model
@@ -269,25 +259,21 @@ const DamTypeManagement = () => {
         if (damTypeId) {
             getDamTypeById(damTypeId)
             .then(res => {
-                // if (res?.data.success) {
-                //     const user = res?.data?.data
-                //     setUpdateState(prev => {
-                //         return {
-                //             ...prev, 
-                //             updateUsername: user.username,
-                //             updateFullname: user.fullName,
-                //             updateEmail: user.email,
-                //             updateDomainId: user?.permission?.domain,
-                //             updateRoleId: user?.permission?.role
-                //         }
-                //     })
-                // }else {
-                //     addToast(createToast({
-                //         title: 'Cập nhật loại đập',
-                //         content: res?.data.message,
-                //         icon: createFailIcon()
-                //     }))
-                // }
+                const damType = res?.data
+                if (damType) {
+                    const updateDamTypeFetchData = {
+                        updateDamTypeId: damType?.damTypeId,
+                        updateDamTypeName: damType?.damTypeName,
+                        updateDamTypeDescription: damType?.damTypeDescription
+                    }
+                    setUpdateState(updateDamTypeFetchData)
+                }else {
+                    addToast(createToast({
+                        title: 'Cập nhật loại đập',
+                        content: "Thông tin loại đập không đúng",
+                        icon: createFailIcon()
+                    }))
+                }
             })
             .catch(err => {
                 addToast(createToast({
@@ -332,23 +318,14 @@ const DamTypeManagement = () => {
             }
             updateDamType(damType)
             .then(res => {
-                // if (res?.data?.success)  {
-                //     setUpdateVisible(false)
-                //     rebaseAllData()
-                //     addToast(createToast({
-                //         title: 'Cập nhật loại đập',
-                //         content: 'Cập nhật loại đập thành công',
-                //         icon: createSuccessIcon()
-                //     }))
-                //     setUpdateValidated(false)
-                // }else {
-                //     addToast(createToast({
-                //         title: 'Cập nhật loại đập',
-                //         content: res?.data?.message,
-                //         icon: createFailIcon()
-                //     }))
-                // }
-
+                setUpdateVisible(false)
+                rebaseAllData()
+                addToast(createToast({
+                    title: 'Cập nhật loại đập',
+                    content: 'Cập nhật loại đập thành công',
+                    icon: createSuccessIcon()
+                }))
+                setUpdateValidated(false)
             })
             .catch(err => {
                 addToast(createToast({
@@ -357,7 +334,6 @@ const DamTypeManagement = () => {
                     icon: createFailIcon()
                 }))
             })  
-            setUpdateState(updateData)
         }
         setUpdateValidated(true)
     }
@@ -387,7 +363,7 @@ const DamTypeManagement = () => {
                             <CCol lg={12}>
                                 <CFormInput
                                     className="mt-4"
-                                    type="password"
+                                    type="text"
                                     placeholder="Mô tả loại đập"
                                     onChange={(e) => handleSetUpdateDamTypeDescription(e.target.value)}
                                     value={updateDamTypeDescription}
@@ -464,6 +440,12 @@ const DamTypeManagement = () => {
         setDeleteVisible(true)
     }
 
+    useEffect(() => {
+        // To reset all add state
+        setAddState(addData)
+        setUpdateState(updateData)
+    }, [addVisible, updateVisible])
+
     return (
         <CRow>
         <CCol xs>
@@ -471,7 +453,7 @@ const DamTypeManagement = () => {
             <CToaster ref={toaster} push={toast} placement="top-end" />
             <CCardHeader>Danh sách loại đập</CCardHeader>
             <CCardBody>
-                <CustomModal visible={addVisible} title={'Thêm loại đập'} body={addForm(addDamTypeLoaded)} setVisible={(value) => setAddVisible(value)}/>
+                <CustomModal visible={addVisible} title={'Thêm loại đập'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
                 <CustomModal visible={updateVisible} title={'Cập nhật loại đập'} body={updateForm(updateDamTypeName)} setVisible={(value) => setUpdateVisible(value)}/>
                 <CustomModal visible={deleteVisible} title={'Xóa người loại đập'} body={deleteForm(deleteIdDamTypeId)} setVisible={(value) => setDeleteVisible(value)}/>
                 <CForm onSubmit={onFilter}>

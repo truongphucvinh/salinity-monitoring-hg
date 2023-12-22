@@ -260,8 +260,6 @@ const UserManagement = () => {
                     icon: createFailIcon()
                 }))
             })  
-            // To reset all add state
-            setAddState(addData)
         }
         setAddValidated(true)
     }
@@ -507,7 +505,6 @@ const UserManagement = () => {
                     icon: createFailIcon()
                 }))
             })  
-            setUpdateState(updateData)
         }
         setUpdateValidated(true)
     }
@@ -677,6 +674,12 @@ const UserManagement = () => {
         setDeleteId(userId)
         setDeleteVisible(true)
     }
+
+    useEffect(() => {
+        // To reset all add state
+        setAddState(addData)
+        setUpdateState(updateData)
+    },[addVisible, updateVisible])
 
     return (
         <CRow>
