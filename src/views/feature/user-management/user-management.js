@@ -270,7 +270,7 @@ const UserManagement = () => {
     const addForm = (isLoaded) => {
         return <>
         {
-            isLoaded ? <CSpinner /> : <CForm 
+            !isLoaded ? <CSpinner /> : <CForm 
             onSubmit={e => createNewUser(e)} 
             noValidate
             validated={addValidated}

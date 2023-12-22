@@ -31,11 +31,21 @@ import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import { createDamType, getAllDamTypes, getDamTypeById, updateDamType } from "src/services/dam-services"
+import CustomSpinner from "src/views/customs/my-spinner"
 
 const DamTypeManagement = () => {
 
-    // User Management Data
+    // Dam Type Management
     const [listDamTypes, setListDamTypes] = useState([])
+    const [isLoadedDamTypes, setIsLoadedDamTypes] = useState(false)
+    const handleSetIsLoadedDamTypes = (value) => {
+        setIsLoadedDamTypes(prev => {
+            return { ...prev, isLoadedDamTypes: value }
+        })
+    }
+    useEffect(() => {
+        handleSetIsLoadedDamTypes(true)
+    }, [listDamTypes])
     
     // Call inital APIs
     const rebaseAllData = () => {
@@ -45,7 +55,6 @@ const DamTypeManagement = () => {
             getAllDamTypes()
             .then(res => {
                 // Install filter users here
-                console.log(res)
                 const damTypes = res?.data
                 setListDamTypes(damTypes)
                 setFilteredDamTypes(damTypes)
@@ -103,13 +112,16 @@ const DamTypeManagement = () => {
 
 
     // Pagination + Filtering
-    const showFilteredTable = (filteredDamTypes, duration) => {
+    const showFilteredTable = (filteredDamTypes, duration, isLoaded) => {
         return (
-            <CTable bordered align="middle" className="mb-0 border" hover responsive>
+            <>
+                {
+                    !isLoaded ? <CustomSpinner /> :
+                    <CTable bordered align="middle" className="mb-0 border" hover responsive>
                 <CTableHead className="text-nowrap">
                   <CTableRow>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Tên loại đặp</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Tên loại đập</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '50%'}}>Mô tả</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Thao tác</CTableHeaderCell>
                   </CTableRow>
@@ -132,6 +144,9 @@ const DamTypeManagement = () => {
                     }
                 </CTableBody>
               </CTable>
+                }
+            </>
+            
         )
     }
     // Adding Modal
@@ -174,17 +189,16 @@ const DamTypeManagement = () => {
                 setAddVisible(false)
                 rebaseAllData()
                 addToast(createToast({
-                    title: 'Thêm loại đặp',
-                    content: 'Thêm loại đặp thành công',
+                    title: 'Thêm loại đập',
+                    content: 'Thêm loại đập thành công',
                     icon: createSuccessIcon()
                 }))
-                handleSetAddDamTypeLoaded(false)
                 setAddValidated(false)
             })
             .catch(err => {
                 addToast(createToast({
-                    title: 'Thêm loại đặp',
-                    content: "Thêm loại đặp không thành công",
+                    title: 'Thêm loại đập',
+                    content: "Thêm loại đập không thành công",
                     icon: createFailIcon()
                 }))
             })  
@@ -199,7 +213,7 @@ const DamTypeManagement = () => {
         return (
             <>
                 {
-                !isLoaded ?
+                isLoaded ?
                 <CForm 
                     onSubmit={e => createNewDamType(e)} 
                     noValidate
@@ -210,8 +224,8 @@ const DamTypeManagement = () => {
                             <CFormInput
                                 className="mt-4"
                                 type="text"
-                                placeholder="Tên loại đặp"
-                                feedbackInvalid="Chưa nhập tên loại đặp!"
+                                placeholder="Tên loại đập"
+                                feedbackInvalid="Chưa nhập tên loại đập!"
                                 onChange={(e) => handleSetAddDamTypeName(e.target.value)}
                                 value={addDamTypeName}
                                 aria-describedby="exampleFormControlInputHelpInline"
@@ -224,7 +238,7 @@ const DamTypeManagement = () => {
                             <CFormInput
                                 className="mt-4"
                                 type="text"
-                                placeholder="Mô tả loại đặp"
+                                placeholder="Mô tả loại đập"
                                 onChange={(e) => handleSetAddDamTypeDescription(e.target.value)}
                                 value={addDamTypeDescription}
                                 aria-describedby="exampleFormControlInputHelpInline"
@@ -269,7 +283,7 @@ const DamTypeManagement = () => {
                 //     })
                 // }else {
                 //     addToast(createToast({
-                //         title: 'Cập nhật người dùng',
+                //         title: 'Cập nhật loại đập',
                 //         content: res?.data.message,
                 //         icon: createFailIcon()
                 //     }))
@@ -277,8 +291,8 @@ const DamTypeManagement = () => {
             })
             .catch(err => {
                 addToast(createToast({
-                    title: 'Cập nhật loại đặp',
-                    content: "Thông tin loại đặp không đúng",
+                    title: 'Cập nhật loại đập',
+                    content: "Thông tin loại đập không đúng",
                     icon: createFailIcon()
                 }))
             })
@@ -322,14 +336,14 @@ const DamTypeManagement = () => {
                 //     setUpdateVisible(false)
                 //     rebaseAllData()
                 //     addToast(createToast({
-                //         title: 'Cập nhật người dùng',
-                //         content: 'Cập nhật người dùng thành công',
+                //         title: 'Cập nhật loại đập',
+                //         content: 'Cập nhật loại đập thành công',
                 //         icon: createSuccessIcon()
                 //     }))
                 //     setUpdateValidated(false)
                 // }else {
                 //     addToast(createToast({
-                //         title: 'Cập nhật người dùng',
+                //         title: 'Cập nhật loại đập',
                 //         content: res?.data?.message,
                 //         icon: createFailIcon()
                 //     }))
@@ -338,8 +352,8 @@ const DamTypeManagement = () => {
             })
             .catch(err => {
                 addToast(createToast({
-                    title: 'Cập nhật loại đặp',
-                    content: "Cập nhật loại đặp không thành công",
+                    title: 'Cập nhật loại đập',
+                    content: "Cập nhật loại đập không thành công",
                     icon: createFailIcon()
                 }))
             })  
@@ -362,7 +376,7 @@ const DamTypeManagement = () => {
                                 <CFormInput
                                     className="mt-4"
                                     type="text"
-                                    placeholder="Tên loại đặp"
+                                    placeholder="Tên loại đập"
                                     onChange={(e) => handleSetUpdateDamTypeName(e.target.value)}
                                     value={updateDamTypeName}
                                     aria-describedby="exampleFormControlInputHelpInline"
@@ -374,7 +388,7 @@ const DamTypeManagement = () => {
                                 <CFormInput
                                     className="mt-4"
                                     type="password"
-                                    placeholder="Mô tả loại đặp"
+                                    placeholder="Mô tả loại đập"
                                     onChange={(e) => handleSetUpdateDamTypeDescription(e.target.value)}
                                     value={updateDamTypeDescription}
                                     aria-describedby="exampleFormControlInputHelpInline"
@@ -401,14 +415,14 @@ const DamTypeManagement = () => {
                 //     setDeleteVisible(false)
                 //     rebaseAllData()
                 //     addToast(createToast({
-                //         title: 'Xóa người dùng',
-                //         content: 'Xóa người dùng thành công',
+                //         title: 'Xóa loại đập',
+                //         content: 'Xóa loại đập thành công',
                 //         icon: createSuccessIcon()
                 //     }))
                 //     setUpdateValidated(false)
                 // }else {
                 //     addToast(createToast({
-                //         title: 'Xóa người dùng',
+                //         title: 'Xóa loại đập',
                 //         content: res?.data?.message,
                 //         icon: createFailIcon()
                 //     }))
@@ -416,8 +430,8 @@ const DamTypeManagement = () => {
             })
             .catch(err => {
                 addToast(createToast({
-                    title: 'Xóa loại đặp',
-                    content: "Xóa loại đặp không thành công",
+                    title: 'Xóa loại đập',
+                    content: "Xóa loại đập không thành công",
                     icon: createFailIcon()
                 }))
             })
@@ -433,7 +447,7 @@ const DamTypeManagement = () => {
                     <CForm onSubmit={() => deleteADamType(damTypeId)}>
                         <CRow>
                             <CCol md={12}>
-                                <p>Bạn có chắc muốn xóa loại đặp này ?</p>
+                                <p>Bạn có chắc muốn xóa loại đập này ?</p>
                             </CCol>
                             <CCol md={12} className="d-flex justify-content-end">
                                 <CButton color="primary" type="submit">Xác nhận</CButton>
@@ -455,18 +469,18 @@ const DamTypeManagement = () => {
         <CCol xs>
           <CCard className="mb-4">
             <CToaster ref={toaster} push={toast} placement="top-end" />
-            <CCardHeader>Danh sách loại đặp</CCardHeader>
+            <CCardHeader>Danh sách loại đập</CCardHeader>
             <CCardBody>
-                <CustomModal visible={addVisible} title={'Thêm người dùng'} body={addForm(addDamTypeLoaded)} setVisible={(value) => setAddVisible(value)}/>
-                <CustomModal visible={updateVisible} title={'Cập nhật người dùng'} body={updateForm(updateDamTypeName)} setVisible={(value) => setUpdateVisible(value)}/>
-                <CustomModal visible={deleteVisible} title={'Xóa người người dùng'} body={deleteForm(deleteIdDamTypeId)} setVisible={(value) => setDeleteVisible(value)}/>
+                <CustomModal visible={addVisible} title={'Thêm loại đập'} body={addForm(addDamTypeLoaded)} setVisible={(value) => setAddVisible(value)}/>
+                <CustomModal visible={updateVisible} title={'Cập nhật loại đập'} body={updateForm(updateDamTypeName)} setVisible={(value) => setUpdateVisible(value)}/>
+                <CustomModal visible={deleteVisible} title={'Xóa người loại đập'} body={deleteForm(deleteIdDamTypeId)} setVisible={(value) => setDeleteVisible(value)}/>
                 <CForm onSubmit={onFilter}>
                     <CRow>
                         <CCol md={12} lg={3}>
                             <CFormInput
                                 className="mb-2"
                                 type="text"
-                                placeholder="Tên loại đặp"
+                                placeholder="Tên loại đập"
                                 onChange={(e) => handleSetDamTypeName(e.target.value)}
                                 aria-describedby="exampleFormControlInputHelpInline"
                             />
@@ -475,7 +489,7 @@ const DamTypeManagement = () => {
                             <CFormInput
                                 className="mb-2"
                                 type="text"
-                                placeholder="Mô tả loại đặp"
+                                placeholder="Mô tả loại đập"
                                 onChange={(e) => handleSetDamTypeDescription(e.target.value)}
                                 aria-describedby="exampleFormControlInputHelpInline"
                             />
@@ -497,7 +511,7 @@ const DamTypeManagement = () => {
                 </CCol>
               </CRow>
               <br />
-              <CustomPagination listItems={filteredDamTypes} showData={showFilteredTable} />
+              <CustomPagination listItems={filteredDamTypes} showData={showFilteredTable} isLoaded={isLoadedDamTypes} />
             </CCardBody>
           </CCard>
         </CCol>
