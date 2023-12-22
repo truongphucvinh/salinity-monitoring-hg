@@ -177,11 +177,17 @@ const UserManagement = () => {
         addFullname: '',
         addEmail: '',
         addDomainId: '',
-        addRoleId: ''
+        addRoleId: '',
+        addLoaded: true
     }
     const [addState, setAddState] = useState(addData)
-    const { addUsername, addPassword, addFullname, addEmail, addDomainId, addRoleId } = addState
+    const { addLoaded, addUsername, addPassword, addFullname, addEmail, addDomainId, addRoleId } = addState
     const [addValidated, setAddValidated] = useState(false)
+    const handleSetAddLoaded = (value) => {
+        setAddState(prev => {
+            return { ...prev, addLoaded: value }
+        })
+    }
     const handleSetAddUsername = (value) => {
         setAddState(prev => {
             return { ...prev, addUsername: value }
@@ -237,6 +243,7 @@ const UserManagement = () => {
                         content: 'Thêm người dùng thành công',
                         icon: createSuccessIcon()
                     }))
+                    handleSetAddLoaded(false)
                     setAddValidated(false)
                 }else {
                     addToast(createToast({
@@ -260,112 +267,117 @@ const UserManagement = () => {
     }
 
     const [addVisible, setAddVisible] = useState(false)
-    const addForm = (
-            <CForm 
-                onSubmit={e => createNewUser(e)} 
-                noValidate
-                validated={addValidated}
-            >
-                <CRow>
-                    <CCol lg={12}>
-                        <CFormInput
-                            className="mt-4"
-                            type="text"
-                            placeholder="Tên tài khoản"
-                            feedbackInvalid="Chưa nhập tên tài khoản!"
-                            onChange={(e) => handleSetAddUsername(e.target.value)}
-                            value={addUsername}
-                            aria-describedby="exampleFormControlInputHelpInline"
-                            required
-                        />
-                    </CCol>
-                </CRow>
-                <CRow>
-                    <CCol lg={12}>
-                        <CFormInput
-                            className="mt-4"
-                            type="password"
-                            placeholder="Mật khẩu"
-                            feedbackInvalid="Chưa nhập mật khẩu!"
-                            onChange={(e) => handleSetAddPassword(e.target.value)}
-                            value={addPassword}
-                            aria-describedby="exampleFormControlInputHelpInline"
-                            required
-                        />
-                    </CCol>
-                </CRow>
-                <CRow>
-                    <CCol lg={12}>
-                        <CFormInput
-                            className="mt-4"
-                            type="text"
-                            placeholder="Họ và tên"
-                            feedbackInvalid="Chưa nhập họ và tên!"
-                            onChange={(e) => handleSetAddFullname(e.target.value)}
-                            value={addFullname}
-                            aria-describedby="exampleFormControlInputHelpInline"
-                            required
-                        />
-                    </CCol>
-                </CRow>
-                <CRow>
-                    <CCol lg={12}>
-                        <CFormInput
-                            className="mt-4"
-                            type="email"
-                            placeholder="Email"
-                            feedbackInvalid="Chưa nhập Email!"
-                            onChange={(e) => handleSetAddEmail(e.target.value)}
-                            value={addEmail}
-                            aria-describedby="exampleFormControlInputHelpInline"
-                            required
-                        />
-                    </CCol>
-                </CRow>
-                <CRow>
-                    <CCol lg={12}>
-                        <CFormSelect
-                            aria-label="Default select example" 
-                            className="mt-4" 
-                            onChange={(e) => handleSetAddDomainId(e.target.value)} 
-                            required
-                            value={addDomainId}
-                            feedbackInvalid="Chưa chọn tổ chức!"
-                        >
-                            <option selected="" value="">Tổ chức</option>
-                            {
-                                listDomains.map((domain) => {
-                                    return  <option key={domain?._id} value={domain?._id}>{domain?.name}</option>
-                                })
-                            }
-                        </CFormSelect>
-                    </CCol>
-                </CRow>
-                <CRow>
-                    <CCol lg={12}>
-                        <CFormSelect 
-                            aria-label="Default select example" 
-                            className="mt-4"
-                            onChange={(e) => handleSetAddRoleId(e.target.value)}
-                            value={addRoleId}
-                            required
-                            feedbackInvalid="Chưa chọn vai trò!"
-                        >
-                            <option selected="" value="" >Vai trò</option>
-                            {
-                                listRoles.map((role) => {
-                                    return  <option key={role?._id} value={role?._id}>{role?.name}</option>
-                                })
-                            }
-                        </CFormSelect>
-                    </CCol>
-                </CRow>
-                <CRow>
-                    <CCol lg={12} className="d-flex justify-content-end">
-                        <CButton type="submit" className="mt-4" color="primary">Hoàn tất</CButton>
-                    </CCol>
-                </CRow>
-            </CForm>)
+    const addForm = (isLoaded) => {
+        return <>
+        {
+            isLoaded ? <CSpinner /> : <CForm 
+            onSubmit={e => createNewUser(e)} 
+            noValidate
+            validated={addValidated}
+        >
+            <CRow>
+                <CCol lg={12}>
+                    <CFormInput
+                        className="mt-4"
+                        type="text"
+                        placeholder="Tên tài khoản"
+                        feedbackInvalid="Chưa nhập tên tài khoản!"
+                        onChange={(e) => handleSetAddUsername(e.target.value)}
+                        value={addUsername}
+                        aria-describedby="exampleFormControlInputHelpInline"
+                        required
+                    />
+                </CCol>
+            </CRow>
+            <CRow>
+                <CCol lg={12}>
+                    <CFormInput
+                        className="mt-4"
+                        type="password"
+                        placeholder="Mật khẩu"
+                        feedbackInvalid="Chưa nhập mật khẩu!"
+                        onChange={(e) => handleSetAddPassword(e.target.value)}
+                        value={addPassword}
+                        aria-describedby="exampleFormControlInputHelpInline"
+                        required
+                    />
+                </CCol>
+            </CRow>
+            <CRow>
+                <CCol lg={12}>
+                    <CFormInput
+                        className="mt-4"
+                        type="text"
+                        placeholder="Họ và tên"
+                        feedbackInvalid="Chưa nhập họ và tên!"
+                        onChange={(e) => handleSetAddFullname(e.target.value)}
+                        value={addFullname}
+                        aria-describedby="exampleFormControlInputHelpInline"
+                        required
+                    />
+                </CCol>
+            </CRow>
+            <CRow>
+                <CCol lg={12}>
+                    <CFormInput
+                        className="mt-4"
+                        type="email"
+                        placeholder="Email"
+                        feedbackInvalid="Chưa nhập Email!"
+                        onChange={(e) => handleSetAddEmail(e.target.value)}
+                        value={addEmail}
+                        aria-describedby="exampleFormControlInputHelpInline"
+                        required
+                    />
+                </CCol>
+            </CRow>
+            <CRow>
+                <CCol lg={12}>
+                    <CFormSelect
+                        aria-label="Default select example" 
+                        className="mt-4" 
+                        onChange={(e) => handleSetAddDomainId(e.target.value)} 
+                        required
+                        value={addDomainId}
+                        feedbackInvalid="Chưa chọn tổ chức!"
+                    >
+                        <option selected="" value="">Tổ chức</option>
+                        {
+                            listDomains.map((domain) => {
+                                return  <option key={domain?._id} value={domain?._id}>{domain?.name}</option>
+                            })
+                        }
+                    </CFormSelect>
+                </CCol>
+            </CRow>
+            <CRow>
+                <CCol lg={12}>
+                    <CFormSelect 
+                        aria-label="Default select example" 
+                        className="mt-4"
+                        onChange={(e) => handleSetAddRoleId(e.target.value)}
+                        value={addRoleId}
+                        required
+                        feedbackInvalid="Chưa chọn vai trò!"
+                    >
+                        <option selected="" value="" >Vai trò</option>
+                        {
+                            listRoles.map((role) => {
+                                return  <option key={role?._id} value={role?._id}>{role?.name}</option>
+                            })
+                        }
+                    </CFormSelect>
+                </CCol>
+            </CRow>
+            <CRow>
+                <CCol lg={12} className="d-flex justify-content-end">
+                    <CButton type="submit" className="mt-4" color="primary">Hoàn tất</CButton>
+                </CCol>
+            </CRow>
+        </CForm>          
+        }
+    </>
+    } 
  
     // Updating Model
     const updateData = {
@@ -673,7 +685,7 @@ const UserManagement = () => {
             <CToaster ref={toaster} push={toast} placement="top-end" />
             <CCardHeader>Danh sách người dùng</CCardHeader>
             <CCardBody>
-                <CustomModal visible={addVisible} title={'Thêm người dùng'} body={addForm} setVisible={(value) => setAddVisible(value)}/>
+                <CustomModal visible={addVisible} title={'Thêm người dùng'} body={addForm(addLoaded)} setVisible={(value) => setAddVisible(value)}/>
                 <CustomModal visible={updateVisible} title={'Cập nhật người dùng'} body={updateForm(updateUsername)} setVisible={(value) => setUpdateVisible(value)}/>
                 <CustomModal visible={deleteVisible} title={'Xóa người người dùng'} body={deleteForm(deleteId)} setVisible={(value) => setDeleteVisible(value)}/>
                 <CForm onSubmit={onFilter}>

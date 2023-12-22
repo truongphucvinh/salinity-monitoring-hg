@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react"
-import * as CryptoJS from 'crypto-js'
 import {
     CCard,
     CCardBody,
@@ -16,7 +15,6 @@ import {
     CFormInput,
     CForm,
     CToaster,
-    CFormSelect,
     CSpinner
   } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
@@ -27,52 +25,32 @@ import {
     cilReload,
     cilPlus
   } from '@coreui/icons'
-import { createUser, deleteUser, getAllDomains, getAllRoles, getAllUsers, getUserById, updateUser } from "src/services/authentication-services"
 import { setAuthApiHeader } from "src/services/global-axios"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
+import { createDamType, getAllDamTypes, getDamTypeById, updateDamType } from "src/services/dam-services"
 
 const DamTypeManagement = () => {
 
     // User Management Data
-    const [listUsers, setListUsers] = useState([])
-    const [listDomains, setListDomains] = useState([])
-    const [listRoles, setListRoles] = useState([])
-    const secretKey = process.env.AUTH_TOKEN || 'oda_dev'
+    const [listDamTypes, setListDamTypes] = useState([])
     
     // Call inital APIs
     const rebaseAllData = () => {
         if (JSON.parse(localStorage.getItem("_isAuthenticated"))) {
             // Setting up access token
             setAuthApiHeader()
-            getAllUsers()
+            getAllDamTypes()
             .then(res => {
                 // Install filter users here
-                const users = res?.data?.data?.result
-                setListUsers(users)
-                setFilteredUsers(users)
+                console.log(res)
+                const damTypes = res?.data
+                setListDamTypes(damTypes)
+                setFilteredDamTypes(damTypes)
             })
             .catch(err => {
-                // Do nothing
-            })
-            
-            getAllDomains()
-            .then(res => {
-                const domains = res?.data?.data?.result
-                setListDomains(domains)
-            })
-            .catch(err => {
-                // Do nothing
-            })
-
-            getAllRoles()
-            .then((res) => {
-                const roles = res?.data?.data?.result
-                setListRoles(roles)
-            })
-            .catch((err) => {
                 // Do nothing
             })
         }
@@ -82,46 +60,34 @@ const DamTypeManagement = () => {
     },[])
 
     // Searching data
-    const [filteredUsers, setFilteredUsers] = useState([])
+    const [filteredDamTypes, setFilteredDamTypes] = useState([])
     const initSearch = {
-        username: '',
-        email: '',
-        fullName: ''
+        damTypeName: "",
+        damTypeDescription: ""
     }
     const [searchState, setSearchState] = useState(initSearch)
-    const {username, email, fullName} = searchState
-    const handleSetUsername = (value) => {
+    const {damTypeName, damTypeDescription} = searchState
+    const handleSetDamTypeName = (value) => {
         setSearchState(prev => {
-            return {...prev, username: value}
+            return {...prev, damTypeName: value}
         })
     }
-    const handleSetEmail = (value) => {
+    const handleSetDamTypeDescription = (value) => {
         setSearchState(prev => {
-            return {...prev, email: value}
-        })
-    }
-    const handleSetFullName = (value) => {
-        setSearchState(prev => {
-            return {...prev, fullName: value}
+            return {...prev, damTypeDescription: value}
         })
     }
     const onFilter = () => {
-        if (username || email || fullName) {
-            setFilteredUsers(listUsers)
-            if (username) {
-                setFilteredUsers(prev => {
-                    return prev.filter(user => user?.username?.includes(username.trim()))
+        if (damTypeName || damTypeDescription) {
+            setFilteredDamTypes(listDamTypes)
+            if (damTypeName) {
+                setFilteredDamTypes(prev => {
+                    return prev.filter(damType => damType?.damTypeName?.includes(damTypeName.trim()))
                 })
             }
-            if (email) {
-                setFilteredUsers(prev => {
-                    return prev.filter(user => user?.email?.includes(email.trim()))
-                })
-            }
-            if (fullName) {
-                console.log();
-                setFilteredUsers(prev => {
-                    return prev.filter(user => user?.fullName?.includes(fullName.trim()))
+            if (damTypeDescription) {
+                setFilteredDamTypes(prev => {
+                    return prev.filter(damType => damType?.damTypeDescription?.includes(damTypeDescription.trim()))
                 })
             }
         }else {
@@ -129,7 +95,7 @@ const DamTypeManagement = () => {
         }
     }
     const onReset = () => {
-        setFilteredUsers(listUsers)
+        setFilteredDamTypes(listDamTypes)
     }
     // Toast
     const [toast, addToast] = useState(0)
@@ -137,30 +103,28 @@ const DamTypeManagement = () => {
 
 
     // Pagination + Filtering
-    const showFilteredTable = (filteredUsers, duration) => {
+    const showFilteredTable = (filteredDamTypes, duration) => {
         return (
             <CTable bordered align="middle" className="mb-0 border" hover responsive>
                 <CTableHead className="text-nowrap">
                   <CTableRow>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Tên tài khoản</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Email</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Họ và tên</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Tên loại đặp</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '50%'}}>Mô tả</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Thao tác</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
                     {
-                        filteredUsers.map((user, index) => {
+                        filteredDamTypes.map((damType, index) => {
                             return (
-                                <CTableRow key={user._id}>
+                                <CTableRow key={damType?.damTypeId}>
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
-                                    <CTableDataCell>{user?.username}</CTableDataCell>
-                                    <CTableDataCell>{user?.email}</CTableDataCell>
-                                    <CTableDataCell>{user?.fullName}</CTableDataCell>
+                                    <CTableDataCell>{damType?.damTypeName}</CTableDataCell>
+                                    <CTableDataCell>{damType?.damTypeDescription}</CTableDataCell>
                                     <CTableDataCell>
-                                        <CIcon icon={cilPencil} onClick={() => openUpdateModal(user?._id)} className="text-success mx-1" role="button"/>
-                                        <CIcon icon={cilTrash} onClick={() => openDeleteModal(user?._id)}  className="text-danger" role="button"/>
+                                        <CIcon icon={cilPencil} onClick={() => openUpdateModal(damType?.damTypeId)} className="text-success mx-1" role="button"/>
+                                        <CIcon icon={cilTrash} onClick={() => openDeleteModal(damType?.damTypeId)}  className="text-danger" role="button"/>
                                     </CTableDataCell>
                                 </CTableRow>    
                             )
@@ -172,84 +136,55 @@ const DamTypeManagement = () => {
     }
     // Adding Modal
     const addData = {
-        addUsername: '',
-        addPassword: '',
-        addFullname: '',
-        addEmail: '',
-        addDomainId: '',
-        addRoleId: ''
+        addDamTypeName: "",
+        addDamTypeDescription: "",
+        addDamTypeLoaded: true
     }
     const [addState, setAddState] = useState(addData)
-    const { addUsername, addPassword, addFullname, addEmail, addDomainId, addRoleId } = addState
+    const { addDamTypeName, addDamTypeDescription, addDamTypeLoaded } = addState
     const [addValidated, setAddValidated] = useState(false)
-    const handleSetAddUsername = (value) => {
+    const handleSetAddDamTypeName = (value) => {
         setAddState(prev => {
-            return { ...prev, addUsername: value }
+            return { ...prev, addDamTypeName: value }
         })
     }
-    const handleSetAddPassword = (value) => {
+    const handleSetAddDamTypeDescription = (value) => {
         setAddState(prev => {
-            return { ...prev, addPassword: value }
+            return { ...prev, addDamTypeDescription: value }
         })
     }
-    const handleSetAddFullname = (value) => {
+    const handleSetAddDamTypeLoaded = (value) => {
         setAddState(prev => {
-            return { ...prev, addFullname: value }
+            return { ...prev, addDamTypeLoaded: value }
         })
     }
-    const handleSetAddEmail = (value) => {
-        setAddState(prev => {
-            return { ...prev, addEmail: value }
-        })
-    }
-    const handleSetAddDomainId = (value) => {
-        setAddState(prev => {
-            return { ...prev, addDomainId: value }
-        })
-    }
-    const handleSetAddRoleId = (value) => {
-        setAddState(prev => {
-            return { ...prev, addRoleId: value }
-        })
-    }
-    const createNewUser = (e) => {
+    const createNewDamType = (e) => {
         // validation
         const form = e.currentTarget
         if (form.checkValidity() === false) {
             e.preventDefault()
             e.stopPropagation()
         } else {
-            const user = {
-                username: addUsername,
-                fullName: addFullname,
-                password: CryptoJS.AES.encrypt(addPassword || '', secretKey).toString(),
-                email: addEmail,
-                domain: addDomainId,
-                role: addRoleId
+            const damType = {
+                damTypeName: addDamTypeName.trim(),
+                damTypeDescription: addDamTypeDescription.trim()
             }
-            createUser(user)
+            createDamType(damType)
             .then(res => {
-                if (res?.data?.success)  {
-                    setAddVisible(false)
-                    rebaseAllData()
-                    addToast(createToast({
-                        title: 'Thêm người dùng',
-                        content: 'Thêm người dùng thành công',
-                        icon: createSuccessIcon()
-                    }))
-                    setAddValidated(false)
-                }else {
-                    addToast(createToast({
-                        title: 'Thêm người dùng',
-                        content: res?.data?.message,
-                        icon: createFailIcon()
-                    }))
-                }
+                setAddVisible(false)
+                rebaseAllData()
+                addToast(createToast({
+                    title: 'Thêm loại đặp',
+                    content: 'Thêm loại đặp thành công',
+                    icon: createSuccessIcon()
+                }))
+                handleSetAddDamTypeLoaded(false)
+                setAddValidated(false)
             })
             .catch(err => {
                 addToast(createToast({
-                    title: 'Thêm người dùng',
-                    content: "Thêm người dùng không thành công",
+                    title: 'Thêm loại đặp',
+                    content: "Thêm loại đặp không thành công",
                     icon: createFailIcon()
                 }))
             })  
@@ -260,238 +195,151 @@ const DamTypeManagement = () => {
     }
 
     const [addVisible, setAddVisible] = useState(false)
-    const addForm = (
-            <CForm 
-                onSubmit={e => createNewUser(e)} 
-                noValidate
-                validated={addValidated}
-            >
-                <CRow>
-                    <CCol lg={12}>
-                        <CFormInput
-                            className="mt-4"
-                            type="text"
-                            placeholder="Tên tài khoản"
-                            feedbackInvalid="Chưa nhập tên tài khoản!"
-                            onChange={(e) => handleSetAddUsername(e.target.value)}
-                            value={addUsername}
-                            aria-describedby="exampleFormControlInputHelpInline"
-                            required
-                        />
-                    </CCol>
-                </CRow>
-                <CRow>
-                    <CCol lg={12}>
-                        <CFormInput
-                            className="mt-4"
-                            type="password"
-                            placeholder="Mật khẩu"
-                            feedbackInvalid="Chưa nhập mật khẩu!"
-                            onChange={(e) => handleSetAddPassword(e.target.value)}
-                            value={addPassword}
-                            aria-describedby="exampleFormControlInputHelpInline"
-                            required
-                        />
-                    </CCol>
-                </CRow>
-                <CRow>
-                    <CCol lg={12}>
-                        <CFormInput
-                            className="mt-4"
-                            type="text"
-                            placeholder="Họ và tên"
-                            feedbackInvalid="Chưa nhập họ và tên!"
-                            onChange={(e) => handleSetAddFullname(e.target.value)}
-                            value={addFullname}
-                            aria-describedby="exampleFormControlInputHelpInline"
-                            required
-                        />
-                    </CCol>
-                </CRow>
-                <CRow>
-                    <CCol lg={12}>
-                        <CFormInput
-                            className="mt-4"
-                            type="email"
-                            placeholder="Email"
-                            feedbackInvalid="Chưa nhập Email!"
-                            onChange={(e) => handleSetAddEmail(e.target.value)}
-                            value={addEmail}
-                            aria-describedby="exampleFormControlInputHelpInline"
-                            required
-                        />
-                    </CCol>
-                </CRow>
-                <CRow>
-                    <CCol lg={12}>
-                        <CFormSelect
-                            aria-label="Default select example" 
-                            className="mt-4" 
-                            onChange={(e) => handleSetAddDomainId(e.target.value)} 
-                            required
-                            value={addDomainId}
-                            feedbackInvalid="Chưa chọn tổ chức!"
-                        >
-                            <option selected="" value="">Tổ chức</option>
-                            {
-                                listDomains.map((domain) => {
-                                    return  <option key={domain?._id} value={domain?._id}>{domain?.name}</option>
-                                })
-                            }
-                        </CFormSelect>
-                    </CCol>
-                </CRow>
-                <CRow>
-                    <CCol lg={12}>
-                        <CFormSelect 
-                            aria-label="Default select example" 
-                            className="mt-4"
-                            onChange={(e) => handleSetAddRoleId(e.target.value)}
-                            value={addRoleId}
-                            required
-                            feedbackInvalid="Chưa chọn vai trò!"
-                        >
-                            <option selected="" value="" >Vai trò</option>
-                            {
-                                listRoles.map((role) => {
-                                    return  <option key={role?._id} value={role?._id}>{role?.name}</option>
-                                })
-                            }
-                        </CFormSelect>
-                    </CCol>
-                </CRow>
-                <CRow>
-                    <CCol lg={12} className="d-flex justify-content-end">
-                        <CButton type="submit" className="mt-4" color="primary">Hoàn tất</CButton>
-                    </CCol>
-                </CRow>
-            </CForm>)
+    const addForm = (isLoaded) => {
+        return (
+            <>
+                {
+                !isLoaded ?
+                <CForm 
+                    onSubmit={e => createNewDamType(e)} 
+                    noValidate
+                    validated={addValidated}
+                >
+                    <CRow>
+                        <CCol lg={12}>
+                            <CFormInput
+                                className="mt-4"
+                                type="text"
+                                placeholder="Tên loại đặp"
+                                feedbackInvalid="Chưa nhập tên loại đặp!"
+                                onChange={(e) => handleSetAddDamTypeName(e.target.value)}
+                                value={addDamTypeName}
+                                aria-describedby="exampleFormControlInputHelpInline"
+                                required
+                            />
+                        </CCol>
+                    </CRow>
+                    <CRow>
+                        <CCol lg={12}>
+                            <CFormInput
+                                className="mt-4"
+                                type="text"
+                                placeholder="Mô tả loại đặp"
+                                onChange={(e) => handleSetAddDamTypeDescription(e.target.value)}
+                                value={addDamTypeDescription}
+                                aria-describedby="exampleFormControlInputHelpInline"
+                            />
+                        </CCol>
+                    </CRow>
+                    <CRow>
+                        <CCol lg={12} className="d-flex justify-content-end">
+                            <CButton type="submit" className="mt-4" color="primary">Hoàn tất</CButton>
+                        </CCol>
+                    </CRow>
+                </CForm> : <CSpinner />
+                }
+            </>
+            )
+    }
  
     // Updating Model
     const updateData = {
-        updateId: '',
-        updateUsername: '',
-        updatePassword: '',
-        updateFullname: '',
-        updateEmail: '',
-        updateDomainId: '',
-        updateRoleId: ''
+        updateDamTypeId: '',
+        updateDamTypeName: '',
+        updateDamTypeDescription: ''
     }
     const [updateState, setUpdateState] = useState(updateData)
-    const { updateId, updateUsername, updatePassword, updateFullname, updateEmail, updateDomainId, updateRoleId } = updateState
+    const { updateDamTypeId, updateDamTypeName, updateDamTypeDescription } = updateState
     const [updateValidated, setUpdateValidated] = useState(false)
-    const getUserDataById = (userId) => {
-        if (userId) {
-            getUserById(userId)
+    const getDamTypeDataById = (damTypeId) => {
+        if (damTypeId) {
+            getDamTypeById(damTypeId)
             .then(res => {
-                if (res?.data.success) {
-                    const user = res?.data?.data
-                    setUpdateState(prev => {
-                        return {
-                            ...prev, 
-                            updateUsername: user.username,
-                            updateFullname: user.fullName,
-                            updateEmail: user.email,
-                            updateDomainId: user?.permission?.domain,
-                            updateRoleId: user?.permission?.role
-                        }
-                    })
-                }else {
-                    addToast(createToast({
-                        title: 'Cập nhật người dùng',
-                        content: res?.data.message,
-                        icon: createFailIcon()
-                    }))
-                }
+                // if (res?.data.success) {
+                //     const user = res?.data?.data
+                //     setUpdateState(prev => {
+                //         return {
+                //             ...prev, 
+                //             updateUsername: user.username,
+                //             updateFullname: user.fullName,
+                //             updateEmail: user.email,
+                //             updateDomainId: user?.permission?.domain,
+                //             updateRoleId: user?.permission?.role
+                //         }
+                //     })
+                // }else {
+                //     addToast(createToast({
+                //         title: 'Cập nhật người dùng',
+                //         content: res?.data.message,
+                //         icon: createFailIcon()
+                //     }))
+                // }
             })
             .catch(err => {
                 addToast(createToast({
-                    title: 'Cập nhật người dùng',
-                    content: "Thông tin người dùng không đúng",
+                    title: 'Cập nhật loại đặp',
+                    content: "Thông tin loại đặp không đúng",
                     icon: createFailIcon()
                 }))
             })
         }
     }
-    const handleSetUpdateId = (value) => {
+    const handleSetUpdateDamTypeId = (value) => {
         setUpdateState(prev => {
-            return { ...prev, updateId: value }
+            return { ...prev, damTypeId: value }
         })
     }
-    const openUpdateModal = (userId) => {
-        handleSetUpdateId(userId)
-        getUserDataById(userId)
+    const openUpdateModal = (damTypeId) => {
+        handleSetUpdateDamTypeId(damTypeId)
+        getDamTypeDataById(damTypeId)
         setUpdateVisible(true)
     }
-    const handleSetUpdateUsername = (value) => {
+    const handleSetUpdateDamTypeName = (value) => {
         setUpdateState(prev => {
-            return { ...prev, updateUsername: value }
+            return { ...prev, updateDamTypeName: value }
         })
     }
-    const handleSetUpdatePassword = (value) => {
+    const handleSetUpdateDamTypeDescription = (value) => {
         setUpdateState(prev => {
-            return { ...prev, updatePassword: value }
+            return { ...prev, updateDamTypeDescription: value }
         })
     }
-    const handleSetUpdateFullname = (value) => {
-        setUpdateState(prev => {
-            return { ...prev, updateFullname: value }
-        })
-    }
-    const handleSetUpdateEmail = (value) => {
-        setUpdateState(prev => {
-            return { ...prev, updateEmail: value }
-        })
-    }
-    const handleSetUpdateDomainId = (value) => {
-        setUpdateState(prev => {
-            return { ...prev, updateDomainId: value }
-        })
-    }
-    const handleSetUpdateRoleId = (value) => {
-        setUpdateState(prev => {
-            return { ...prev, updateRoleId: value }
-        })
-    }
-    const updateAUser = (e) => {
+    const updateADamType = (e) => {
         // validation
         const form = e.currentTarget
         if (form.checkValidity() === false) {
             e.preventDefault()
             e.stopPropagation()
         } else {
-            const user = {
-                username: updateUsername,
-                fullName: updateFullname,
-                password: CryptoJS.AES.encrypt(updatePassword || '', secretKey).toString(),
-                email: updateEmail,
-                domain: updateDomainId,
-                role: updateRoleId
+            const damType = {
+                damTypeId: updateDamTypeId,
+                damTypeName: updateDamTypeName,
+                damTypeDescription: updateDamTypeDescription
             }
-            updateUser(user, updateId)
+            updateDamType(damType)
             .then(res => {
-                if (res?.data?.success)  {
-                    setUpdateVisible(false)
-                    rebaseAllData()
-                    addToast(createToast({
-                        title: 'Cập nhật người dùng',
-                        content: 'Cập nhật người dùng thành công',
-                        icon: createSuccessIcon()
-                    }))
-                    setUpdateValidated(false)
-                }else {
-                    addToast(createToast({
-                        title: 'Cập nhật người dùng',
-                        content: res?.data?.message,
-                        icon: createFailIcon()
-                    }))
-                }
+                // if (res?.data?.success)  {
+                //     setUpdateVisible(false)
+                //     rebaseAllData()
+                //     addToast(createToast({
+                //         title: 'Cập nhật người dùng',
+                //         content: 'Cập nhật người dùng thành công',
+                //         icon: createSuccessIcon()
+                //     }))
+                //     setUpdateValidated(false)
+                // }else {
+                //     addToast(createToast({
+                //         title: 'Cập nhật người dùng',
+                //         content: res?.data?.message,
+                //         icon: createFailIcon()
+                //     }))
+                // }
 
             })
             .catch(err => {
                 addToast(createToast({
-                    title: 'Cập nhật người dùng',
-                    content: "Cập nhật người dùng không thành công",
+                    title: 'Cập nhật loại đặp',
+                    content: "Cập nhật loại đặp không thành công",
                     icon: createFailIcon()
                 }))
             })  
@@ -505,7 +353,7 @@ const DamTypeManagement = () => {
             <>
                 {  isLoaded ? 
                     <CForm 
-                        onSubmit={e => updateAUser(e)} 
+                        onSubmit={e => updateADamType(e)} 
                         noValidate
                         validated={updateValidated}
                     >
@@ -514,10 +362,9 @@ const DamTypeManagement = () => {
                                 <CFormInput
                                     className="mt-4"
                                     type="text"
-                                    placeholder="Tên tài khoản"
-                                    feedbackInvalid="Chưa nhập tên tài khoản!"
-                                    onChange={(e) => handleSetUpdateUsername(e.target.value)}
-                                    value={updateUsername}
+                                    placeholder="Tên loại đặp"
+                                    onChange={(e) => handleSetUpdateDamTypeName(e.target.value)}
+                                    value={updateDamTypeName}
                                     aria-describedby="exampleFormControlInputHelpInline"
                                 />
                             </CCol>
@@ -527,74 +374,11 @@ const DamTypeManagement = () => {
                                 <CFormInput
                                     className="mt-4"
                                     type="password"
-                                    placeholder="Mật khẩu"
-                                    feedbackInvalid="Chưa nhập mật khẩu!"
-                                    onChange={(e) => handleSetUpdatePassword(e.target.value)}
-                                    value={updatePassword}
+                                    placeholder="Mô tả loại đặp"
+                                    onChange={(e) => handleSetUpdateDamTypeDescription(e.target.value)}
+                                    value={updateDamTypeDescription}
                                     aria-describedby="exampleFormControlInputHelpInline"
                                 />
-                            </CCol>
-                        </CRow>
-                        <CRow>
-                            <CCol lg={12}>
-                                <CFormInput
-                                    className="mt-4"
-                                    type="text"
-                                    placeholder="Họ và tên"
-                                    feedbackInvalid="Chưa nhập họ và tên!"
-                                    onChange={(e) => handleSetUpdateFullname(e.target.value)}
-                                    value={updateFullname}
-                                    aria-describedby="exampleFormControlInputHelpInline"
-                                />
-                            </CCol>
-                        </CRow>
-                        <CRow>
-                            <CCol lg={12}>
-                                <CFormInput
-                                    className="mt-4"
-                                    type="email"
-                                    placeholder="Email"
-                                    feedbackInvalid="Chưa nhập email hoặc chưa đúng định dạng @..."
-                                    onChange={(e) => handleSetUpdateEmail(e.target.value)}
-                                    value={updateEmail}
-                                    aria-describedby="exampleFormControlInputHelpInline"
-                                />
-                            </CCol>
-                        </CRow>
-                        <CRow>
-                            <CCol lg={12}>
-                                <CFormSelect
-                                    aria-label="Default select example" 
-                                    className="mt-4" 
-                                    onChange={(e) => handleSetUpdateDomainId(e.target.value)} 
-                                    value={updateDomainId}
-                                    feedbackInvalid="Chưa chọn tổ chức!"
-                                >
-                                    <option selected="" value="">Tổ chức</option>
-                                    {
-                                        listDomains.map((domain) => {
-                                            return  <option key={domain?._id} value={domain?._id}>{domain?.name}</option>
-                                        })
-                                    }
-                                </CFormSelect>
-                            </CCol>
-                        </CRow>
-                        <CRow>
-                            <CCol lg={12}>
-                                <CFormSelect 
-                                    aria-label="Default select example" 
-                                    className="mt-4"
-                                    onChange={(e) => handleSetUpdateRoleId(e.target.value)} 
-                                    value={updateRoleId}
-                                    feedbackInvalid="Chưa chọn vai trò!"
-                                >
-                                    <option selected="" value="" >Vai trò</option>
-                                    {
-                                        listRoles.map((role) => {
-                                            return  <option key={role?._id} value={role?._id}>{role?.name}</option>
-                                        })
-                                    }
-                                </CFormSelect>
                             </CCol>
                         </CRow>
                         <CRow>
@@ -609,47 +393,47 @@ const DamTypeManagement = () => {
     }
 
     // Delete
-    const deleteAUser = (userId) => {
-        if (userId) {
-            deleteUser(userId)
+    const deleteADamType = (damTypeId) => {
+        if (damTypeId) {
+            deleteADamType(damTypeId)
             .then(res => {
-                if (res?.data?.success)  {
-                    setDeleteVisible(false)
-                    rebaseAllData()
-                    addToast(createToast({
-                        title: 'Xóa người dùng',
-                        content: 'Xóa người dùng thành công',
-                        icon: createSuccessIcon()
-                    }))
-                    setUpdateValidated(false)
-                }else {
-                    addToast(createToast({
-                        title: 'Xóa người dùng',
-                        content: res?.data?.message,
-                        icon: createFailIcon()
-                    }))
-                }
+                // if (res?.data?.success)  {
+                //     setDeleteVisible(false)
+                //     rebaseAllData()
+                //     addToast(createToast({
+                //         title: 'Xóa người dùng',
+                //         content: 'Xóa người dùng thành công',
+                //         icon: createSuccessIcon()
+                //     }))
+                //     setUpdateValidated(false)
+                // }else {
+                //     addToast(createToast({
+                //         title: 'Xóa người dùng',
+                //         content: res?.data?.message,
+                //         icon: createFailIcon()
+                //     }))
+                // }
             })
             .catch(err => {
                 addToast(createToast({
-                    title: 'Xóa người dùng',
-                    content: "Xóa người dùng không thành công",
+                    title: 'Xóa loại đặp',
+                    content: "Xóa loại đặp không thành công",
                     icon: createFailIcon()
                 }))
             })
         }
     }
     const [deleteVisible, setDeleteVisible] = useState(false)
-    const [deleteId, setDeleteId] = useState(0)
-    const deleteForm = (userId) => {
+    const [deleteIdDamTypeId, setDeleteDamTypeId] = useState(0)
+    const deleteForm = (damTypeId) => {
         return (
             <>
                 {   
-                    userId ? 
-                    <CForm onSubmit={() => deleteAUser(userId)}>
+                    damTypeId ? 
+                    <CForm onSubmit={() => deleteADamType(damTypeId)}>
                         <CRow>
                             <CCol md={12}>
-                                <p>Bạn có chắc muốn xóa người dùng này ?</p>
+                                <p>Bạn có chắc muốn xóa loại đặp này ?</p>
                             </CCol>
                             <CCol md={12} className="d-flex justify-content-end">
                                 <CButton color="primary" type="submit">Xác nhận</CButton>
@@ -661,8 +445,8 @@ const DamTypeManagement = () => {
             </>
         )
     }
-    const openDeleteModal = (userId) => {
-        setDeleteId(userId)
+    const openDeleteModal = (damTypeId) => {
+        setDeleteDamTypeId(damTypeId)
         setDeleteVisible(true)
     }
 
@@ -671,19 +455,19 @@ const DamTypeManagement = () => {
         <CCol xs>
           <CCard className="mb-4">
             <CToaster ref={toaster} push={toast} placement="top-end" />
-            <CCardHeader>Danh sách người dùng</CCardHeader>
+            <CCardHeader>Danh sách loại đặp</CCardHeader>
             <CCardBody>
-                <CustomModal visible={addVisible} title={'Thêm người dùng'} body={addForm} setVisible={(value) => setAddVisible(value)}/>
-                <CustomModal visible={updateVisible} title={'Cập nhật người dùng'} body={updateForm(updateUsername)} setVisible={(value) => setUpdateVisible(value)}/>
-                <CustomModal visible={deleteVisible} title={'Xóa người người dùng'} body={deleteForm(deleteId)} setVisible={(value) => setDeleteVisible(value)}/>
+                <CustomModal visible={addVisible} title={'Thêm người dùng'} body={addForm(addDamTypeLoaded)} setVisible={(value) => setAddVisible(value)}/>
+                <CustomModal visible={updateVisible} title={'Cập nhật người dùng'} body={updateForm(updateDamTypeName)} setVisible={(value) => setUpdateVisible(value)}/>
+                <CustomModal visible={deleteVisible} title={'Xóa người người dùng'} body={deleteForm(deleteIdDamTypeId)} setVisible={(value) => setDeleteVisible(value)}/>
                 <CForm onSubmit={onFilter}>
                     <CRow>
                         <CCol md={12} lg={3}>
                             <CFormInput
                                 className="mb-2"
                                 type="text"
-                                placeholder="Tên tài khoản"
-                                onChange={(e) => handleSetUsername(e.target.value)}
+                                placeholder="Tên loại đặp"
+                                onChange={(e) => handleSetDamTypeName(e.target.value)}
                                 aria-describedby="exampleFormControlInputHelpInline"
                             />
                         </CCol>
@@ -691,17 +475,8 @@ const DamTypeManagement = () => {
                             <CFormInput
                                 className="mb-2"
                                 type="text"
-                                placeholder="Email"
-                                onChange={(e) => handleSetEmail(e.target.value)}
-                                aria-describedby="exampleFormControlInputHelpInline"
-                            />
-                        </CCol>
-                        <CCol md={12} lg={3}>
-                            <CFormInput
-                                className="mb-2"
-                                type="text"
-                                placeholder="Họ và tên"
-                                onChange={(e) => handleSetFullName(e.target.value)}
+                                placeholder="Mô tả loại đặp"
+                                onChange={(e) => handleSetDamTypeDescription(e.target.value)}
                                 aria-describedby="exampleFormControlInputHelpInline"
                             />
                         </CCol>
@@ -722,7 +497,7 @@ const DamTypeManagement = () => {
                 </CCol>
               </CRow>
               <br />
-              <CustomPagination listItems={filteredUsers} showData={showFilteredTable} />
+              <CustomPagination listItems={filteredDamTypes} showData={showFilteredTable} />
             </CCardBody>
           </CCard>
         </CCol>
