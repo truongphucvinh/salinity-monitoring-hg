@@ -368,14 +368,15 @@ const RiverManagement = () => {
                         </CRow>
                         <CRow>
                             <CCol lg={12}>
-                                <CFormInput
+                                <CFormTextarea
                                     className="mt-4"
                                     type="text"
                                     placeholder="Mô tả vị trí sông, kênh, rạch"
                                     onChange={(e) => handleSetUpdateRiverLocation(e.target.value)}
                                     value={updateRiverLocation}
+                                    rows={3}
                                     aria-describedby="exampleFormControlInputHelpInline"
-                                />
+                                ></CFormTextarea>
                             </CCol>
                         </CRow>
                         <CRow>

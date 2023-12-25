@@ -47,6 +47,11 @@ const UserManagement = () => {
     
     // Call inital APIs
     // Filtering all users of our project
+    const onFilterUsers = (listUsers, domainId) => {
+        return listUsers.filter(user => {
+            return user?.permission?.domain === domainId
+        })
+    }
     const rebaseAllData = () => {
         if (JSON.parse(localStorage.getItem("_isAuthenticated"))) {
             // Setting up access token
@@ -55,8 +60,9 @@ const UserManagement = () => {
             .then(res => {
                 // Install filter users here
                 const users = res?.data?.data?.result
-                setListUsers(users)
-                setFilteredUsers(users)
+                const filteredUsers = onFilterUsers(users, defaultDomainId)
+                setListUsers(filteredUsers)
+                setFilteredUsers(filteredUsers)
             })
             .catch(err => {
                 // Do nothing
@@ -83,6 +89,7 @@ const UserManagement = () => {
     }
     useEffect(() => {
        rebaseAllData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
 
     // Searching data
