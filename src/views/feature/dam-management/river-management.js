@@ -218,7 +218,8 @@ const RiverManagement = () => {
                                 className="mt-4"
                                 type="text"
                                 placeholder="Tên sông, kênh, rạch"
-                                feedbackInvalid="Chưa nhập tên sông, kênh, rạch!"
+                                maxLength={50}
+                                feedbackInvalid="Không bỏ trống và phải ít hơn 50 ký tự"
                                 onChange={(e) => handleSetAddRiverName(e.target.value)}
                                 value={addRiverName}
                                 aria-describedby="exampleFormControlInputHelpInline"
@@ -232,7 +233,8 @@ const RiverManagement = () => {
                                 className="mt-4"
                                 type="text"
                                 placeholder="Mô tả vị trí sông, kênh, rạch"
-                                feedbackInvalid="Chưa nhập mô tả sông, kênh, rạch!"
+                                feedbackInvalid="Không bỏ trống và phải ít hơn 250 ký tự"
+                                maxLength={250}
                                 onChange={(e) => handleSetAddRiverLocation(e.target.value)}
                                 value={addRiverLocation}
                                 required
@@ -374,6 +376,8 @@ const RiverManagement = () => {
                                     placeholder="Mô tả vị trí sông, kênh, rạch"
                                     onChange={(e) => handleSetUpdateRiverLocation(e.target.value)}
                                     value={updateRiverLocation}
+                                    feedbackInvalid="Phải ít hơn 250 ký tự"
+                                    maxLength={250}
                                     rows={3}
                                     aria-describedby="exampleFormControlInputHelpInline"
                                 ></CFormTextarea>
