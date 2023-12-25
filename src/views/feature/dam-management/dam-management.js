@@ -32,7 +32,7 @@ import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
-import { createDam, createDamType, deleteDamType, getAllDamTypes, getAllDams, getAllRivers, getDamTypeById, updateDamType } from "src/services/dam-services"
+import { createDam, deleteDam, getAllDamTypes, getAllDams, getAllRivers, getDamById, updateDam } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
 import CustomDateTimePicker from "src/views/customs/my-datetimepicker/my-datetimepicker"
 
@@ -95,78 +95,49 @@ const DamManagement = () => {
     const [filteredDams, setFilteredDams] = useState([])
     const initSearch = {
         damName: "",
-        damConstructedAt: "",
         damDescription: "",
         damHeight: 0,
-        damCapacity: 0,
+        damSize: 0,
         damLongtitude: 0,
         damLatitude: 0,
-        damTypeId: "",
-        damRiverId: ""
+        damTypeName: "",
+        damRiverName: ""
     }
     const [searchState, setSearchState] = useState(initSearch)
-    const {damName, damConstructedAt, damDescription, damHeight, damCapacity, damTypeId, damRiverId} = searchState
+    const {damName, damSize, damRiverName} = searchState
     const handleSetDamName = (value) => {
         setSearchState(prev => {
             return {...prev, damName: value}
         })
     }
-    const handleSetDamDescription = (value) => {
+    const handleSetDamSize = (value) => {
         setSearchState(prev => {
-            return {...prev, damDescription: value}
+            return {...prev, damSize: value}
         })
     }
-    const handleSetDamConstructedAt = (value) => {
+    const handleSetDamRiverName = (value) => {
         setSearchState(prev => {
-            return {...prev, damConstructedAt: value}
-        })
-    }
-    const handleSetDamHeight = (value) => {
-        setSearchState(prev => {
-            return {...prev, damHeight: value}
-        })
-    }
-    const handleSetDamCapacity = (value) => {
-        setSearchState(prev => {
-            return {...prev, damCapacity: value}
-        })
-    }
-    const handleSetDamTypeId = (value) => {
-        setSearchState(prev => {
-            return {...prev, damTypeId: value}
-        })
-    }
-    const handleSetDamRiverId = (value) => {
-        setSearchState(prev => {
-            return {...prev, damRiverId: value}
+            return {...prev, damRiverName: value}
         })
     }
     const onFilter = () => {
-        if (damName || damDescription || damConstructedAt || damHeight || damCapacity) {
+        if (damName || damRiverName || damSize) {
             setFilteredDams(listDams)
             if (damName) {
                 setFilteredDams(prev => {
                     return prev.filter(dam => dam?.damName?.includes(damName.trim()))
                 })
             }
-            if (damDescription) {
+            if (damRiverName) {
                 setFilteredDams(prev => {
-                    return prev.filter(dam => dam?.damDescription?.includes(damDescription.trim()))
+                    return prev.filter(dam => dam?.damRiver?.riverName.includes(damRiverName.trim()))
                 })
             }
-            if (damConstructedAt) {
+            if (damSize) {
                 setFilteredDams(prev => {
-                    return prev.filter(dam => dam?.damConstructedAt?.includes(damConstructedAt.trim()))
-                })
-            }
-            if (damHeight) {
-                setFilteredDams(prev => {
-                    return prev.filter(dam => dam?.damHeight?.includes(damHeight.trim()))
-                })
-            }
-            if (damCapacity) {
-                setFilteredDams(prev => {
-                    return prev.filter(dam => dam?.damCapacity?.includes(damCapacity.trim()))
+                    return prev.filter(dam => {
+                        return dam?.damHeight === parseFloat(damSize) || dam?.damCapacity === parseFloat(damSize)
+                    })
                 })
             }
         }else {
@@ -291,15 +262,15 @@ const DamManagement = () => {
             e.stopPropagation()
         } else {
             const dam = {
-                damName: addDamName.trim(),
-                damConstructedAt: addDamConstructedAt.trim(),
+                damName: addDamName ? addDamName.trim() : addDamName,
+                damConstructedAt: addDamConstructedAt,
                 damHeight: addDamHeight,
                 damCapacity: addDamCapacity,
-                damLongtitude: addDamLongtitude.trim(),
-                damLatitude: addDamLatitude.trim(),
-                damDescription: addDamDescription.trim(),
-                damRiverId: addDamRiverId.trim(),
-                damTypeId: addDamTypeId.trim()
+                damLongtitude: addDamLongtitude,
+                damLatitude: addDamLatitude,
+                damDescription: addDamDescription ? addDamDescription.trim() : addDamDescription,
+                damRiverId: addDamRiverId,
+                damTypeId: addDamTypeId
             }
             createDam(dam)
             .then(res => {
@@ -370,7 +341,7 @@ const DamManagement = () => {
                         </CCol>
                     </CRow>
                     <CRow>
-                        <CCol lg={12}>
+                        <CCol xs={12} lg={6}>
                             <CFormInput
                                 className="mt-4"
                                 type="number"
@@ -382,9 +353,7 @@ const DamManagement = () => {
                                 required
                             />
                         </CCol>
-                    </CRow>
-                    <CRow>
-                        <CCol lg={12}>
+                        <CCol xs={12} lg={6}>
                             <CFormInput
                                 className="mt-4"
                                 type="number"
@@ -398,7 +367,7 @@ const DamManagement = () => {
                         </CCol>
                     </CRow>
                     <CRow>
-                        <CCol lg={12}>
+                        <CCol xs={12} lg={6}>
                             <CFormInput
                                 className="mt-4"
                                 type="number"
@@ -410,9 +379,7 @@ const DamManagement = () => {
                                 required
                             />
                         </CCol>
-                    </CRow>
-                    <CRow>
-                        <CCol lg={12}>
+                        <CCol xs={12} lg={6}>
                             <CFormInput
                                 className="mt-4"
                                 type="number"
@@ -426,43 +393,43 @@ const DamManagement = () => {
                         </CCol>
                     </CRow>
                     <CRow>
-                <CCol lg={12}>
-                    <CFormSelect 
-                        aria-label="Default select example" 
-                        className="mt-4"
-                        onChange={(e) => handleSetAddDamRiverId(e.target.value)}
-                        value={addDamRiverId}
-                        required
-                        feedbackInvalid="Chưa chọn sông!"
-                    >
-                        <option selected="" value="" >Sông, kênh, rạch</option>
-                        {
-                            listRivers.map((river) => {
-                                return  <option key={river?.riverId} value={river?.riverId}>{river?.riverName}</option>
-                            })
-                        }
-                    </CFormSelect>
-                </CCol>
-            </CRow>
-            <CRow>
-                <CCol lg={12}>
-                    <CFormSelect 
-                        aria-label="Default select example" 
-                        className="mt-4"
-                        onChange={(e) => handleSetAddDamTypeId(e.target.value)}
-                        value={addDamTypeId}
-                        required
-                        feedbackInvalid="Chưa chọn loại đập!"
-                    >
-                        <option selected="" value="" >Loại đập</option>
-                        {
-                            listDamTypes.map((damType) => {
-                                return  <option key={damType?.damTypeId} value={damType?.damTypeId}>{damType?.damTypeName}</option>
-                            })
-                        }
-                    </CFormSelect>
-                </CCol>
-            </CRow>
+                        <CCol lg={12}>
+                            <CFormSelect 
+                                aria-label="Default select example" 
+                                className="mt-4"
+                                onChange={(e) => handleSetAddDamRiverId(e.target.value)}
+                                value={addDamRiverId}
+                                required
+                                feedbackInvalid="Chưa chọn sông!"
+                            >
+                                <option selected="" value="" >Sông, kênh, rạch</option>
+                                {
+                                    listRivers.map((river) => {
+                                        return  <option key={river?.riverId} value={river?.riverId}>{river?.riverName}</option>
+                                    })
+                                }
+                            </CFormSelect>
+                        </CCol>
+                    </CRow>
+                    <CRow>
+                        <CCol lg={12}>
+                            <CFormSelect 
+                                aria-label="Default select example" 
+                                className="mt-4"
+                                onChange={(e) => handleSetAddDamTypeId(e.target.value)}
+                                value={addDamTypeId}
+                                required
+                                feedbackInvalid="Chưa chọn loại đập!"
+                            >
+                                <option selected="" value="" >Loại đập</option>
+                                {
+                                    listDamTypes.map((damType) => {
+                                        return  <option key={damType?.damTypeId} value={damType?.damTypeId}>{damType?.damTypeName}</option>
+                                    })
+                                }
+                            </CFormSelect>
+                        </CCol>
+                    </CRow>
                     <CRow>
                         <CCol lg={12} className="d-flex justify-content-end">
                             <CButton type="submit" className="mt-4" color="primary">Hoàn tất</CButton>
@@ -476,25 +443,50 @@ const DamManagement = () => {
  
     // Updating Model
     const updateData = {
-        updateDamTypeId: '',
-        updateDamTypeName: '',
-        updateDamTypeDescription: ''
+        updateId: '',
+        updateDamName: "",
+        updateDamConstructedAt: "",
+        updateDamDescription: "",
+        updateDamHeight: '',
+        updateDamCapacity: '',
+        updateDamLongtitude: '',
+        updateDamLatitude: '',
+        updateDamTypeId: "",
+        updateDamRiverId: ""
     }
     const [updateState, setUpdateState] = useState(updateData)
-    const { updateDamTypeId, updateDamTypeName, updateDamTypeDescription } = updateState
+    const { updateId,
+        updateDamName,
+        updateDamConstructedAt,
+        updateDamDescription,
+        updateDamHeight,
+        updateDamCapacity,
+        updateDamLongtitude,
+        updateDamLatitude,
+        updateDamTypeId,
+        updateDamRiverId 
+    } = updateState
     const [updateValidated, setUpdateValidated] = useState(false)
-    const getDamTypeDataById = (damId) => {
+    const getDamDataById = (damId) => {
         if (damId) {
-            getDamTypeById(damId)
+            getDamById(damId)
             .then(res => {
                 const dam = res?.data
                 if (dam) {
-                    const updateDamTypeFetchData = {
-                        updateDamTypeId: dam?.damId,
-                        updateDamTypeName: dam?.damName,
-                        updateDamTypeDescription: dam?.damDescription
+                    const constructedAt = `${dam?.damConstructedAt[0]}-${dam?.damConstructedAt[1]}-${dam?.damConstructedAt[2]}`
+                    const updateDamFetchData = {
+                        updateId: dam?.damId,
+                        updateDamName: dam?.damName,
+                        updateDamConstructedAt: constructedAt,
+                        updateDamDescription: dam?.damDescription,
+                        updateDamHeight: dam?.damHeight,
+                        updateDamCapacity: dam?.damCapacity,
+                        updateDamLongtitude: dam?.damLongtitude,
+                        updateDamLatitude: dam?.damLatitude,
+                        updateDamTypeId: dam?.damType?.damTypeId,
+                        updateDamRiverId: dam?.damRiver?.riverId 
                     }
-                    setUpdateState(updateDamTypeFetchData)
+                    setUpdateState(updateDamFetchData)
                 }else {
                     addToast(createToast({
                         title: 'Cập nhật đập',
@@ -512,27 +504,56 @@ const DamManagement = () => {
             })
         }
     }
-    const handleSetUpdateDamTypeId = (value) => {
-        setUpdateState(prev => {
-            return { ...prev, damId: value }
-        })
-    }
     const openUpdateModal = (damId) => {
-        handleSetUpdateDamTypeId(damId)
-        getDamTypeDataById(damId)
+        getDamDataById(damId)
         setUpdateVisible(true)
     }
-    const handleSetUpdateDamTypeName = (value) => {
+    const handleSetUpdateDamName = (value) => {
         setUpdateState(prev => {
-            return { ...prev, updateDamTypeName: value }
+            return { ...prev, updateDamName: value }
         })
     }
-    const handleSetUpdateDamTypeDescription = (value) => {
+    const handleSetUpdateDamConstructedAt = (value) => {
         setUpdateState(prev => {
-            return { ...prev, updateDamTypeDescription: value }
+            return { ...prev, updateDamConstructedAt: value }
         })
     }
-    const updateADamType = (e) => {
+    const handleSetUpdateDamDescription = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateDamDescription: value }
+        })
+    }
+    const handleSetUpdateDamHeight = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateDamHeight: value }
+        })
+    }
+    const handleSetUpdateDamCapacity = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateDamCapacity: value }
+        })
+    }
+    const handleSetUpdateDamLatitude = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateDamLatitude: value }
+        })
+    }
+    const handleSetUpdateDamLongtitude = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateDamLongtitude: value }
+        })
+    }
+    const handleSetUpdateDamTypeId = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateDamTypeId: value }
+        })
+    }
+    const handleSetUpdateDamRiverId = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateDamRiverId: value }
+        })
+    }
+    const updateADam = (e) => {
         // validation
         const form = e.currentTarget
         if (form.checkValidity() === false) {
@@ -540,11 +561,18 @@ const DamManagement = () => {
             e.stopPropagation()
         } else {
             const dam = {
-                damId: updateDamTypeId,
-                damName: updateDamTypeName,
-                damDescription: updateDamTypeDescription
+                damId: updateId,
+                damName: updateDamName ? updateDamName.trim() : updateDamName,
+                damConstructedAt: updateDamConstructedAt,
+                damDescription: updateDamDescription ? updateDamDescription.trim() : updateDamDescription,
+                damHeight: updateDamHeight,
+                damCapacity: updateDamCapacity,
+                damLongtitude: updateDamLongtitude,
+                damLatitude: updateDamLatitude,
+                damTypeId: updateDamTypeId,
+                damRiverId: updateDamRiverId 
             }
-            updateDamType(dam)
+            updateDam(dam)
             .then(res => {
                 setUpdateVisible(false)
                 rebaseAllData()
@@ -571,21 +599,28 @@ const DamManagement = () => {
             <>
                 {  isLoaded ? 
                     <CForm 
-                        onSubmit={e => updateADamType(e)} 
+                        onSubmit={e => updateADam(e)} 
                         noValidate
                         validated={updateValidated}
                     >
                         <CRow>
-                            <CCol lg={12}>
+                            <CCol lg={6}>
                                 <CFormInput
                                     className="mt-4"
                                     type="text"
                                     placeholder="Tên đập"
                                     maxLength={50}
-                                    feedbackInvalid="Ít hơn 50 ký tự"
-                                    onChange={(e) => handleSetUpdateDamTypeName(e.target.value)}
-                                    value={updateDamTypeName}
+                                    feedbackInvalid="It hơn 50 ký tự"
+                                    onChange={(e) => handleSetUpdateDamName(e.target.value)}
+                                    value={updateDamName}
                                     aria-describedby="exampleFormControlInputHelpInline"
+                                />
+                            </CCol>
+                            <CCol lg={6}>
+                                <CustomDateTimePicker 
+                                    classes='mt-4' 
+                                    value={updateDamConstructedAt}
+                                    setValue={handleSetUpdateDamConstructedAt}
                                 />
                             </CCol>
                         </CRow>
@@ -594,14 +629,100 @@ const DamManagement = () => {
                                 <CFormTextarea
                                     className="mt-4"
                                     type="text"
-                                    placeholder="Mô tả đập"
-                                    onChange={(e) => handleSetUpdateDamTypeDescription(e.target.value)}
-                                    value={updateDamTypeDescription}
-                                    rows={3}
+                                    placeholder="Mô tả"
                                     maxLength={250}
-                                    feedbackInvalid="Ít hơn 250 ký tự"
+                                    feedbackInvalid="It hơn 250 ký tự"
+                                    onChange={(e) => handleSetUpdateDamDescription(e.target.value)}
+                                    value={updateDamDescription}
+                                    rows={3}
                                     aria-describedby="exampleFormControlInputHelpInline"
                                 ></CFormTextarea>
+                            </CCol>
+                        </CRow>
+                        <CRow>
+                            <CCol xs={12} lg={6}>
+                                <CFormInput
+                                    className="mt-4"
+                                    type="number"
+                                    placeholder="Chiều cao"
+                                    feedbackInvalid="Lớn hơn 0"
+                                    onChange={(e) => handleSetUpdateDamHeight(e.target.value)}
+                                    value={updateDamHeight}
+                                    aria-describedby="exampleFormControlInputHelpInline"
+                                />
+                            </CCol>
+                            <CCol xs={12} lg={6}>
+                                <CFormInput
+                                    className="mt-4"
+                                    type="number"
+                                    placeholder="Chiều rộng"
+                                    feedbackInvalid="Lớn hơn 0"
+                                    onChange={(e) => handleSetUpdateDamCapacity(e.target.value)}
+                                    value={updateDamCapacity}
+                                    aria-describedby="exampleFormControlInputHelpInline"
+                                />
+                            </CCol>
+                        </CRow>
+                        <CRow>
+                            <CCol xs={12} lg={6}>
+                                <CFormInput
+                                    className="mt-4"
+                                    type="number"
+                                    placeholder="Kinh độ"
+                                    feedbackInvalid="Là một số"
+                                    onChange={(e) => handleSetUpdateDamLongtitude(e.target.value)}
+                                    value={updateDamLongtitude}
+                                    aria-describedby="exampleFormControlInputHelpInline"
+                                />
+                            </CCol>
+                            <CCol xs={12} lg={6}>
+                                <CFormInput
+                                    className="mt-4"
+                                    type="number"
+                                    placeholder="Vĩ độ"
+                                    feedbackInvalid="Là một số"
+                                    onChange={(e) => handleSetUpdateDamLatitude(e.target.value)}
+                                    value={updateDamLatitude}
+                                    aria-describedby="exampleFormControlInputHelpInline"
+                                />
+                            </CCol>
+                        </CRow>
+                        <CRow>
+                            <CCol lg={12}>
+                                <CFormSelect 
+                                    aria-label="Default select example" 
+                                    className="mt-4"
+                                    onChange={(e) => handleSetUpdateDamRiverId(e.target.value)}
+                                    value={updateDamRiverId}
+                                    required
+                                    feedbackInvalid="Chưa chọn sông!"
+                                >
+                                    <option selected="" value="" >Sông, kênh, rạch</option>
+                                    {
+                                        listRivers.map((river) => {
+                                            return  <option key={river?.riverId} value={river?.riverId}>{river?.riverName}</option>
+                                        })
+                                    }
+                                </CFormSelect>
+                            </CCol>
+                        </CRow>
+                        <CRow>
+                            <CCol lg={12}>
+                                <CFormSelect 
+                                    aria-label="Default select example" 
+                                    className="mt-4"
+                                    onChange={(e) => handleSetUpdateDamTypeId(e.target.value)}
+                                    value={updateDamTypeId}
+                                    required
+                                    feedbackInvalid="Chưa chọn loại đập!"
+                                >
+                                    <option selected="" value="" >Loại đập</option>
+                                    {
+                                        listDamTypes.map((damType) => {
+                                            return  <option key={damType?.damTypeId} value={damType?.damTypeId}>{damType?.damTypeName}</option>
+                                        })
+                                    }
+                                </CFormSelect>
                             </CCol>
                         </CRow>
                         <CRow>
@@ -616,9 +737,9 @@ const DamManagement = () => {
     }
 
     // Delete
-    const deleteADamType = (damId) => {
+    const deleteADam = (damId) => {
         if (damId) {
-            deleteDamType(damId)
+            deleteDam(damId)
             .then(res => {
                 setDeleteVisible(false)
                 rebaseAllData()
@@ -639,13 +760,13 @@ const DamManagement = () => {
         }
     }
     const [deleteVisible, setDeleteVisible] = useState(false)
-    const [deleteIdDamTypeId, setDeleteDamTypeId] = useState(0)
+    const [deleteIdDamId, setDeleteDamId] = useState(0)
     const deleteForm = (damId) => {
         return (
             <>
                 {   
                     damId ? 
-                    <CForm onSubmit={() => deleteADamType(damId)}>
+                    <CForm onSubmit={() => deleteADam(damId)}>
                         <CRow>
                             <CCol md={12}>
                                 <p>Bạn có chắc muốn xóa đập này ?</p>
@@ -661,7 +782,7 @@ const DamManagement = () => {
         )
     }
     const openDeleteModal = (damId) => {
-        setDeleteDamTypeId(damId)
+        setDeleteDamId(damId)
         setDeleteVisible(true)
     }
 
@@ -680,8 +801,8 @@ const DamManagement = () => {
             <CCardHeader>Danh sách đập</CCardHeader>
             <CCardBody>
                 <CustomModal visible={addVisible} title={'Thêm đập'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
-                <CustomModal visible={updateVisible} title={'Cập nhật đập'} body={updateForm(updateDamTypeName)} setVisible={(value) => setUpdateVisible(value)}/>
-                <CustomModal visible={deleteVisible} title={'Xóa người đập'} body={deleteForm(deleteIdDamTypeId)} setVisible={(value) => setDeleteVisible(value)}/>
+                <CustomModal visible={updateVisible} title={'Cập nhật đập'} body={updateForm(updateDamName)} setVisible={(value) => setUpdateVisible(value)}/>
+                <CustomModal visible={deleteVisible} title={'Xóa người đập'} body={deleteForm(deleteIdDamId)} setVisible={(value) => setDeleteVisible(value)}/>
                 <CForm onSubmit={onFilter}>
                     <CRow>
                         <CCol md={12} lg={3}>
@@ -697,8 +818,20 @@ const DamManagement = () => {
                             <CFormInput
                                 className="mb-2"
                                 type="text"
-                                placeholder="Mô tả đập"
-                                onChange={(e) => handleSetDamDescription(e.target.value)}
+                                placeholder="Tên sông, kênh, rạch"
+                                onChange={(e) => handleSetDamRiverName(e.target.value)}
+                                aria-describedby="exampleFormControlInputHelpInline"
+                            />
+                        </CCol>
+                        <CCol md={12} lg={3}>
+                            <CFormInput
+                                className="mb-2"
+                                type="text"
+                                placeholder="Kích thước"
+                                onChange={(e) => {
+                                    // Present for height and capacity
+                                    handleSetDamSize(e.target.value)
+                                }}
                                 aria-describedby="exampleFormControlInputHelpInline"
                             />
                         </CCol>

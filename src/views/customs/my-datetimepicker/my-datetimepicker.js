@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import clsx from "clsx"
 import styles from "./mydatetimepicker.module.css"
 
@@ -17,6 +17,12 @@ const CustomDateTimePicker = ({classes, value, setValue}) => {
     const handleOnFocus = () => {
         setType('date')
     }
+    useEffect(() => {
+        if (value !== '') {
+            setType('date')
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     return (
         <>
