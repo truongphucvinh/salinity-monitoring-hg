@@ -22,6 +22,7 @@ import 'simplebar-react/dist/simplebar.min.css'
 
 // sidebar nav config
 import navigation from '../_nav'
+import { cilAudio } from '@coreui/icons'
 
 const AppSidebar = () => {
   const dispatch = useDispatch()
@@ -41,7 +42,7 @@ const AppSidebar = () => {
     >
       <CSidebarHeader className="border-bottom">
         <CSidebarBrand to="/">
-          <CIcon customClassName="sidebar-brand-full" icon={logo} height={32} />
+          <span className='d-flex align-items-center'><CIcon customClassName="sidebar-brand-full me-2" icon={cilAudio} height={32} />Giám sát độ mặn</span>
           <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} />
         </CSidebarBrand>
         <CCloseButton

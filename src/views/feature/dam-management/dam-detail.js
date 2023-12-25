@@ -16,7 +16,6 @@ import CustomSpinner from "src/views/customs/my-spinner"
 
 const DamDetail = () => {
     const { id } = useParams()
-    // const id = 'ff676fa5-4cdf-46c8-96d9-406090f61418'
     const damData = {
         dam: '',
         isLoaded: false
