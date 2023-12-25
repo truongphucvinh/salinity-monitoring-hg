@@ -15,7 +15,8 @@ import {
     CFormInput,
     CForm,
     CToaster,
-    CSpinner
+    CSpinner,
+    CFormTextarea
   } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -122,7 +123,7 @@ const RiverManagement = () => {
                   <CTableRow>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Tên sông, kênh, rạch</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '50%'}}>Vị trí</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '50%'}}>Mô tả</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Thao tác</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
@@ -227,16 +228,18 @@ const RiverManagement = () => {
                     </CRow>
                     <CRow>
                         <CCol lg={12}>
-                            <CFormInput
+                            <CFormTextarea
                                 className="mt-4"
                                 type="text"
                                 placeholder="Mô tả vị trí sông, kênh, rạch"
-                                feedbackInvalid="Chưa nhập vị trí sông, kênh, rạch!"
+                                feedbackInvalid="Chưa nhập mô tả sông, kênh, rạch!"
                                 onChange={(e) => handleSetAddRiverLocation(e.target.value)}
                                 value={addRiverLocation}
                                 required
+                                rows={3}
                                 aria-describedby="exampleFormControlInputHelpInline"
-                            />
+                            >
+                            </CFormTextarea>
                         </CCol>
                     </CRow>
                     <CRow>

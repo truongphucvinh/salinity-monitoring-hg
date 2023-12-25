@@ -41,6 +41,9 @@ const UserManagement = () => {
     const [listDomains, setListDomains] = useState([])
     const [listRoles, setListRoles] = useState([])
     const secretKey = process.env.AUTH_TOKEN || 'oda_dev'
+    const defaultDomainId = process.env.HG_DOMAIN_ID || '6585900cf7ed98f198697653'
+    const defaultAdminId = process.env.ADMIN_ROLE_ID || '6588e34a6f4d6dd9d37c8a01'
+    const defaultClientId = process.env.CLIENT_ROLE_ID || '6588e2806f4d6dd9d37c89bd'
     
     // Call inital APIs
     // Filtering all users of our project
@@ -228,12 +231,21 @@ const UserManagement = () => {
             e.preventDefault()
             e.stopPropagation()
         } else {
+            // This is backup for general domain and role selection also
+            // const user = {
+            //     username: addUsername,
+            //     fullName: addFullname,
+            //     password: CryptoJS.AES.encrypt(addPassword || '', secretKey).toString(),
+            //     email: addEmail,
+            //     domain: addDomainId,
+            //     role: addRoleId
+            // }
             const user = {
                 username: addUsername,
                 fullName: addFullname,
                 password: CryptoJS.AES.encrypt(addPassword || '', secretKey).toString(),
                 email: addEmail,
-                domain: addDomainId,
+                domain: defaultDomainId,
                 role: addRoleId
             }
             createUser(user)
@@ -332,7 +344,8 @@ const UserManagement = () => {
                     />
                 </CCol>
             </CRow>
-            <CRow>
+            {/* This is backup for vary of domain selection */}
+            {/* <CRow> 
                 <CCol lg={12}>
                     <CFormSelect
                         aria-label="Default select example" 
@@ -350,7 +363,7 @@ const UserManagement = () => {
                         }
                     </CFormSelect>
                 </CCol>
-            </CRow>
+            </CRow> */}
             <CRow>
                 <CCol lg={12}>
                     <CFormSelect 
@@ -363,7 +376,9 @@ const UserManagement = () => {
                     >
                         <option selected="" value="" >Vai trò</option>
                         {
-                            listRoles.map((role) => {
+                            listRoles.filter(role => {
+                                return role._id === defaultAdminId || role._id === defaultClientId
+                            }).map((role) => {
                                 return  <option key={role?._id} value={role?._id}>{role?.name}</option>
                             })
                         }
