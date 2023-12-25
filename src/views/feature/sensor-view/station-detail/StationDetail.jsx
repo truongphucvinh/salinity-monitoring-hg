@@ -13,8 +13,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendar } from "@fortawesome/free-regular-svg-icons";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
+//modal 
+import { CModal, CNav, CNavItem, CNavLink, CTabContent } from '@coreui/react';
+
 //chart
-import { CCard, CCardBody, CCol, CCardHeader, CRow } from '@coreui/react'
+import { CCard, CCardBody, CCol, CCardHeader, CRow, CTabPane } from '@coreui/react'
 import {
   CChartBar,
   CChartDoughnut,
@@ -103,6 +106,55 @@ const StationDetail = () => {
       setAge(event.target.value);
     };
 
+    //sensor list
+    const [displaySensorList, setDisplaySensorList] = useState(false);
+    const [sensorList, setSensorList] = useState([
+      {
+        id: 1,
+        name: "sensor 1",
+        description: "sensor 1 description"
+      },
+      {
+        id: 2,
+        name: "sensor 2",
+        description: "sensor 2 description"
+      },
+      {
+        id: 3,
+        name: "sensor 3",
+        description: "sensor 2 description"
+      },
+      {
+        id: 4,
+        name: "sensor 4",
+        description: "sensor 2 description"
+      },
+      {
+        id: 5,
+        name: "sensor 5",
+        description: "sensor 2 description"
+      }
+    ])
+
+    const [selectedSensor, setSelectedSensor] = useState(
+      {
+        id: 2,
+        name: "sensor 2",
+        description: "sensor 2 description"
+      }
+    );
+
+    const handleChangeSensor = (sensorId) => {
+      if(sensorId!=selectedSensor.id) {
+        //goi api lay gia tri cua sensorId
+        setDisplaySensorList(false);
+      }
+    } 
+
+    //tab
+    const [activeKey, setActiveKey] = useState(1)
+
+
     useEffect(() => {
         console.log("abc");
       }, [dateRange])
@@ -116,6 +168,14 @@ const StationDetail = () => {
             </div>
             <div className="station-detail__date-selection">
                 <div className="station-detail__date-selection__left">
+                    <div className="station-detail__date-selection__sensor-option" onClick={() => setDisplaySensorList(true)}>
+                      <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8.46447 15.5355C6.51185 13.5829 6.51185 10.4171 8.46447 8.46447M5.63592 18.364C2.1212 14.8493 2.1212 9.15077 5.63592 5.63605M15.5355 15.5355C17.4881 13.5829 17.4881 10.4171 15.5355 8.46447M18.364 18.364C21.8788 14.8493 21.8788 9.15077 18.364 5.63605M13 12.0001C13 12.5523 12.5523 13.0001 12 13.0001C11.4477 13.0001 11 12.5523 11 12.0001C11 11.4478 11.4477 11.0001 12 11.0001C12.5523 11.0001 13 11.4478 13 12.0001Z" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span className="sensor-name">Sensor 1</span>
+                      {/* <span className="change-btn">Xem khác</span> */}
+                    </div>
+                    <div className="division"></div>
                     <div className="station-detail__date-selection__show-by">
                         Hiển thị theo 
                         <select name="" id="">
@@ -147,7 +207,35 @@ const StationDetail = () => {
                 </div>
             <div className="station-detail__content">
                 <div className="station-detail__content__table">
-                    <table>
+                  <CNav variant="tabs" role="tablist">
+                    <CNavItem role="presentation">
+                      <CNavLink
+                        active={activeKey === 1}
+                        component="button"
+                        role="tab"
+                        aria-controls="home-tab-pane"
+                        aria-selected={activeKey === 1}
+                        onClick={() => setActiveKey(1)}
+                      >
+                        Dữ liệu trạm
+                      </CNavLink>
+                    </CNavItem>
+                    <CNavItem role="presentation">
+                      <CNavLink
+                        active={activeKey === 2}
+                        component="button"
+                        role="tab"
+                        aria-controls="profile-tab-pane"
+                        aria-selected={activeKey === 2}
+                        onClick={() => setActiveKey(2)}
+                      >
+                        Dữ liệu cảm biến độ mặn
+                      </CNavLink>
+                    </CNavItem>
+                  </CNav>
+                  <CTabContent>
+                    <CTabPane role="tabpanel" aria-labelledby="home-tab-pane" visible={activeKey === 1}>
+                      <table>
                         <tr>
                             <th className="time">Thời gian</th>
                             <th className="index">Giá trị</th>
@@ -172,7 +260,38 @@ const StationDetail = () => {
                             <td>12:00 15/12/2023</td>
                             <td className="index">9.6</td>
                         </tr>
-                    </table>
+                      </table>
+                    </CTabPane>
+                    <CTabPane role="tabpanel" aria-labelledby="profile-tab-pane" visible={activeKey === 2}>
+                      <table>
+                        <tr>
+                            <th className="time">Thời gian</th>
+                            <th className="index">Giá trị</th>
+                        </tr>
+                        <tr>
+                            <td>12:00 15/12/2023</td>
+                            <td className="index">9.6</td>
+                        </tr>
+                        <tr>
+                            <td>12:00 15/12/2023</td>
+                            <td className="index">9.6</td>
+                        </tr>
+                        <tr>
+                            <td>12:00 15/12/2023</td>
+                            <td className="index">9.6</td>
+                        </tr>
+                        <tr>
+                            <td>12:00 15/12/2023</td>
+                            <td className="index">9.6</td>
+                        </tr>
+                        <tr>
+                            <td>12:00 15/12/2023</td>
+                            <td className="index">9.6</td>
+                        </tr>
+                      </table>
+                    </CTabPane>
+                  </CTabContent>
+                    
                 </div>
                 <div className="station-detail__content__chart">
                     <div className="station-detail__content__chart__heading">
@@ -190,6 +309,48 @@ const StationDetail = () => {
                 </div>
             </div>
         </div>
+
+        {/* sensor list modal */}
+        <CModal
+            backdrop="static"
+            alignment="center"
+            visible={displaySensorList}
+            onClose={() => setDisplaySensorList(false)}
+            aria-labelledby="StaticBackdropExampleLabel"
+            className='sensor-list'
+        >
+          <div className="sensor-list">
+            <div className="sensor-list__title">
+                Danh sách cảm biến Trạm 1
+            </div>
+            <div className="sensor-list__list">
+              {
+                sensorList.map((sensor) => {
+                  return <>
+                    <div 
+                      className={"sensor-list__list__item " + (sensor.id == selectedSensor.id ? 'sensor-list__list__item--is-selected' : '')}
+                      onClick={() => handleChangeSensor(sensor.id)}
+                    >
+                      <div className="sensor-list__list__item__name">
+                        { sensor.name }
+                      </div>
+                      <div className="sensor-list__list__item__description">
+                        { sensor.description }
+                      </div>
+                    </div>
+                  </>
+                })
+              }
+            </div>
+            <div className="sensor-list__action">
+              <div className="sensor-list__action__cancel-btn"
+                onClick={() => setDisplaySensorList(false)}
+              >
+                Đóng
+              </div>
+            </div>
+          </div>
+        </CModal>
     </>)
 }
 

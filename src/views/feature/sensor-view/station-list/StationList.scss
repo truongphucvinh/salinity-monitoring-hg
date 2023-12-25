@@ -208,3 +208,57 @@
         }
     }
 }
+
+.sensor-list {
+    --cui-modal-width: 820px;
+    padding: 20px;
+    &__title {
+        // text-align: center;
+        padding: 0 5px;
+        font: {
+            size: 20px;
+            weight: bold;
+        }
+    }
+    &__list {
+        margin-top: 20px;
+        // border: 1px solid green;
+        width: 100%;
+        justify-content: center;
+        &__item {
+            padding: 10px;
+            border-radius: 3px;
+            min-width: 250px;
+            height: 120px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            margin: 5px;
+            transition: all 0.5s ease;
+            cursor: pointer;
+            float: left;
+            &:hover {
+                @extend %shadow;
+                transition: all 0.5s ease;
+            }
+            &__name {
+                font: {
+                    weight: bold;
+                }
+            }
+        }
+    }
+    &__action {
+        margin-top: 140px;
+        padding: 0 5px;
+        display: flex;
+        justify-content: right;
+        clear: left;
+        &__cancel-btn {
+            @include button(100px, 40px, white);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            color: rgba(255, 0, 0, 0.7);
+            &:hover {
+                filter: brightness(99.3%);
+            }
+        }
+    }
+}

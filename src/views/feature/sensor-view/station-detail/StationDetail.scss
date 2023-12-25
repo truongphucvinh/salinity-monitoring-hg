@@ -22,6 +22,7 @@
         border-radius: 3px;
         &__left {
             display: flex;
+            align-items: center;
         }
         &__period {            
             margin-left: 20px;
@@ -57,19 +58,39 @@
                 }
             }
         }
+        select {
+            margin-left: 10px;
+            height: 40px;
+            width: 150px;
+            border-radius: 3px;
+            padding: 5px;
+            &:focus {
+                outline: none;
+            }
+        }
+        &__sensor-option {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            .sensor-name {
+                margin-left: 10px;
+                cursor: pointer;
+            }
+            .change-btn {
+                margin-left: 10px;
+                color: $green;
+                cursor: pointer;
+            }
+        }
+        .division {
+            border: 1px solid rgba(0, 0, 0, 0.7);
+            height: 25px;
+            margin:  0 25px;
+        }
         &__show-by {
             display: flex;
             align-items: center;
-            select {
-                margin-left: 10px;
-                height: 40px;
-                width: 150px;
-                border-radius: 3px;
-                padding: 5px;
-                &:focus {
-                    outline: none;
-                }
-            }
+            // margin-left: 20px;
         }
         &__filter-btn {
             margin-left: 20px;
@@ -88,6 +109,7 @@
         justify-content: space-between;
         margin-top: 20px;
         &__table {
+            // background-color: white;
             width: 30%;
             // border: 1px solid red;
             table {
@@ -131,4 +153,66 @@
     }
 }
 
+//modal
+.modal-content {
+    border: none;
+    border-radius: 1px;
+}
 
+.sensor-list {
+    --cui-modal-width: 820px;
+    padding: 20px;
+    &__title {
+        // text-align: center;
+        padding: 0 5px;
+        font: {
+            size: 20px;
+            weight: bold;
+        }
+    }
+    &__list {
+        margin-top: 20px;
+        // border: 1px solid green;
+        width: 100%;
+        justify-content: center;
+        &__item {
+            padding: 10px;
+            border-radius: 3px;
+            min-width: 250px;
+            height: 120px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            margin: 5px;
+            transition: all 0.5s ease;
+            cursor: pointer;
+            float: left;
+            &:hover {
+                @extend %shadow;
+                transition: all 0.5s ease;
+            }
+            &__name {
+                font: {
+                    weight: bold;
+                }
+            }
+            &--is-selected {
+                border-color: $green;
+                cursor: auto;
+            }
+        }
+    }
+    &__action {
+        margin-top: 140px;
+        padding: 0 5px;
+        display: flex;
+        justify-content: right;
+        clear: left;
+        &__cancel-btn {
+            @include button(100px, 40px, white);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            color: rgba(255, 0, 0, 0.7);
+            &:hover {
+                filter: brightness(99.3%);
+            }
+        }
+    }
+}
