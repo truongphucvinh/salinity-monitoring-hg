@@ -27,7 +27,7 @@ import {
     cilReload,
     cilPlus
   } from '@coreui/icons'
-import { createUser, deleteUser, getAllDomains, getAllRoles, getAllUsers, getUserById, updateUser } from "src/services/authentication-services"
+import { createUser, deleteUser, /*getAllDomains*/ getAllRoles, getAllUsers, getUserById, updateUser } from "src/services/authentication-services"
 import { setAuthApiHeader } from "src/services/global-axios"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
@@ -38,7 +38,7 @@ const UserManagement = () => {
 
     // User Management Data
     const [listUsers, setListUsers] = useState([])
-    const [listDomains, setListDomains] = useState([])
+    // const [listDomains, setListDomains] = useState([])
     const [listRoles, setListRoles] = useState([])
     const secretKey = process.env.AUTH_TOKEN || 'oda_dev'
     const defaultDomainId = process.env.HG_DOMAIN_ID || '6585900cf7ed98f198697653'
@@ -62,14 +62,14 @@ const UserManagement = () => {
                 // Do nothing
             })
             
-            getAllDomains()
-            .then(res => {
-                const domains = res?.data?.data?.result
-                setListDomains(domains)
-            })
-            .catch(err => {
-                // Do nothing
-            })
+            // getAllDomains()
+            // .then(res => {
+            //     const domains = res?.data?.data?.result
+            //     setListDomains(domains)
+            // })
+            // .catch(err => {
+            //     // Do nothing
+            // })
 
             getAllRoles()
             .then((res) => {
@@ -182,12 +182,12 @@ const UserManagement = () => {
         addPassword: '',
         addFullname: '',
         addEmail: '',
-        addDomainId: '',
+        // addDomainId: '',
         addRoleId: '',
         addLoaded: true
     }
     const [addState, setAddState] = useState(addData)
-    const { addLoaded, addUsername, addPassword, addFullname, addEmail, addDomainId, addRoleId } = addState
+    const { addLoaded, addUsername, addPassword, addFullname, addEmail, /*addDomainId*/ addRoleId } = addState
     const [addValidated, setAddValidated] = useState(false)
     const handleSetAddLoaded = (value) => {
         setAddState(prev => {
@@ -214,11 +214,11 @@ const UserManagement = () => {
             return { ...prev, addEmail: value }
         })
     }
-    const handleSetAddDomainId = (value) => {
-        setAddState(prev => {
-            return { ...prev, addDomainId: value }
-        })
-    }
+    // const handleSetAddDomainId = (value) => {
+    //     setAddState(prev => {
+    //         return { ...prev, addDomainId: value }
+    //     })
+    // }
     const handleSetAddRoleId = (value) => {
         setAddState(prev => {
             return { ...prev, addRoleId: value }
@@ -377,7 +377,7 @@ const UserManagement = () => {
                         <option selected="" value="" >Vai trò</option>
                         {
                             listRoles.filter(role => {
-                                return role._id === defaultAdminId || role._id === defaultClientId
+                                return role?._id === defaultAdminId || role?._id === defaultClientId
                             }).map((role) => {
                                 return  <option key={role?._id} value={role?._id}>{role?.name}</option>
                             })
@@ -402,11 +402,11 @@ const UserManagement = () => {
         updatePassword: '',
         updateFullname: '',
         updateEmail: '',
-        updateDomainId: '',
+        // updateDomainId: '',
         updateRoleId: ''
     }
     const [updateState, setUpdateState] = useState(updateData)
-    const { updateId, updateUsername, updatePassword, updateFullname, updateEmail, updateDomainId, updateRoleId } = updateState
+    const { updateId, updateUsername, updatePassword, updateFullname, updateEmail, /*updateDomainId*/ updateRoleId } = updateState
     const [updateValidated, setUpdateValidated] = useState(false)
     const getUserDataById = (userId) => {
         if (userId) {
@@ -417,6 +417,7 @@ const UserManagement = () => {
                     setUpdateState(prev => {
                         return {
                             ...prev, 
+                            updateId: user?._id,
                             updateUsername: user.username,
                             updateFullname: user.fullName,
                             updateEmail: user.email,
@@ -441,13 +442,12 @@ const UserManagement = () => {
             })
         }
     }
-    const handleSetUpdateId = (value) => {
-        setUpdateState(prev => {
-            return { ...prev, updateId: value }
-        })
-    }
+    // const handleSetUpdateId = (value) => {
+    //     setUpdateState(prev => {
+    //         return { ...prev, updateId: value }
+    //     })
+    // }
     const openUpdateModal = (userId) => {
-        handleSetUpdateId(userId)
         getUserDataById(userId)
         setUpdateVisible(true)
     }
@@ -471,11 +471,11 @@ const UserManagement = () => {
             return { ...prev, updateEmail: value }
         })
     }
-    const handleSetUpdateDomainId = (value) => {
-        setUpdateState(prev => {
-            return { ...prev, updateDomainId: value }
-        })
-    }
+    // const handleSetUpdateDomainId = (value) => {
+    //     setUpdateState(prev => {
+    //         return { ...prev, updateDomainId: value }
+    //     })
+    // }
     const handleSetUpdateRoleId = (value) => {
         setUpdateState(prev => {
             return { ...prev, updateRoleId: value }
@@ -488,12 +488,21 @@ const UserManagement = () => {
             e.preventDefault()
             e.stopPropagation()
         } else {
+            // This is backup for update user with the general domain selections
+            // const user = {
+            //     username: updateUsername,
+            //     fullName: updateFullname,
+            //     password: CryptoJS.AES.encrypt(updatePassword || '', secretKey).toString(),
+            //     email: updateEmail,
+            //     domain: updateDomainId,
+            //     role: updateRoleId
+            // }
             const user = {
                 username: updateUsername,
                 fullName: updateFullname,
                 password: CryptoJS.AES.encrypt(updatePassword || '', secretKey).toString(),
                 email: updateEmail,
-                domain: updateDomainId,
+                domain: defaultDomainId,
                 role: updateRoleId
             }
             updateUser(user, updateId)
@@ -588,7 +597,8 @@ const UserManagement = () => {
                                 />
                             </CCol>
                         </CRow>
-                        <CRow>
+                        {/* This is backup to update user with the general domain selections */}
+                        {/* <CRow>
                             <CCol lg={12}>
                                 <CFormSelect
                                     aria-label="Default select example" 
@@ -605,7 +615,7 @@ const UserManagement = () => {
                                     }
                                 </CFormSelect>
                             </CCol>
-                        </CRow>
+                        </CRow> */}
                         <CRow>
                             <CCol lg={12}>
                                 <CFormSelect 
@@ -617,7 +627,9 @@ const UserManagement = () => {
                                 >
                                     <option selected="" value="" >Vai trò</option>
                                     {
-                                        listRoles.map((role) => {
+                                        listRoles.filter(role => {
+                                            return role?._id === defaultAdminId || role?._id === defaultClientId
+                                        }).map((role) => {
                                             return  <option key={role?._id} value={role?._id}>{role?.name}</option>
                                         })
                                     }
