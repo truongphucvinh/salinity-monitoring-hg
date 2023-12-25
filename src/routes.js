@@ -52,11 +52,13 @@ const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 const UserManagement = React.lazy(() => import('./views/feature/user-management/user-management'))
 const DamTypeManagement = React.lazy(() => import('./views/feature/dam-management/dam-type-management'))
 const RiverManagement = React.lazy(() => import('./views/feature/dam-management/river-management'))
+const DamManagement = React.lazy(() => import('./views/feature/dam-management/dam-management'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
+  { path: '/dam-management', name: 'Quản lý đặp', element: DamManagement },  
   { path: '/river-management', name: 'Quản lý sông, kênh, rạch', element: RiverManagement },  
-  { path: '/dam-management', name: 'Quản lý đặp ngăn mặn', element: DamTypeManagement },  
+  { path: '/dam-type-management', name: 'Quản lý loại đặp', element: DamTypeManagement },  
   { path: '/user-management', name: 'Quản lý người dùng', element: UserManagement },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
