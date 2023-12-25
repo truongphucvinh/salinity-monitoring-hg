@@ -25,7 +25,8 @@ import {
     cilTrash,
     cilMagnifyingGlass,
     cilReload,
-    cilPlus
+    cilPlus,
+    cilTouchApp
   } from '@coreui/icons'
 import { setAuthApiHeader } from "src/services/global-axios"
 import CustomPagination from "src/views/customs/my-pagination"
@@ -35,6 +36,7 @@ import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import { createDam, deleteDam, getAllDamTypes, getAllDams, getAllRivers, getDamById, updateDam } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
 import CustomDateTimePicker from "src/views/customs/my-datetimepicker/my-datetimepicker"
+import { useNavigate } from "react-router-dom"
 
 const DamManagement = () => {
 
@@ -147,6 +149,13 @@ const DamManagement = () => {
     const onReset = () => {
         setFilteredDams(listDams)
     }
+
+    // Change Page Route
+    const navigate = useNavigate()
+    const openDamDetail = (damId) => {
+        navigate(`dam-detail/${damId}`)
+    }
+
     // Toast
     const [toast, addToast] = useState(0)
     const toaster = useRef()
@@ -178,6 +187,7 @@ const DamManagement = () => {
                                     <CTableDataCell>{dam?.damRiver?.riverName}</CTableDataCell>
                                     <CTableDataCell>{`${dam?.damCapacity} x ${dam?.damHeight} (mét)`}</CTableDataCell>
                                     <CTableDataCell>
+                                        <CIcon icon={cilTouchApp} onClick={() => openDamDetail(dam?.damId)} className="text-primary mx-1" role="button"/>
                                         <CIcon icon={cilPencil} onClick={() => openUpdateModal(dam?.damId)} className="text-success mx-1" role="button"/>
                                         <CIcon icon={cilTrash} onClick={() => openDeleteModal(dam?.damId)}  className="text-danger" role="button"/>
                                     </CTableDataCell>
