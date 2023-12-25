@@ -26,7 +26,7 @@
         }
         &__period {            
             margin-left: 20px;
-            display: flex;
+            display: none;
             align-items: center;
             background-color: white;
             padding: 5px;
@@ -86,15 +86,17 @@
             border: 1px solid rgba(0, 0, 0, 0.7);
             height: 25px;
             margin:  0 25px;
+            display: none;
         }
         &__show-by {
-            display: flex;
+            display: none;
             align-items: center;
             // margin-left: 20px;
         }
         &__filter-btn {
             margin-left: 20px;
             @include button(100px, 40px, $dark-blue);
+            display: none;
         }
         &__download-btn  {
             cursor: pointer;
@@ -109,9 +111,10 @@
         justify-content: space-between;
         margin-top: 20px;
         &__table {
-            // background-color: white;
             width: 30%;
-            // border: 1px solid red;
+            .nav-link {
+                color: black !important;
+            }
             table {
                 background-color: white;
                 @extend %shadow;
@@ -124,12 +127,25 @@
                 td {
                     padding: 10px;
                 }
-                tr + tr {
-                //    border-top: 1px solid black; 
-                }
+            }
+            .sensor-value {
                 .index {
                     width: 40%;
                     text-align: center;
+                }
+            }
+            .station-value {
+                .type {
+                    width: 30%;
+                }
+                .time {
+                    text-align: right;
+                }
+                .unit, .index {
+                    text-align: center;
+                }
+                .index {
+                    font-weight: bold;
                 }
             }
         }
@@ -148,9 +164,18 @@
             }
             &__chart {
                 padding: 20px;
+                input {
+                    color: black !important;
+                    fill: black !important;
+                }
             }
         }
     }
+}
+
+//tab
+.tab-content {
+    background-color: white;
 }
 
 //modal
@@ -216,3 +241,20 @@
         }
     }
 }
+
+//hight chart
+.highcharts-range-selector-buttons, .highcharts-credits {
+    display: none;
+}
+
+.highcharts-navigator-mask-inside {
+    fill: #1a284848;
+}
+
+.highcharts-input-group {
+    text {
+        color: black !important;
+        fill: black !important;
+    }
+}
+

@@ -155,7 +155,7 @@ const StationList = () => {
   }
 
   //sensor list
-  const [displaySensorList, setDisplaySensorList] = useState(true);
+  const [displaySensorList, setDisplaySensorList] = useState(false);
   const [sensorList, setSensorList] = useState([
     {
       name: "sensor 1",
