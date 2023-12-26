@@ -15,7 +15,8 @@ import {
     CFormInput,
     CForm,
     CToaster,
-    CSpinner
+    CSpinner,
+    CFormTextarea
   } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -49,20 +50,16 @@ const DamTypeManagement = () => {
     
     // Call inital APIs
     const rebaseAllData = () => {
-        if (JSON.parse(localStorage.getItem("_isAuthenticated"))) {
-            // Setting up access token
-            setAuthApiHeader()
-            getAllDamTypes()
-            .then(res => {
-                // Install filter users here
-                const damTypes = res?.data
-                setListDamTypes(damTypes)
-                setFilteredDamTypes(damTypes)
-            })
-            .catch(err => {
-                // Do nothing
-            })
-        }
+        getAllDamTypes()
+        .then(res => {
+            // Install filter users here
+            const damTypes = res?.data
+            setListDamTypes(damTypes)
+            setFilteredDamTypes(damTypes)
+        })
+        .catch(err => {
+            // Do nothing
+        })
     }
     useEffect(() => {
        rebaseAllData()
@@ -206,7 +203,7 @@ const DamTypeManagement = () => {
     const [addVisible, setAddVisible] = useState(false)
     const addForm = () => {
         return <>
-                        <CForm 
+                <CForm 
                     onSubmit={e => createNewDamType(e)} 
                     noValidate
                     validated={addValidated}
@@ -217,7 +214,8 @@ const DamTypeManagement = () => {
                                 className="mt-4"
                                 type="text"
                                 placeholder="Tên loại đập"
-                                feedbackInvalid="Chưa nhập tên loại đập!"
+                                maxLength={50}
+                                feedbackInvalid="Không bỏ trống và phải ít hơn 50 ký tự"
                                 onChange={(e) => handleSetAddDamTypeName(e.target.value)}
                                 value={addDamTypeName}
                                 aria-describedby="exampleFormControlInputHelpInline"
@@ -227,14 +225,17 @@ const DamTypeManagement = () => {
                     </CRow>
                     <CRow>
                         <CCol lg={12}>
-                            <CFormInput
+                            <CFormTextarea
                                 className="mt-4"
                                 type="text"
                                 placeholder="Mô tả loại đập"
+                                maxLength={250}
+                                feedbackInvalid="Không bỏ trống và ít hơn 250 ký tự"
                                 onChange={(e) => handleSetAddDamTypeDescription(e.target.value)}
                                 value={addDamTypeDescription}
+                                rows={3}
                                 aria-describedby="exampleFormControlInputHelpInline"
-                            />
+                            ></CFormTextarea>
                         </CCol>
                     </CRow>
                     <CRow>
@@ -355,6 +356,8 @@ const DamTypeManagement = () => {
                                     className="mt-4"
                                     type="text"
                                     placeholder="Tên loại đập"
+                                    maxLength={50}
+                                    feedbackInvalid="Ít hơn 50 ký tự"
                                     onChange={(e) => handleSetUpdateDamTypeName(e.target.value)}
                                     value={updateDamTypeName}
                                     aria-describedby="exampleFormControlInputHelpInline"
@@ -363,14 +366,17 @@ const DamTypeManagement = () => {
                         </CRow>
                         <CRow>
                             <CCol lg={12}>
-                                <CFormInput
+                                <CFormTextarea
                                     className="mt-4"
                                     type="text"
                                     placeholder="Mô tả loại đập"
                                     onChange={(e) => handleSetUpdateDamTypeDescription(e.target.value)}
                                     value={updateDamTypeDescription}
+                                    rows={3}
+                                    maxLength={250}
+                                    feedbackInvalid="Ít hơn 250 ký tự"
                                     aria-describedby="exampleFormControlInputHelpInline"
-                                />
+                                ></CFormTextarea>
                             </CCol>
                         </CRow>
                         <CRow>
@@ -438,6 +444,7 @@ const DamTypeManagement = () => {
         // To reset all add state
         setAddState(addData)
         setUpdateState(updateData)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addVisible, updateVisible])
 
     return (
@@ -448,7 +455,7 @@ const DamTypeManagement = () => {
             <CCardHeader>Danh sách loại đập</CCardHeader>
             <CCardBody>
                 <CustomModal visible={addVisible} title={'Thêm loại đập'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
-                <CustomModal visible={updateVisible} title={'Cập nhật loại đập'} body={updateForm(updateDamTypeName)} setVisible={(value) => setUpdateVisible(value)}/>
+                <CustomModal visible={updateVisible} title={'Cập nhật loại đập'} body={updateForm(updateDamTypeId)} setVisible={(value) => setUpdateVisible(value)}/>
                 <CustomModal visible={deleteVisible} title={'Xóa người loại đập'} body={deleteForm(deleteIdDamTypeId)} setVisible={(value) => setDeleteVisible(value)}/>
                 <CForm onSubmit={onFilter}>
                     <CRow>

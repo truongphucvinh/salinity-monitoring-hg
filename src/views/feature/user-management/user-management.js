@@ -27,23 +27,32 @@ import {
     cilReload,
     cilPlus
   } from '@coreui/icons'
-import { createUser, deleteUser, getAllDomains, getAllRoles, getAllUsers, getUserById, updateUser } from "src/services/authentication-services"
+import { createUser, deleteUser, /*getAllDomains*/ getAllRoles, getAllUsers, getUserById, updateUser } from "src/services/authentication-services"
 import { setAuthApiHeader } from "src/services/global-axios"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
+import CustomAdminChecker from "src/views/customs/my-adminchecker"
 
 const UserManagement = () => {
 
     // User Management Data
     const [listUsers, setListUsers] = useState([])
-    const [listDomains, setListDomains] = useState([])
+    // const [listDomains, setListDomains] = useState([])
     const [listRoles, setListRoles] = useState([])
     const secretKey = process.env.AUTH_TOKEN || 'oda_dev'
+    const defaultDomainId = process.env.HG_DOMAIN_ID || '6585900cf7ed98f198697653'
+    const defaultAdminId = process.env.ADMIN_ROLE_ID || '6588e34a6f4d6dd9d37c8a01'
+    const defaultClientId = process.env.CLIENT_ROLE_ID || '6588e2806f4d6dd9d37c89bd'
     
     // Call inital APIs
     // Filtering all users of our project
+    const onFilterUsers = (listUsers, domainId) => {
+        return listUsers.filter(user => {
+            return user?.permission?.domain === domainId
+        })
+    }
     const rebaseAllData = () => {
         if (JSON.parse(localStorage.getItem("_isAuthenticated"))) {
             // Setting up access token
@@ -52,21 +61,22 @@ const UserManagement = () => {
             .then(res => {
                 // Install filter users here
                 const users = res?.data?.data?.result
-                setListUsers(users)
-                setFilteredUsers(users)
+                const filteredUsers = onFilterUsers(users, defaultDomainId)
+                setListUsers(filteredUsers)
+                setFilteredUsers(filteredUsers)
             })
             .catch(err => {
                 // Do nothing
             })
             
-            getAllDomains()
-            .then(res => {
-                const domains = res?.data?.data?.result
-                setListDomains(domains)
-            })
-            .catch(err => {
-                // Do nothing
-            })
+            // getAllDomains()
+            // .then(res => {
+            //     const domains = res?.data?.data?.result
+            //     setListDomains(domains)
+            // })
+            // .catch(err => {
+            //     // Do nothing
+            // })
 
             getAllRoles()
             .then((res) => {
@@ -80,6 +90,7 @@ const UserManagement = () => {
     }
     useEffect(() => {
        rebaseAllData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
 
     // Searching data
@@ -166,7 +177,7 @@ const UserManagement = () => {
                                 </CTableRow>    
                             )
                         }) : <CTableRow>
-                            <CTableDataCell colSpan={4}><p className="text-center">{'Không có dữ liệu'}</p></CTableDataCell>
+                            <CTableDataCell colSpan={5}><p className="text-center">{'Không có dữ liệu'}</p></CTableDataCell>
                         </CTableRow>
                     }
                 </CTableBody>
@@ -179,12 +190,12 @@ const UserManagement = () => {
         addPassword: '',
         addFullname: '',
         addEmail: '',
-        addDomainId: '',
+        // addDomainId: '',
         addRoleId: '',
         addLoaded: true
     }
     const [addState, setAddState] = useState(addData)
-    const { addLoaded, addUsername, addPassword, addFullname, addEmail, addDomainId, addRoleId } = addState
+    const { addLoaded, addUsername, addPassword, addFullname, addEmail, /*addDomainId*/ addRoleId } = addState
     const [addValidated, setAddValidated] = useState(false)
     const handleSetAddLoaded = (value) => {
         setAddState(prev => {
@@ -211,11 +222,11 @@ const UserManagement = () => {
             return { ...prev, addEmail: value }
         })
     }
-    const handleSetAddDomainId = (value) => {
-        setAddState(prev => {
-            return { ...prev, addDomainId: value }
-        })
-    }
+    // const handleSetAddDomainId = (value) => {
+    //     setAddState(prev => {
+    //         return { ...prev, addDomainId: value }
+    //     })
+    // }
     const handleSetAddRoleId = (value) => {
         setAddState(prev => {
             return { ...prev, addRoleId: value }
@@ -228,12 +239,21 @@ const UserManagement = () => {
             e.preventDefault()
             e.stopPropagation()
         } else {
+            // This is backup for general domain and role selection also
+            // const user = {
+            //     username: addUsername,
+            //     fullName: addFullname,
+            //     password: CryptoJS.AES.encrypt(addPassword || '', secretKey).toString(),
+            //     email: addEmail,
+            //     domain: addDomainId,
+            //     role: addRoleId
+            // }
             const user = {
                 username: addUsername,
                 fullName: addFullname,
                 password: CryptoJS.AES.encrypt(addPassword || '', secretKey).toString(),
                 email: addEmail,
-                domain: addDomainId,
+                domain: defaultDomainId,
                 role: addRoleId
             }
             createUser(user)
@@ -332,7 +352,8 @@ const UserManagement = () => {
                     />
                 </CCol>
             </CRow>
-            <CRow>
+            {/* This is backup for vary of domain selection */}
+            {/* <CRow> 
                 <CCol lg={12}>
                     <CFormSelect
                         aria-label="Default select example" 
@@ -350,7 +371,7 @@ const UserManagement = () => {
                         }
                     </CFormSelect>
                 </CCol>
-            </CRow>
+            </CRow> */}
             <CRow>
                 <CCol lg={12}>
                     <CFormSelect 
@@ -363,7 +384,9 @@ const UserManagement = () => {
                     >
                         <option selected="" value="" >Vai trò</option>
                         {
-                            listRoles.map((role) => {
+                            listRoles.filter(role => {
+                                return role?._id === defaultAdminId || role?._id === defaultClientId
+                            }).map((role) => {
                                 return  <option key={role?._id} value={role?._id}>{role?.name}</option>
                             })
                         }
@@ -387,11 +410,11 @@ const UserManagement = () => {
         updatePassword: '',
         updateFullname: '',
         updateEmail: '',
-        updateDomainId: '',
+        // updateDomainId: '',
         updateRoleId: ''
     }
     const [updateState, setUpdateState] = useState(updateData)
-    const { updateId, updateUsername, updatePassword, updateFullname, updateEmail, updateDomainId, updateRoleId } = updateState
+    const { updateId, updateUsername, updatePassword, updateFullname, updateEmail, /*updateDomainId*/ updateRoleId } = updateState
     const [updateValidated, setUpdateValidated] = useState(false)
     const getUserDataById = (userId) => {
         if (userId) {
@@ -402,6 +425,7 @@ const UserManagement = () => {
                     setUpdateState(prev => {
                         return {
                             ...prev, 
+                            updateId: user?._id,
                             updateUsername: user.username,
                             updateFullname: user.fullName,
                             updateEmail: user.email,
@@ -426,13 +450,12 @@ const UserManagement = () => {
             })
         }
     }
-    const handleSetUpdateId = (value) => {
-        setUpdateState(prev => {
-            return { ...prev, updateId: value }
-        })
-    }
+    // const handleSetUpdateId = (value) => {
+    //     setUpdateState(prev => {
+    //         return { ...prev, updateId: value }
+    //     })
+    // }
     const openUpdateModal = (userId) => {
-        handleSetUpdateId(userId)
         getUserDataById(userId)
         setUpdateVisible(true)
     }
@@ -456,11 +479,11 @@ const UserManagement = () => {
             return { ...prev, updateEmail: value }
         })
     }
-    const handleSetUpdateDomainId = (value) => {
-        setUpdateState(prev => {
-            return { ...prev, updateDomainId: value }
-        })
-    }
+    // const handleSetUpdateDomainId = (value) => {
+    //     setUpdateState(prev => {
+    //         return { ...prev, updateDomainId: value }
+    //     })
+    // }
     const handleSetUpdateRoleId = (value) => {
         setUpdateState(prev => {
             return { ...prev, updateRoleId: value }
@@ -473,12 +496,21 @@ const UserManagement = () => {
             e.preventDefault()
             e.stopPropagation()
         } else {
+            // This is backup for update user with the general domain selections
+            // const user = {
+            //     username: updateUsername,
+            //     fullName: updateFullname,
+            //     password: CryptoJS.AES.encrypt(updatePassword || '', secretKey).toString(),
+            //     email: updateEmail,
+            //     domain: updateDomainId,
+            //     role: updateRoleId
+            // }
             const user = {
                 username: updateUsername,
                 fullName: updateFullname,
                 password: CryptoJS.AES.encrypt(updatePassword || '', secretKey).toString(),
                 email: updateEmail,
-                domain: updateDomainId,
+                domain: defaultDomainId,
                 role: updateRoleId
             }
             updateUser(user, updateId)
@@ -573,7 +605,8 @@ const UserManagement = () => {
                                 />
                             </CCol>
                         </CRow>
-                        <CRow>
+                        {/* This is backup to update user with the general domain selections */}
+                        {/* <CRow>
                             <CCol lg={12}>
                                 <CFormSelect
                                     aria-label="Default select example" 
@@ -590,7 +623,7 @@ const UserManagement = () => {
                                     }
                                 </CFormSelect>
                             </CCol>
-                        </CRow>
+                        </CRow> */}
                         <CRow>
                             <CCol lg={12}>
                                 <CFormSelect 
@@ -602,7 +635,9 @@ const UserManagement = () => {
                                 >
                                     <option selected="" value="" >Vai trò</option>
                                     {
-                                        listRoles.map((role) => {
+                                        listRoles.filter(role => {
+                                            return role?._id === defaultAdminId || role?._id === defaultClientId
+                                        }).map((role) => {
                                             return  <option key={role?._id} value={role?._id}>{role?.name}</option>
                                         })
                                     }
@@ -682,10 +717,12 @@ const UserManagement = () => {
         // To reset all add state
         setAddState(addData)
         setUpdateState(updateData)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[addVisible, updateVisible])
 
     return (
         <CRow>
+        <CustomAdminChecker />
         <CCol xs>
           <CCard className="mb-4">
             <CToaster ref={toaster} push={toast} placement="top-end" />

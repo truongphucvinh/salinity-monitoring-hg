@@ -29,6 +29,7 @@ const CustomPagination = ({ listItems, showData, isLoaded }) => {
         }
         setPaginationState(prev => {return {...prev, totalPages: noPages}})
         setPaginationState(prev => {return {...prev, items: tempItems}})
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [listItems, active])
     return (
         <>

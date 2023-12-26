@@ -15,7 +15,8 @@ import {
     CFormInput,
     CForm,
     CToaster,
-    CSpinner
+    CSpinner,
+    CFormTextarea
   } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -30,7 +31,7 @@ import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
-import { createDamType, createRiver, deleteDamType, deleteRiver, getAllDamTypes, getAllRivers, getDamRiverById, getDamTypeById, getRiverById, updateDamType, updateRiver } from "src/services/dam-services"
+import { createRiver,  deleteRiver,  getAllRivers,  getRiverById,  updateRiver } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
 
 const RiverManagement = () => {
@@ -49,20 +50,16 @@ const RiverManagement = () => {
     
     // Call inital APIs
     const rebaseAllData = () => {
-        if (JSON.parse(localStorage.getItem("_isAuthenticated"))) {
-            // Setting up access token
-            setAuthApiHeader()
-            getAllRivers()
-            .then(res => {
-                // Install filter users here
-                const rivers = res?.data
-                setListRivers(rivers)
-                setFilteredRivers(rivers)
-            })
-            .catch(err => {
-                // Do nothing
-            })
-        }
+        getAllRivers()
+        .then(res => {
+            // Install filter users here
+            const rivers = res?.data
+            setListRivers(rivers)
+            setFilteredRivers(rivers)
+        })
+        .catch(err => {
+            // Do nothing
+        })
     }
     useEffect(() => {
        rebaseAllData()
@@ -122,7 +119,7 @@ const RiverManagement = () => {
                   <CTableRow>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Tên sông, kênh, rạch</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '50%'}}>Vị trí</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '50%'}}>Mô tả</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Thao tác</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
@@ -217,7 +214,8 @@ const RiverManagement = () => {
                                 className="mt-4"
                                 type="text"
                                 placeholder="Tên sông, kênh, rạch"
-                                feedbackInvalid="Chưa nhập tên sông, kênh, rạch!"
+                                maxLength={50}
+                                feedbackInvalid="Không bỏ trống và phải ít hơn 50 ký tự"
                                 onChange={(e) => handleSetAddRiverName(e.target.value)}
                                 value={addRiverName}
                                 aria-describedby="exampleFormControlInputHelpInline"
@@ -227,16 +225,19 @@ const RiverManagement = () => {
                     </CRow>
                     <CRow>
                         <CCol lg={12}>
-                            <CFormInput
+                            <CFormTextarea
                                 className="mt-4"
                                 type="text"
                                 placeholder="Mô tả vị trí sông, kênh, rạch"
-                                feedbackInvalid="Chưa nhập vị trí sông, kênh, rạch!"
+                                feedbackInvalid="Không bỏ trống và phải ít hơn 250 ký tự"
+                                maxLength={250}
                                 onChange={(e) => handleSetAddRiverLocation(e.target.value)}
                                 value={addRiverLocation}
                                 required
+                                rows={3}
                                 aria-describedby="exampleFormControlInputHelpInline"
-                            />
+                            >
+                            </CFormTextarea>
                         </CCol>
                     </CRow>
                     <CRow>
@@ -365,14 +366,17 @@ const RiverManagement = () => {
                         </CRow>
                         <CRow>
                             <CCol lg={12}>
-                                <CFormInput
+                                <CFormTextarea
                                     className="mt-4"
                                     type="text"
                                     placeholder="Mô tả vị trí sông, kênh, rạch"
                                     onChange={(e) => handleSetUpdateRiverLocation(e.target.value)}
                                     value={updateRiverLocation}
+                                    feedbackInvalid="Phải ít hơn 250 ký tự"
+                                    maxLength={250}
+                                    rows={3}
                                     aria-describedby="exampleFormControlInputHelpInline"
-                                />
+                                ></CFormTextarea>
                             </CCol>
                         </CRow>
                         <CRow>
@@ -440,6 +444,7 @@ const RiverManagement = () => {
         // To reset all add state
         setAddState(addData)
         setUpdateState(updateData)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addVisible, updateVisible])
 
     return (

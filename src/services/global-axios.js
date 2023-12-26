@@ -3,7 +3,7 @@ import axios from 'axios'
 
 const AUTH_API_URL = process.env.AUTH_HOST_API_URL || 'http://dev.iotlab.net.vn:5000'
 // const DAM_API_URL = process.env.DAM_HOST_API_URL || 'http://172.30.37.182:8081'
-const DAM_API_URL = 'http://localhost:8081'
+const DAM_API_URL = process.env.DAM_HOST_API_URL || 'http://localhost:8081'
 const authApi = axios.create({
     baseURL:`${AUTH_API_URL}/api/v1`,
     timeout:10000,
