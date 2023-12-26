@@ -51,6 +51,9 @@ import exportingModule from "highcharts/modules/exporting";
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 
+//service
+import thingService from 'src/services/thing';
+
 //select
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
@@ -113,18 +116,7 @@ const optionss = {
     ],
   };
 
-  //hight chart 
-  // exportingModule(Highcharts);
-
 const StationDetail = () => {
-  // const chartComponent = useRef(null);
-
-  // const printChartAsImage = () => {
-  //   // chart to image
-  //   const chart = chartComponent.current.chart;
-  //   console.log(chart.getSVG());
-  // };
-
     const [value, setValue] = React.useState([
         dayjs('2022-04-17'),
         dayjs('2022-04-21'),
@@ -133,88 +125,43 @@ const StationDetail = () => {
       const random = () => Math.round(Math.random() * 100)
 
     const [dateRange, setDateRange] = useState([null, null]);
-    const [startDate, endDate] = dateRange;
 
     //sensor list
     const [displaySensorList, setDisplaySensorList] = useState(false);
-    const [sensorList, setSensorList] = useState([
-      {
-        id: 1,
-        name: "sensor 1",
-        description: "sensor 1 description"
-      },
-      {
-        id: 2,
-        name: "sensor 2",
-        description: "sensor 2 description"
-      },
-      {
-        id: 3,
-        name: "sensor 3",
-        description: "sensor 2 description"
-      },
-      {
-        id: 4,
-        name: "sensor 4",
-        description: "sensor 2 description"
-      },
-      {
-        id: 5,
-        name: "sensor 5",
-        description: "sensor 2 description"
-      }
-    ])
+    const [sensorList, setSensorList] = useState([])
 
-    const [selectedSensor, setSelectedSensor] = useState(); //id
+    const [selectedSensorId, setSelectedSensorId] = useState(0); //id
+
+    const [thing, setThing] = useState();
 
     const handleChangeSensor = (event) => {
-      setSelectedSensor(event.target.value);
+      setSelectedSensorId(event.target.value);
     } 
 
     //tab
     const [activeKey, setActiveKey] = useState(2);
 
-    //higth chart
-    // (async () => {
-
-    //   const data = await fetch(
-    //     'https://demo-live-data.highcharts.com/aapl-c.json'
-    //   ).then(response => response.json());
-    
-    //   // Create the chart
-    //   Highcharts.stockChart('container', {
-    //     rangeSelector: {
-    //       selected: 1
-    //     },
-    
-    //     title: {
-    //       text: 'AAPL Stock Price'
-    //     },
-    
-    //     series: [{
-    //       name: 'AAPL',
-    //       data: data,
-    //       tooltip: {
-    //         valueDecimals: 2
-    //       }
-    //     }]
-    //   });
-    // })();
-
-  //   var Highcharts = require('highcharts/highstock'); 
-  //   require('highcharts/modules/exporting')(Highcharts);
-
-  //  Highcharts.stockChart('container', {
-  //     series: [{
-  //       data: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-  //       pointInterval: 24 * 60 * 60 * 1000
-  //     }]
-  //   });
-
 
     useEffect(() => {
-        console.log("abc");
-      }, [dateRange])
+      //get sensor list in specific thing/station
+      var thingId = JSON.parse(localStorage.getItem('thingInfo'))?.id;
+      thingService.getThingById(thingId)
+        .then((res) => {
+          setThing(res);
+          //loc danh sach station
+          var sensorLists = []; 
+          res?.multiDataStreamDTOs.map((multiDTS) => {
+            sensorLists.push(multiDTS.sensor);
+            setSensorList(sensorLists);
+            console.log("sensor list: ", sensorLists);
+          })
+          console.log("res thing info: ", res);
+          return sensorLists;
+        })
+        .then((res) => {
+          setSelectedSensorId(res[0]?.sensorId);
+        })
+    }, [])
 
     return (<>
         <div className="station-detail">
@@ -284,14 +231,14 @@ const StationDetail = () => {
                     fill: "black !important",
                   }
                 }}
-                  value={selectedSensor}
+                  value={selectedSensorId}
                   onChange={handleChangeSensor}
                   displayEmpty
                   inputProps={{ 'aria-label': 'Without label' }}
                 >
                   {
                     sensorList.map((sensor, index) => {
-                      return <MenuItem value={sensor.id} key={index}>{ sensor.name }</MenuItem>
+                      return <MenuItem value={sensor.sensorId} key={index}>{ sensor.sensorName }</MenuItem>
                     })
                   }
                 </Select>
@@ -420,48 +367,6 @@ const StationDetail = () => {
                 </div>
             </div>
         </div>
-
-        {/* sensor list modal */}
-        {/* <CModal
-            backdrop="static"
-            alignment="center"
-            visible={displaySensorList}
-            onClose={() => setDisplaySensorList(false)}
-            aria-labelledby="StaticBackdropExampleLabel"
-            className='sensor-list'
-        >
-          <div className="sensor-list">
-            <div className="sensor-list__title">
-                Danh sách cảm biến Trạm 1
-            </div>
-            <div className="sensor-list__list">
-              {
-                sensorList.map((sensor) => {
-                  return <>
-                    <div 
-                      className={"sensor-list__list__item " + (sensor.id == selectedSensor.id ? 'sensor-list__list__item--is-selected' : '')}
-                      onClick={() => handleChangeSensor(sensor.id)}
-                    >
-                      <div className="sensor-list__list__item__name">
-                        { sensor.name }
-                      </div>
-                      <div className="sensor-list__list__item__description">
-                        { sensor.description }
-                      </div>
-                    </div>
-                  </>
-                })
-              }
-            </div>
-            <div className="sensor-list__action">
-              <div className="sensor-list__action__cancel-btn"
-                onClick={() => setDisplaySensorList(false)}
-              >
-                Đóng
-              </div>
-            </div>
-          </div>
-        </CModal> */}
     </>)
 }
 

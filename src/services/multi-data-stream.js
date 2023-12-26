@@ -19,5 +19,14 @@ export default  {
         } catch(error) {
             throw error;
         }
+    },
+
+    deleteMultiDataStream: async function(multiDataStreamId) {
+        try {
+            const response = await axios.delete(BASE_URL+`ctu/geo/multi-data-streams/${multiDataStreamId}`);
+            return response;
+        } catch(error) {
+            throw error;
+        }
     }
 }

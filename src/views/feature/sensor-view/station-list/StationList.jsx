@@ -30,7 +30,7 @@ import { Checkbox } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
 
 //service
-import multiDataStream from 'src/services/multi-data-stream';
+import multiDataStreamSerivce from 'src/services/multi-data-stream';
 import stationService from 'src/services/station';
 import thingService from 'src/services/thing';
 import sensorService from 'src/services/sensor'
@@ -53,19 +53,6 @@ const MenuProps = {
     },
   },}
 
-const names = [
-  'Oliver Hansen',
-  'Van Henry',
-  'April Tucker',
-  'Ralph Hubbard',
-  'Omar Alexander',
-  'Carlos Abbott',
-  'Miriam Wagner',
-  'Bradley Wilkerson',
-  'Virginia Andrews',
-  'Kelly Snyder',
-];
-
 const StationList = () => {
     
   //menu
@@ -82,7 +69,10 @@ const StationList = () => {
 
   //modal 
   const [openCreateStationModal, setOpenCreateStationModal] = React.useState(false);
-  const handleOpenCreateStationModal = () => setOpenCreateStationModal(true);
+  const handleOpenCreateStationModal = () => {
+    setOpenCreateStationModal(true);
+    setIsModification(false);
+  };
   const handleCloseCreateStationModal = () => {
     setOpenCreateStationModal(false);
     setNewStation({name: '', description: ''});
@@ -125,6 +115,7 @@ const StationList = () => {
   //select chip sensor list
   const [sensorList, setSensorList] = useState([])
   const [selectedSensorList, setSelectedSensorList] = useState([]);
+  const [selectedSensorListBackup, setSelectedSensorListBackup] = useState([]);
 
   const handleChange = (event) => {
     const {
@@ -159,8 +150,6 @@ const StationList = () => {
   }
   const [stationDeletionLoading, setStationDeletionLoading] = useState(false);
   const handleDeleteStation = (station) => {
-    console.log("stationid: ", station?.station?.id);
-    console.log("station: ", station, station.thingId);
     stationService.deleteStation(station?.station?.id)
       .then((res) => {
         thingService.deleteThing(station?.thingId)
@@ -173,6 +162,9 @@ const StationList = () => {
         })
       })
   }
+  const [sensorIdListByMDT, setSensorIdListByMDT] = useState([]); //{sensorId, multiDTSId}, sensorId va multiDTSId tuong ung => xoa link sensor trong khi modify
+
+  const [isModification, setIsModification] = useState(false); //true: modify, false: create
 
   useLayoutEffect(() => {
 
@@ -184,6 +176,7 @@ const StationList = () => {
     stationService.getStationList()
       .then((res) => {
         setStationList(res);
+        console.log("station list: ", res)
       })
       .then(() => {
         setStationListLoading(false);
@@ -196,7 +189,6 @@ const StationList = () => {
   useEffect(() => {
     sensorService.getSensorList()
       .then((res) => {
-        console.log("sensor list: ", res);
         setSensorList(res);
       })
   }, [])
@@ -209,8 +201,18 @@ const StationList = () => {
     console.log(newStation);
   }
 
-  const handelCreateStation = (e) => {
+  const handelSubmitStationForm = (e) => { //for creation and modification
     e.preventDefault();
+    if(isModification) {
+      console.log("modify");
+      handelModifyStation();
+    } else {
+      console.log("create");
+      handelCreateStation();
+    }
+  }
+
+  const handelCreateStation = () => {
     setStationCreationLoading(true);
     //create thing
     newThing.name = newStation.name;
@@ -229,7 +231,7 @@ const StationList = () => {
             description: newStation.description
           }
           selectedSensorList.map((sensorId) => {
-            multiDataStream.createDataStream(res.data.id, sensorId, dataStreamInfo)
+            multiDataStreamSerivce.createDataStream(res.data.id, sensorId, dataStreamInfo)
               .then((resMultiDTS) => {
                 console.log("resMultiDTS: ", resMultiDTS);
               })
@@ -249,20 +251,67 @@ const StationList = () => {
       })
   }
 
-  const handleModifyStation = (stationInfo) => {
-    console.log("station info: ", stationInfo);
+  const handleDisplayModifyStation = (stationInfo) => {
+    setSensorIdListByMDT([]);
     setNewStation({
       name: stationInfo?.station.name, 
       description: stationInfo?.station.description
     });
-    var sensorIdList = []; 
+    var sensorIdList = [];
+    var sensorIdListByMDTs = []; 
     stationInfo?.multiDataStreamDTOs.map((multiDTS) => {
+      var sensorMDTId = {
+        sensorId: multiDTS?.sensor.sensorId,
+        multiDTSId: multiDTS?.multiDataStreamId
+      }
+      sensorIdListByMDTs.push(sensorMDTId);
+      setSensorIdListByMDT(sensorIdListByMDTs);
       sensorIdList.push(multiDTS?.sensor.sensorId);
-      console.log("sensorIdList: ", sensorIdList);
     })
     setSelectedSensorList(sensorIdList);
-    handleOpenCreateStationModal();
+    setSelectedSensorListBackup([...sensorIdList]);
+    setOpenCreateStationModal(true);
+    setIsModification(true);
     setAnchorEl(null);
+  }
+
+  const handelModifyStation = async () => {
+    //cap nhap lien ket sensor
+    //neu khong co trong backup => them
+    var thingId = stationIsSelected.thingId;
+    const x = await Promise.all(selectedSensorList.map(async (sensorId, index) => {
+      if (selectedSensorListBackup.includes(sensorId) == 0) {
+        var multiDTSInfo = {
+          name: `sensorId ${sensorId}, thingId ${thingId}`,
+          description: 'Multi data stream description'
+        };
+        await multiDataStreamSerivce.createDataStream(thingId, sensorId, multiDTSInfo)
+          .then((res) => {});
+      }
+    })) 
+
+    //neu co trong backup nhung khong co trong mang hien tai => xoa
+    const xyz = await Promise.all(selectedSensorListBackup.map(async (sensorId, index) => {
+      if(selectedSensorList.includes(sensorId)==0) {
+        var multiDataStreamId = handelFindMDTIdBySensorId(sensorId);
+        await multiDataStreamSerivce.deleteMultiDataStream(multiDataStreamId)
+          .then((res) => {})
+      }
+    })) 
+    setStationListChange(!stationListChange);
+  }
+
+  const handelFindMDTIdBySensorId = (sensorId) => {
+    for(let i=0; i<sensorIdListByMDT.length; i++) {
+      if(sensorId==sensorIdListByMDT[i].sensorId) {
+        return sensorIdListByMDT[i].multiDTSId;
+      }
+    }
+  }
+
+  const handelDirectToDetail = (thingId) => {
+    console.log("thingId: ", thingId);
+    localStorage.setItem("thingInfo", JSON.stringify({id: thingId}))
   }
 
     return (
@@ -314,7 +363,7 @@ const StationList = () => {
                                   </IconButton>
                               </Tooltip>
                           </div>
-                          <div className="station__list__item__action__detail-btn">
+                          <div className="station__list__item__action__detail-btn" onClick={() => {handelDirectToDetail(station?.thingId)}}>
                               Chi tiết
                           </div>
                       </div>
@@ -366,7 +415,7 @@ const StationList = () => {
               
             </MenuItem>
             <Divider />
-            <MenuItem onClick={() => handleModifyStation(stationIsSelected)}>
+            <MenuItem onClick={() => handleDisplayModifyStation(stationIsSelected)}>
               Chỉnh sửa
             </MenuItem>
             <Divider />
@@ -393,7 +442,7 @@ const StationList = () => {
           >
             <Fade in={openCreateStationModal}>
               <Box sx={style}>
-                <form className="station-creation" onSubmit={handelCreateStation}>
+                <form className="station-creation" onSubmit={handelSubmitStationForm}>
                   <div className="station-creation__title">
                     Thêm trạm
                   </div>

@@ -12,6 +12,15 @@ export default {
         }
     },
 
+    getThingById: async function(thingId) {
+        try {
+            const response = await axios.get(BASE_URL+`ctu/geo/things/${thingId}`)
+            return response.data;
+        } catch(error) {
+            throw error;
+        }
+    },
+
     createThing: async function(thingInfo) {
         try {
             const response = await axios.post(BASE_URL+'ctu/geo/things', thingInfo);
