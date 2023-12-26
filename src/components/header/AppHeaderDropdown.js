@@ -22,7 +22,7 @@ import {
 } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 
-import avatar8 from './../../assets/images/avatars/8.jpg'
+import avatar8 from './../../assets/images/avatars/user.jpg'
 import { useNavigate } from 'react-router-dom'
 
 const AppHeaderDropdown = () => {
@@ -109,8 +109,8 @@ const AppHeaderDropdown = () => {
               </CBadge>
             </CDropdownItem> */}
             <CDropdownDivider />
-            <CDropdownItem href={false} onClick={handleLogout}>
-              <CIcon icon={cilLockLocked}  className="me-2" />
+            <CDropdownItem href={false} role='button' onClick={handleLogout}>
+              <CIcon icon={cilLockLocked}  className="me-2" role='button' />
               Đăng xuất
             </CDropdownItem>
           </CDropdownMenu>
