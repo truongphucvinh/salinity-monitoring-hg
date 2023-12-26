@@ -56,7 +56,7 @@ const DamManagement = React.lazy(() => import('./views/feature/dam-management/da
 const DamDetail = React.lazy(() => import('./views/feature/dam-management/dam-detail'))
 
 const routes = [
-  { path: '/', exact: true, name: 'Home' },
+  { path: '/', exact: true, name: 'Trang chủ' },
   { path: '/dam-management/dam-detail/:id', name: '', element: DamDetail },  
   { path: '/dam-management/dam-detail', name: 'Thông tin đập', element: DamDetail },  
   { path: '/dam-management', name: 'Quản lý đập', element: DamManagement },  

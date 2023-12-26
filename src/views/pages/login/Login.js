@@ -59,7 +59,7 @@ const Login = () => {
       .then(res => {
         localStorage.setItem("_authenticatedUser", JSON.stringify(res?.data?.data))
         localStorage.setItem("_isAuthenticated", JSON.stringify(true))
-        navigate('/dashboard')
+        navigate('/')
       }).catch(err => {
         addToast(exampleToast)
       })
