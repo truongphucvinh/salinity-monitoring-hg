@@ -329,6 +329,7 @@ const DamManagement = () => {
                         <CCol lg={6}>
                             <CustomDateTimePicker 
                                 classes='mt-4' 
+                                placeholder={'Ngày xây dựng'}
                                 value={addDamConstructedAt}
                                 setValue={handleSetAddDamConstructedAt}
                             />
