@@ -50,20 +50,16 @@ const DamTypeManagement = () => {
     
     // Call inital APIs
     const rebaseAllData = () => {
-        if (JSON.parse(localStorage.getItem("_isAuthenticated"))) {
-            // Setting up access token
-            setAuthApiHeader()
-            getAllDamTypes()
-            .then(res => {
-                // Install filter users here
-                const damTypes = res?.data
-                setListDamTypes(damTypes)
-                setFilteredDamTypes(damTypes)
-            })
-            .catch(err => {
-                // Do nothing
-            })
-        }
+        getAllDamTypes()
+        .then(res => {
+            // Install filter users here
+            const damTypes = res?.data
+            setListDamTypes(damTypes)
+            setFilteredDamTypes(damTypes)
+        })
+        .catch(err => {
+            // Do nothing
+        })
     }
     useEffect(() => {
        rebaseAllData()
@@ -459,7 +455,7 @@ const DamTypeManagement = () => {
             <CCardHeader>Danh sách loại đập</CCardHeader>
             <CCardBody>
                 <CustomModal visible={addVisible} title={'Thêm loại đập'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
-                <CustomModal visible={updateVisible} title={'Cập nhật loại đập'} body={updateForm(updateDamTypeName)} setVisible={(value) => setUpdateVisible(value)}/>
+                <CustomModal visible={updateVisible} title={'Cập nhật loại đập'} body={updateForm(updateDamTypeId)} setVisible={(value) => setUpdateVisible(value)}/>
                 <CustomModal visible={deleteVisible} title={'Xóa người loại đập'} body={deleteForm(deleteIdDamTypeId)} setVisible={(value) => setDeleteVisible(value)}/>
                 <CForm onSubmit={onFilter}>
                     <CRow>

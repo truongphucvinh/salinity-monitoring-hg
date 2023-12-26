@@ -1,6 +1,6 @@
 import { damApi } from "./global-axios"
 
-const damStatusId = process.env.DAM_STATUS_OPEN_ID || 'fb6b6286-d66b-4746-afc2-7e6f3140066f'
+export const defaultDamStatusId = process.env.DAM_STATUS_OPEN_ID || 'fb6b6286-d66b-4746-afc2-7e6f3140066f'
 
 export const getAllDamTypes = () => damApi.get('/dam-types')
 export const getDamTypeById = (damTypeId) => damApi.get(`/dam-types/${damTypeId}`)
@@ -20,7 +20,7 @@ export const createDamStatus = (damStatus) => damApi.post('/dam-statuses', damSt
 export const updateDamStatus = (damStatus) => damApi.patch('/dam-statuses', damStatus)
 export const deleteDamStatus = (damStatusId) => damApi.delete(`/dam-statuses/${damStatusId}`)
 
-export const getAllDamSchedules = (damId) => damApi.get(`/dam-schedules?damId=${damId}&damStatusId=${damStatusId}`)
+export const getAllDamSchedules = (damId) => damApi.get(`/dam-schedules?damId=${damId}&damStatusId=${defaultDamStatusId}`)
 export const getDamScheduleId = (damScheduleId) => damApi.get(`/dam-schedules/${damScheduleId}`)
 export const createDamSchedule = (damSchedule) => damApi.post('/dam-schedules', damSchedule)
 export const updateDamSchedule = (damSchedule) => damApi.patch('/dam-schedules', damSchedule)

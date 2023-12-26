@@ -19,6 +19,8 @@ import CustomSpinner from "src/views/customs/my-spinner"
 import CustomMap from "src/views/customs/my-map"
 import CIcon from "@coreui/icons-react"
 import { cilPencil, cilTrash, cilTouchApp } from "@coreui/icons"
+import DamScheduleManagement from "./dam-schedule-management"
+import { damStatusConverter } from "src/tools"
 
 const DamDetail = () => {
     // Got the id of URL
@@ -75,52 +77,6 @@ const DamDetail = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    const showFilteredTable = () => {
-        return (
-            <CTable bordered align="middle" className="mb-0 border" hover responsive>
-                <CTableHead className="text-nowrap">
-                  <CTableRow>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Diễn giải</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Ngày mở</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Ngày đóng</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Thao tác</CTableHeaderCell>
-                  </CTableRow>
-                </CTableHead>
-                <CTableBody>
-                    {
-                        damSchedules?.length !== 0 ? damSchedules.map((damSchedule, index) => {
-                            return (
-                                <CTableRow key={damSchedule?.damScheduleId}>
-                                    <CTableDataCell>{index + 1}</CTableDataCell>
-                                    <CTableDataCell>{damSchedule?.damScheduleDescription}</CTableDataCell>
-                                    <CTableDataCell>{`${damSchedule?.damScheduleBeginAt[0]}-${damSchedule?.damScheduleBeginAt[1]}-${damSchedule?.damScheduleBeginAt[2]} lúc ${damSchedule?.damScheduleBeginAt[3]}:${damSchedule?.damScheduleBeginAt[4]}:${damSchedule?.damScheduleBeginAt[5]}`}</CTableDataCell>
-                                    <CTableDataCell>{`${damSchedule?.damScheduleEndAt[0]}-${damSchedule?.damScheduleEndAt[1]}-${damSchedule?.damScheduleEndAt[2]} lúc ${damSchedule?.damScheduleEndAt[3]}:${damSchedule?.damScheduleEndAt[4]}:${damSchedule?.damScheduleEndAt[5]}`}</CTableDataCell>
-                                    <CTableDataCell>
-                                        <CIcon icon={cilTouchApp} 
-                                            // onClick={() => openDamDetail(damSchedule?.damScheduleId)} 
-                                            className="text-primary mx-1" role="button"
-                                        />
-                                        <CIcon icon={cilPencil} 
-                                            // onClick={() => openUpdateModal(damSchedule?.damScheduleId)} 
-                                            className="text-success mx-1" role="button"
-                                        />
-                                        <CIcon icon={cilTrash} 
-                                            // onClick={() => openDeleteModal(damSchedule?.damScheduleId)}  
-                                            className="text-danger" role="button"
-                                        />
-                                    </CTableDataCell>
-                                </CTableRow>    
-                            )
-                        }) : <CTableRow>
-                            <CTableDataCell colSpan={4}><p className="text-center">{'Không có dữ liệu'}</p></CTableDataCell>
-                        </CTableRow>
-                    }
-                </CTableBody>
-              </CTable>
-        )
-    }
-
     return (
         <>
             {
@@ -160,6 +116,10 @@ const DamDetail = () => {
                                                     <CTableDataCell className="bg-body-tertiary fw-bold" style={{'width' : '20%'}}>Mô tả</CTableDataCell>
                                                     <CTableDataCell>{dam?.damDescription ? dam?.damDescription : 'Không có dữ liệu'}</CTableDataCell>
                                                 </CTableRow> 
+                                                <CTableRow>
+                                                    <CTableDataCell className="bg-body-tertiary fw-bold" style={{'width' : '20%'}}>Trạng thái</CTableDataCell>
+                                                    <CTableDataCell><CIcon icon={damStatusConverter(dam)?.icon} className="me-2"/>{damStatusConverter(dam)?.status}</CTableDataCell>
+                                                </CTableRow> 
                                             </CTableBody>
                                         </CTable> : <CustomSpinner />
                                     }
@@ -179,7 +139,7 @@ const DamDetail = () => {
                             <CRow>
                                 <CCol lg={12}>
                                     <h4 className="text-center my-4 fw-bold" style={{'color': 'black'}}>Lịch mở đập</h4>
-                                    {showFilteredTable()}
+                                    <DamScheduleManagement damInstance={dam} rebaseDetailPage={rebaseAllData}/>
                                 </CCol>
                             </CRow>
                         </CCardBody>

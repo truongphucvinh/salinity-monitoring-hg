@@ -33,6 +33,7 @@ import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
+import CustomAdminChecker from "src/views/customs/my-adminchecker"
 
 const UserManagement = () => {
 
@@ -176,7 +177,7 @@ const UserManagement = () => {
                                 </CTableRow>    
                             )
                         }) : <CTableRow>
-                            <CTableDataCell colSpan={4}><p className="text-center">{'Không có dữ liệu'}</p></CTableDataCell>
+                            <CTableDataCell colSpan={5}><p className="text-center">{'Không có dữ liệu'}</p></CTableDataCell>
                         </CTableRow>
                     }
                 </CTableBody>
@@ -721,6 +722,7 @@ const UserManagement = () => {
 
     return (
         <CRow>
+        <CustomAdminChecker />
         <CCol xs>
           <CCard className="mb-4">
             <CToaster ref={toaster} push={toast} placement="top-end" />

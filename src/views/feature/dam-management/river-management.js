@@ -50,20 +50,16 @@ const RiverManagement = () => {
     
     // Call inital APIs
     const rebaseAllData = () => {
-        if (JSON.parse(localStorage.getItem("_isAuthenticated"))) {
-            // Setting up access token
-            setAuthApiHeader()
-            getAllRivers()
-            .then(res => {
-                // Install filter users here
-                const rivers = res?.data
-                setListRivers(rivers)
-                setFilteredRivers(rivers)
-            })
-            .catch(err => {
-                // Do nothing
-            })
-        }
+        getAllRivers()
+        .then(res => {
+            // Install filter users here
+            const rivers = res?.data
+            setListRivers(rivers)
+            setFilteredRivers(rivers)
+        })
+        .catch(err => {
+            // Do nothing
+        })
     }
     useEffect(() => {
        rebaseAllData()

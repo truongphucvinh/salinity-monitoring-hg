@@ -109,7 +109,7 @@ const AppHeaderDropdown = () => {
               </CBadge>
             </CDropdownItem> */}
             <CDropdownDivider />
-            <CDropdownItem href={false} role='button' onClick={handleLogout}>
+            <CDropdownItem role='button' onClick={handleLogout}>
               <CIcon icon={cilLockLocked}  className="me-2" role='button' />
               Đăng xuất
             </CDropdownItem>

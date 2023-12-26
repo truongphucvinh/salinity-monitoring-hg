@@ -37,6 +37,7 @@ import { createDam, deleteDam, getAllDamTypes, getAllDams, getAllRivers, getDamB
 import CustomSpinner from "src/views/customs/my-spinner"
 import CustomDateTimePicker from "src/views/customs/my-datetimepicker/my-datetimepicker"
 import { useNavigate } from "react-router-dom"
+import { damStatusConverter } from "src/tools"
 
 const DamManagement = () => {
 
@@ -56,10 +57,7 @@ const DamManagement = () => {
     
     // Call inital APIs
     const rebaseAllData = () => {
-        if (JSON.parse(localStorage.getItem("_isAuthenticated"))) {
-            // Setting up access token
-            setAuthApiHeader()
-            getAllDams()
+        getAllDams()
             .then(res => {
                 // Install filter users here
                 const dams = res?.data
@@ -87,7 +85,6 @@ const DamManagement = () => {
             .catch(err => {
                 // Do nothing
             })
-        }
     }
     useEffect(() => {
        rebaseAllData()
@@ -160,7 +157,6 @@ const DamManagement = () => {
     const [toast, addToast] = useState(0)
     const toaster = useRef()
 
-
     // Pagination + Filtering + Fix here
     const showFilteredTable = (filteredDams, duration, isLoaded) => {
         return (
@@ -171,9 +167,10 @@ const DamManagement = () => {
                 <CTableHead className="text-nowrap">
                   <CTableRow>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Tên đập</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Tên đập</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Thuộc sông, kênh, rạch</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Kích thước</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Trạng thái</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Thao tác</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
@@ -186,6 +183,7 @@ const DamManagement = () => {
                                     <CTableDataCell>{dam?.damName}</CTableDataCell>
                                     <CTableDataCell>{dam?.damRiver?.riverName}</CTableDataCell>
                                     <CTableDataCell>{`${dam?.damCapacity} x ${dam?.damHeight} (mét)`}</CTableDataCell>
+                                    <CTableDataCell><CIcon icon={damStatusConverter(dam)?.icon} className="me-2"/>{damStatusConverter(dam)?.status}</CTableDataCell>
                                     <CTableDataCell>
                                         <CIcon icon={cilTouchApp} onClick={() => openDamDetail(dam?.damId)} className="text-primary mx-1" role="button"/>
                                         <CIcon icon={cilPencil} onClick={() => openUpdateModal(dam?.damId)} className="text-success mx-1" role="button"/>
@@ -194,7 +192,7 @@ const DamManagement = () => {
                                 </CTableRow>    
                             )
                         }) : <CTableRow>
-                            <CTableDataCell colSpan={4}><p className="text-center">{'Không có dữ liệu'}</p></CTableDataCell>
+                            <CTableDataCell colSpan={6}><p className="text-center">{'Không có dữ liệu'}</p></CTableDataCell>
                         </CTableRow>
                     }
                 </CTableBody>

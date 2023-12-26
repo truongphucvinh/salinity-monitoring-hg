@@ -26,16 +26,16 @@ import {
     cilReload,
     cilPlus
   } from '@coreui/icons'
-import { setAuthApiHeader } from "src/services/global-axios"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
-import { createDamSchedule, createDamType, defaultDamStatusId, deleteDamType, getAllDamSchedules, getAllDamTypes, getDamScheduleId, getDamTypeById, updateDamSchedule, updateDamType } from "src/services/dam-services"
+import { createDamSchedule, createDamType, defaultDamStatusId, deleteDamSchedule, deleteDamType, getAllDamSchedules, getAllDamTypes, getDamScheduleId, getDamTypeById, updateDamSchedule, updateDamType } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
-import CustomDateTimePicker from "src/views/customs/my-datetimepicker/my-datetimepicker"
+import CustomDateTimePickerV2 from "src/views/customs/my-datetimepicker/my-datetimepicker-time"
+import { formatDate } from "src/tools"
 
-const DamTypeManagement = ({damInstance}) => {
+const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
     
 
     // Dam Schedule Management
@@ -52,10 +52,8 @@ const DamTypeManagement = ({damInstance}) => {
     
     // Call inital APIs
     const rebaseAllData = () => {
-        if (JSON.parse(localStorage.getItem("_isAuthenticated"))) {
-            // Setting up access token
-            setAuthApiHeader()
-            getAllDamSchedules()
+        if (damInstance) {
+            getAllDamSchedules(damInstance?.damId)
             .then(res => {
                 // Install filter users here
                 const damSchedules = res?.data
@@ -100,17 +98,17 @@ const DamTypeManagement = ({damInstance}) => {
             setFilteredDamSchedules(listDamSchedules)
             if (damScheduleYear) {
                 setFilteredDamSchedules(prev => {
-                    return prev.filter(damSchedule => damSchedule?.damScheduleBeginAt[0] === parseFloat(damScheduleYear))
+                    return prev.filter(damSchedule => damSchedule?.damScheduleBeginAt[0] === parseFloat(damScheduleYear) || damSchedule?.damScheduleEndAt[0] === parseFloat(damScheduleYear))
                 })
             }
             if (damScheduleMonth) {
                 setFilteredDamSchedules(prev => {
-                    return prev.filter(damSchedule => damSchedule?.damScheduleBeginAt[1] === parseFloat(damScheduleMonth))
+                    return prev.filter(damSchedule => damSchedule?.damScheduleBeginAt[1] === parseFloat(damScheduleMonth) || damSchedule?.damScheduleEndAt[1] === parseFloat(damScheduleMonth))
                 })
             }
             if (damScheduleDay) {
                 setFilteredDamSchedules(prev => {
-                    return prev.filter(damSchedule => damSchedule?.damScheduleBeginAt[2] === parseFloat(damScheduleDay))
+                    return prev.filter(damSchedule => damSchedule?.damScheduleBeginAt[2] === parseFloat(damScheduleDay) || damSchedule?.damScheduleEndAt[2] === parseFloat(damScheduleDay))
                 })
             }
         }else {
@@ -148,26 +146,22 @@ const DamTypeManagement = ({damInstance}) => {
                                 <CTableRow key={damSchedule?.damScheduleId}>
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
                                     <CTableDataCell>{damSchedule?.damScheduleDescription}</CTableDataCell>
-                                    <CTableDataCell>{`${damSchedule?.damScheduleBeginAt[0]}-${damSchedule?.damScheduleBeginAt[1]}-${damSchedule?.damScheduleBeginAt[2]} lúc ${damSchedule?.damScheduleBeginAt[3]}:${damSchedule?.damScheduleBeginAt[4]}:${damSchedule?.damScheduleBeginAt[5]}`}</CTableDataCell>
-                                    <CTableDataCell>{`${damSchedule?.damScheduleEndAt[0]}-${damSchedule?.damScheduleEndAt[1]}-${damSchedule?.damScheduleEndAt[2]} lúc ${damSchedule?.damScheduleEndAt[3]}:${damSchedule?.damScheduleEndAt[4]}:${damSchedule?.damScheduleEndAt[5]}`}</CTableDataCell>
+                                    <CTableDataCell>{`${damSchedule?.damScheduleBeginAt[0]}-${damSchedule?.damScheduleBeginAt[1]}-${damSchedule?.damScheduleBeginAt[2]} lúc ${damSchedule?.damScheduleBeginAt[3]}:${damSchedule?.damScheduleBeginAt[4]}:${damSchedule?.damScheduleBeginAt[5] ? damSchedule?.damScheduleBeginAt[5] : '00'}`}</CTableDataCell>
+                                    <CTableDataCell>{`${damSchedule?.damScheduleEndAt[0]}-${damSchedule?.damScheduleEndAt[1]}-${damSchedule?.damScheduleEndAt[2]} lúc ${damSchedule?.damScheduleEndAt[3]}:${damSchedule?.damScheduleEndAt[4]}:${damSchedule?.damScheduleEndAt[5] ? damSchedule?.damScheduleEndAt[5] : '00'}`}</CTableDataCell>
                                     <CTableDataCell>
-                                        <CIcon icon={cilTouchApp} 
-                                            // onClick={() => openDamDetail(damSchedule?.damScheduleId)} 
-                                            className="text-primary mx-1" role="button"
-                                        />
                                         <CIcon icon={cilPencil} 
-                                            // onClick={() => openUpdateModal(damSchedule?.damScheduleId)} 
+                                            onClick={() => openUpdateModal(damSchedule?.damScheduleId)} 
                                             className="text-success mx-1" role="button"
                                         />
                                         <CIcon icon={cilTrash} 
-                                            // onClick={() => openDeleteModal(damSchedule?.damScheduleId)}  
+                                            onClick={() => openDeleteModal(damSchedule?.damScheduleId)}  
                                             className="text-danger" role="button"
                                         />
                                     </CTableDataCell>
                                 </CTableRow>    
                             )
                         }) : <CTableRow>
-                            <CTableDataCell colSpan={4}><p className="text-center">{'Không có dữ liệu'}</p></CTableDataCell>
+                            <CTableDataCell colSpan={5}><p className="text-center">{'Không có dữ liệu'}</p></CTableDataCell>
                         </CTableRow>
                     }
                 </CTableBody>
@@ -182,7 +176,7 @@ const DamTypeManagement = ({damInstance}) => {
         addDamScheduleBeginAt: "",
         addDamScheduleEndAt: "",
         addDamScheduleDescription: "",
-        addDamScheduleDamId: damInstance?.damScheduleId,
+        addDamScheduleDamId: damInstance?.damId,
         addDamScheduleDamStatusId: defaultDamStatusId
     }
     const [addState, setAddState] = useState(addData)
@@ -209,16 +203,6 @@ const DamTypeManagement = ({damInstance}) => {
             return { ...prev, addDamScheduleEndAt: value }
         })
     }
-    const handleSetAddDamScheduleDamId = (value) => {
-        setAddState(prev => {
-            return { ...prev, addDamScheduleDamId: value }
-        })
-    }
-    const handleSetAddDamScheduleDamStatusId = (value) => {
-        setAddState(prev => {
-            return { ...prev, addDamScheduleDamStatusId: value }
-        })
-    }
 
     const createNewDamSchedule = (e) => {
         // validation
@@ -243,12 +227,13 @@ const DamTypeManagement = ({damInstance}) => {
                     content: 'Thêm lịch mở đập thành công',
                     icon: createSuccessIcon()
                 }))
+                rebaseDetailPage()
                 setAddValidated(false)
             })
             .catch(err => {
                 addToast(createToast({
                     title: 'Thêm lịch mở đập',
-                    content: "Thêm lịch mở đập không thành công",
+                    content: err?.response?.data?.message ? err?.response?.data?.message : "Thêm lịch mở đập không thành công",
                     icon: createFailIcon()
                 }))
             })
@@ -266,7 +251,7 @@ const DamTypeManagement = ({damInstance}) => {
                 >
                     <CRow>
                         <CCol lg={12}>
-                            <CustomDateTimePicker 
+                            <CustomDateTimePickerV2 
                                 value={addDamScheduleBeginAt}
                                 setValue={handleSetAddDamScheduleBeginAt}
                                 placeholder={'Ngày mở'}
@@ -275,10 +260,11 @@ const DamTypeManagement = ({damInstance}) => {
                     </CRow>
                     <CRow>
                         <CCol lg={12}>
-                            <CustomDateTimePicker 
+                            <CustomDateTimePickerV2 
                                 value={addDamScheduleEndAt}
                                 setValue={handleSetAddDamScheduleEndAt}
                                 placeholder={'Ngày đóng'}
+                                classes={'mt-4'}
                             /> 
                         </CCol>
                     </CRow>
@@ -314,7 +300,7 @@ const DamTypeManagement = ({damInstance}) => {
         updateDamScheduleBeginAt: "",
         updateDamScheduleEndAt: "",
         updateDamScheduleDescription: "",
-        updateDamScheduleDamId: damInstance?.damScheduleId,
+        updateDamScheduleDamId: damInstance?.damId,
         updateDamScheduleDamStatusId: defaultDamStatusId
     }
     const [updateState, setUpdateState] = useState(updateData)
@@ -323,7 +309,7 @@ const DamTypeManagement = ({damInstance}) => {
         updateDamScheduleBeginAt,
         updateDamScheduleEndAt,
         updateDamScheduleDescription,
-        updateDamScheduleDamIdmInstance,
+        updateDamScheduleDamId,
         updateDamScheduleDamStatusId
     } = updateState
     const [updateValidated, setUpdateValidated] = useState(false)
@@ -335,13 +321,14 @@ const DamTypeManagement = ({damInstance}) => {
                 if (damSchedule) {
                     const updateDamScheduleFetchData = {
                         updateDamScheduleId: damSchedule?.damScheduleId,
-                        updateDamScheduleBeginAt: damSchedule?.damScheduleBeginAt,
-                        updateDamScheduleEndAt: damSchedule?.damScheduleEndAt,
+                        updateDamScheduleBeginAt: formatDate(damSchedule?.damScheduleBeginAt),
+                        updateDamScheduleEndAt: formatDate(damSchedule?.damScheduleEndAt),
                         updateDamScheduleDescription: damSchedule?.damScheduleDescription,
-                        updateDamScheduleDamId: damInstance?.damScheduleId,
+                        updateDamScheduleDamId: damInstance?.damId,
                         updateDamScheduleDamStatusId: defaultDamStatusId
                     }
                     setUpdateState(updateDamScheduleFetchData)
+                    rebaseDetailPage()
                 }else {
                     addToast(createToast({
                         title: 'Cập nhật lịch mở đập',
@@ -360,21 +347,21 @@ const DamTypeManagement = ({damInstance}) => {
         }
     }
     const openUpdateModal = (damScheduleId) => {
-        getDamScheduleDataById(damTypeId)
+        getDamScheduleDataById(damScheduleId)
         setUpdateVisible(true)
     }
     const handleSetUpdateDamScheduleBeginAt = (value) => {
-        setAddState(prev => {
+        setUpdateState(prev => {
             return { ...prev, updateDamScheduleBeginAt: value }
         })
     }
     const handleSetUpdateDamScheduleDescription = (value) => {
-        setAddState(prev => {
+        setUpdateState(prev => {
             return { ...prev, updateDamScheduleDescription: value }
         })
     }
     const handleSetUpdateDamScheduleEndAt = (value) => {
-        setAddState(prev => {
+        setUpdateState(prev => {
             return { ...prev, updateDamScheduleEndAt: value }
         })
     }
@@ -390,8 +377,8 @@ const DamTypeManagement = ({damInstance}) => {
                 damScheduleBeginAt: updateDamScheduleBeginAt,
                 damScheduleEndAt: updateDamScheduleEndAt,
                 damScheduleDescription: updateDamScheduleDescription,
-                damScheduleDamIdmInstance: updateDamScheduleDamIdmInstance,
-                damScheduleDamStatusI: updateDamScheduleDamStatusId
+                damScheduleDamId: updateDamScheduleDamId,
+                damScheduleDamStatusId: updateDamScheduleDamStatusId
             }
             updateDamSchedule(damSchedule)
             .then(res => {
@@ -407,7 +394,7 @@ const DamTypeManagement = ({damInstance}) => {
             .catch(err => {
                 addToast(createToast({
                     title: 'Cập nhật lịch mở đập',
-                    content: "Cập nhật lịch mở đập không thành công",
+                    content: err?.response?.data?.message ? err?.response?.data?.message : "Cập nhật lịch mở đập không thành công",
                     icon: createFailIcon()
                 }))
             })  
@@ -426,7 +413,7 @@ const DamTypeManagement = ({damInstance}) => {
                     >
                         <CRow>
                             <CCol lg={12}>
-                                <CustomDateTimePicker 
+                                <CustomDateTimePickerV2 
                                     value={updateDamScheduleBeginAt}
                                     setValue={handleSetUpdateDamScheduleBeginAt}
                                     placeholder={'Ngày mở'}
@@ -435,10 +422,11 @@ const DamTypeManagement = ({damInstance}) => {
                         </CRow>
                         <CRow>
                             <CCol lg={12}>
-                                <CustomDateTimePicker 
+                                <CustomDateTimePickerV2 
                                     value={updateDamScheduleEndAt}
                                     setValue={handleSetUpdateDamScheduleEndAt}
                                     placeholder={'Ngày đóng'}
+                                    classes={'mt-4'}
                                 /> 
                             </CCol>
                         </CRow>
@@ -468,10 +456,10 @@ const DamTypeManagement = ({damInstance}) => {
         )
     }
 
-    // Delete - fix here
-    const deleteADamType = (damTypeId) => {
-        if (damTypeId) {
-            deleteDamType(damTypeId)
+    // Delete
+    const deleteADamSchedule = (damScheduleId) => {
+        if (damScheduleId) {
+            deleteDamSchedule(damScheduleId)
             .then(res => {
                 setDeleteVisible(false)
                 rebaseAllData()
@@ -481,6 +469,7 @@ const DamTypeManagement = ({damInstance}) => {
                     icon: createSuccessIcon()
                 }))
                 setUpdateValidated(false)
+                rebaseDetailPage()
             })
             .catch(err => {
                 addToast(createToast({
@@ -492,13 +481,13 @@ const DamTypeManagement = ({damInstance}) => {
         }
     }
     const [deleteVisible, setDeleteVisible] = useState(false)
-    const [deleteIdDamTypeId, setDeleteDamTypeId] = useState(0)
-    const deleteForm = (damTypeId) => {
+    const [deleteDamScheduleId, setDeleteDamScheduleId] = useState(0)
+    const deleteForm = (damScheduleId) => {
         return (
             <>
                 {   
-                    damTypeId ? 
-                    <CForm onSubmit={() => deleteADamType(damTypeId)}>
+                    damScheduleId ? 
+                    <CForm onSubmit={() => deleteADamSchedule(damScheduleId)}>
                         <CRow>
                             <CCol md={12}>
                                 <p>Bạn có chắc muốn xóa lịch mở đập này ?</p>
@@ -513,8 +502,8 @@ const DamTypeManagement = ({damInstance}) => {
             </>
         )
     }
-    const openDeleteModal = (damTypeId) => {
-        setDeleteDamTypeId(damTypeId)
+    const openDeleteModal = (damScheduleId) => {
+        setDeleteDamScheduleId(damScheduleId)
         setDeleteVisible(true)
     }
 
@@ -526,58 +515,62 @@ const DamTypeManagement = ({damInstance}) => {
     }, [addVisible, updateVisible])
 
     return (
-        <CRow>
-        <CCol xs>
-          <CCard className="mb-4">
-            <CToaster ref={toaster} push={toast} placement="top-end" />
-            <CCardHeader>Danh sách lịch mở đập</CCardHeader>
-            <CCardBody>
-                <CustomModal visible={addVisible} title={'Thêm lịch mở đập'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
-                <CustomModal visible={updateVisible} title={'Cập nhật lịch mở đập'} body={updateForm(updateDamTypeName)} setVisible={(value) => setUpdateVisible(value)}/>
-                <CustomModal visible={deleteVisible} title={'Xóa người lịch mở đập'} body={deleteForm(deleteIdDamTypeId)} setVisible={(value) => setDeleteVisible(value)}/>
-                <CForm onSubmit={onFilter}>
-                    <CRow>
-                        <CCol md={12} lg={3}>
-                            <CFormInput
-                                className="mb-2"
-                                type="text"
-                                placeholder="Tên lịch mở đập"
-                                onChange={(e) => handleSetDamScheduleDay(e.target.value)}
-                                aria-describedby="exampleFormControlInputHelpInline"
-                            />
-                        </CCol>
-                        <CCol md={12} lg={3}>
-                            <CFormInput
-                                className="mb-2"
-                                type="text"
-                                placeholder="Mô tả lịch mở đập"
-                                onChange={(e) => handleSetDamScheduleMonth(e.target.value)}
-                                aria-describedby="exampleFormControlInputHelpInline"
-                            />
-                        </CCol>
-                        <CCol md={12} lg={3}>
-                            <CButton color="primary" className="me-2 " type="submit">
-                                <CIcon icon={cilMagnifyingGlass} className="text-white"/>                             
-                            </CButton>
-                            <CButton color="success" onClick={onReset}>
-                                <CIcon icon={cilReload} className="text-white"/>   
-                            </CButton>
-                        </CCol>
-                    </CRow>
-              </CForm>
-              <br />
-              <CRow>
-                <CCol xs={12}>
-                    <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>
-                </CCol>
-              </CRow>
-              <br />
-              <CustomPagination listItems={filteredDamSchedules} showData={showFilteredTable} isLoaded={isLoadedDamSchedules} />
-            </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
+        <CCard className="mb-4">
+        <CToaster ref={toaster} push={toast} placement="top-end" />
+        <CCardBody>
+            <CustomModal visible={addVisible} title={'Thêm lịch mở đập'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
+            <CustomModal visible={updateVisible} title={'Cập nhật lịch mở đập'} body={updateForm(updateDamScheduleBeginAt)} setVisible={(value) => setUpdateVisible(value)}/>
+            <CustomModal visible={deleteVisible} title={'Xóa người lịch mở đập'} body={deleteForm(deleteDamScheduleId)} setVisible={(value) => setDeleteVisible(value)}/>
+            <CForm onSubmit={onFilter}>
+                <CRow>
+                    <CCol md={12} lg={3}>
+                        <CFormInput
+                            className="mb-2"
+                            type="text"
+                            placeholder="Ngày"
+                            onChange={(e) => handleSetDamScheduleDay(e.target.value)}
+                            aria-describedby="exampleFormControlInputHelpInline"
+                        />
+                    </CCol>
+                    <CCol md={12} lg={3}>
+                        <CFormInput
+                            className="mb-2"
+                            type="text"
+                            placeholder="Tháng"
+                            onChange={(e) => handleSetDamScheduleMonth(e.target.value)}
+                            aria-describedby="exampleFormControlInputHelpInline"
+                        />
+                    </CCol>
+                    <CCol md={12} lg={3}>
+                        <CFormInput
+                            className="mb-2"
+                            type="text"
+                            placeholder="Năm"
+                            onChange={(e) => handleSetDamScheduleYear(e.target.value)}
+                            aria-describedby="exampleFormControlInputHelpInline"
+                        />
+                    </CCol>
+                    <CCol md={12} lg={3}>
+                        <CButton color="primary" className="me-2 " type="submit">
+                            <CIcon icon={cilMagnifyingGlass} className="text-white"/>                             
+                        </CButton>
+                        <CButton color="success" onClick={onReset}>
+                            <CIcon icon={cilReload} className="text-white"/>   
+                        </CButton>
+                    </CCol>
+                </CRow>
+          </CForm>
+          <br />
+          <CRow>
+            <CCol xs={12}>
+                <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>
+            </CCol>
+          </CRow>
+          <br />
+          <CustomPagination listItems={filteredDamSchedules} showData={showFilteredTable} isLoaded={isLoadedDamSchedules} />
+        </CCardBody>
+      </CCard>
     )
 }
 
-export default DamTypeManagement
+export default DamScheduleManagement

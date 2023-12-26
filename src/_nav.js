@@ -20,16 +20,12 @@ import {
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
 const _nav = [
-  // {
-  //   component: CNavItem,
-  //   name: 'Trang chủ',
-  //   to: '/dashboard',
-  //   icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
-  //   badge: {
-  //     color: 'info',
-  //     text: 'NEW',
-  //   },
-  // },
+  {
+    component: CNavItem,
+    name: 'Trang chủ',
+    to: '/dashboard',
+    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+  },
   {
     component: CNavTitle,
     name: 'Người dùng',
