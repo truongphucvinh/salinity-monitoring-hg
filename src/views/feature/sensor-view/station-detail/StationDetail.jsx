@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendar } from "@fortawesome/free-regular-svg-icons";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
+
 //modal 
 import { CModal, CNav, CNavItem, CNavLink, CTabContent } from '@coreui/react';
 
@@ -46,6 +47,9 @@ import Highcharts from 'highcharts/highstock'
 import HighchartsReact from 'highcharts-react-official'
 import exportingModule from "highcharts/modules/exporting";
 
+//select sensor list
+import FormControl from '@mui/material/FormControl';
+import FormHelperText from '@mui/material/FormHelperText';
 
 //select
 import MenuItem from '@mui/material/MenuItem';
@@ -113,7 +117,6 @@ const optionss = {
   // exportingModule(Highcharts);
 
 const StationDetail = () => {
-
   // const chartComponent = useRef(null);
 
   // const printChartAsImage = () => {
@@ -131,12 +134,6 @@ const StationDetail = () => {
 
     const [dateRange, setDateRange] = useState([null, null]);
     const [startDate, endDate] = dateRange;
-
-    const [age, setAge] = React.useState('');
-
-    const handleChange = (event) => {
-      setAge(event.target.value);
-    };
 
     //sensor list
     const [displaySensorList, setDisplaySensorList] = useState(false);
@@ -168,19 +165,10 @@ const StationDetail = () => {
       }
     ])
 
-    const [selectedSensor, setSelectedSensor] = useState(
-      {
-        id: 2,
-        name: "sensor 2",
-        description: "sensor 2 description"
-      }
-    );
+    const [selectedSensor, setSelectedSensor] = useState(); //id
 
-    const handleChangeSensor = (sensorId) => {
-      if(sensorId!=selectedSensor.id) {
-        //goi api lay gia tri cua sensorId
-        setDisplaySensorList(false);
-      }
+    const handleChangeSensor = (event) => {
+      setSelectedSensor(event.target.value);
     } 
 
     //tab
@@ -235,14 +223,13 @@ const StationDetail = () => {
                         Trạm đo mặn số 1
                 </div>
             </div>
-            <div className="station-detail__date-selection">
-                <div className="station-detail__date-selection__left">
-                    <div className="station-detail__date-selection__sensor-option" onClick={() => setDisplaySensorList(true)}>
+               {/*<div className="station-detail__date-selection">
+                  <div className="station-detail__date-selection__left">
+                   <div className="station-detail__date-selection__sensor-option" onClick={() => setDisplaySensorList(true)}>
                       <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M8.46447 15.5355C6.51185 13.5829 6.51185 10.4171 8.46447 8.46447M5.63592 18.364C2.1212 14.8493 2.1212 9.15077 5.63592 5.63605M15.5355 15.5355C17.4881 13.5829 17.4881 10.4171 15.5355 8.46447M18.364 18.364C21.8788 14.8493 21.8788 9.15077 18.364 5.63605M13 12.0001C13 12.5523 12.5523 13.0001 12 13.0001C11.4477 13.0001 11 12.5523 11 12.0001C11 11.4478 11.4477 11.0001 12 11.0001C12.5523 11.0001 13 11.4478 13 12.0001Z" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                       <span className="sensor-name">Cảm biến độ mặn</span>
-                      {/* <span className="change-btn">Xem khác</span> */}
                     </div>
                     <div className="division"></div>
                     <div className="station-detail__date-selection__show-by">
@@ -268,12 +255,48 @@ const StationDetail = () => {
                     <div className="station-detail__date-selection__filter-btn">
                         Lọc
                     </div>
-                    </div>
+
+                    </div> 
                     <div className="station-detail__date-selection__download-btn">
                         <FontAwesomeIcon icon={faDownload}/>        
                         <span>Tải xuống excel</span>
                     </div>
-                </div>
+                </div>*/}
+
+            <div className="station-detail__sensor-list">
+              <FormControl sx={{ m: 0, minWidth: 480 }}>
+                <Select
+                 sx={{
+                  backgroundColor: "white",
+                  color: "black",
+                  '.MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#00000050',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    border: "1px solid #00000050",
+                    borderColor: '#00000050',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    // borderColor: 'black',
+                    border: "1px solid #00000050",
+                  },
+                  '.MuiSvgIcon-root ': {
+                    fill: "black !important",
+                  }
+                }}
+                  value={selectedSensor}
+                  onChange={handleChangeSensor}
+                  displayEmpty
+                  inputProps={{ 'aria-label': 'Without label' }}
+                >
+                  {
+                    sensorList.map((sensor, index) => {
+                      return <MenuItem value={sensor.id} key={index}>{ sensor.name }</MenuItem>
+                    })
+                  }
+                </Select>
+              </FormControl>
+            </div>
             <div className="station-detail__content">
                 <div className="station-detail__content__table">
                   <CNav variant="tabs" role="tablist">
@@ -399,7 +422,7 @@ const StationDetail = () => {
         </div>
 
         {/* sensor list modal */}
-        <CModal
+        {/* <CModal
             backdrop="static"
             alignment="center"
             visible={displaySensorList}
@@ -438,7 +461,7 @@ const StationDetail = () => {
               </div>
             </div>
           </div>
-        </CModal>
+        </CModal> */}
     </>)
 }
 

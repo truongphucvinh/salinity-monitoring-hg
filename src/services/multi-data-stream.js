@@ -10,5 +10,14 @@ export default  {
         } catch (error) {
             throw error;
         }
+    },
+
+    createDataStream: async function(thingId, sensorId, dataStreamInfo) {  //lien ket voi sensor
+        try {
+            const response = await axios.post(BASE_URL+`ctu/geo/multi-data-streams/thing/${thingId}/sensor/${sensorId}`, dataStreamInfo);
+            return response;
+        } catch(error) {
+            throw error;
+        }
     }
 }

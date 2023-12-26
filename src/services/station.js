@@ -19,5 +19,14 @@ export default {
         } catch(error) {
             throw error;
         }
+    },
+
+    deleteStation: async function(stationId) {
+        try {
+            const response = await axios.delete(BASE_URL+`ctu/geo/stations/${stationId}`);
+            return response;
+        } catch(error) {
+            throw error;
+        }
     }
 }

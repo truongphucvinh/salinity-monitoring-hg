@@ -11,6 +11,13 @@
             }
         }
     }
+    &__sensor-list {
+        margin-top: 20px;
+        width: 100%;
+        .css-1yk1gt9-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root {
+            background-color: white;
+        }
+    }
     &__date-selection {
         margin-top: 20px;
         display: flex;

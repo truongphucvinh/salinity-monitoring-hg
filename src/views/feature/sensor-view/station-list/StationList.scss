@@ -110,10 +110,10 @@
             height: 40px;
             border: none;
             border-bottom: 1px solid rgba(0, 0, 0, 0.5);
-            padding: 0 5px;
+            padding: 0 10px;
             transition: all 0.3s ease;
             &:focus {
-                padding: 0 10px;
+                padding: 0 15px;
                 outline: none;
                 @extend %shadow;
                 transition: all 0.3s ease;
@@ -261,4 +261,8 @@
             }
         }
     }
+}
+
+.css-kk1bwy-MuiButtonBase-root-MuiMenuItem-root.Mui-selected {
+    font-weight: bold;
 }

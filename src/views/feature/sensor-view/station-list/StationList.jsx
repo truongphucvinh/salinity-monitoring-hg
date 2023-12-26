@@ -26,24 +26,32 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import { Checkbox } from '@mui/material';
+import ListItemText from '@mui/material/ListItemText';
 
 //service
 import multiDataStream from 'src/services/multi-data-stream';
 import stationService from 'src/services/station';
-import thingService from 'src/services/thing'
-import { Accordion } from '@mui/material';
+import thingService from 'src/services/thing';
+import sensorService from 'src/services/sensor'
 
 //bootstrap
 import { Spinner } from 'react-bootstrap';
 
 //modal
 import { CModal} from '@coreui/react';
-
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
 
 //select chip
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },}
 
 const names = [
   'Oliver Hansen',
@@ -75,7 +83,11 @@ const StationList = () => {
   //modal 
   const [openCreateStationModal, setOpenCreateStationModal] = React.useState(false);
   const handleOpenCreateStationModal = () => setOpenCreateStationModal(true);
-  const handleCloseCreateStationModal = () => setOpenCreateStationModal(false);
+  const handleCloseCreateStationModal = () => {
+    setOpenCreateStationModal(false);
+    setNewStation({name: '', description: ''});
+    setSelectedSensorList([]);
+  };
 
   const style = {
     position: 'absolute',
@@ -110,20 +122,19 @@ const StationList = () => {
 
   const [stationList, setStationList] = useState([]);
 
-  //select chip
-  const theme = useTheme();
-  const [personName, setPersonName] = React.useState([]);
+  //select chip sensor list
+  const [sensorList, setSensorList] = useState([])
+  const [selectedSensorList, setSelectedSensorList] = useState([]);
 
   const handleChange = (event) => {
     const {
       target: { value },
     } = event;
-    setPersonName(
-      // On autofill we get a stringified value.
+    setSelectedSensorList(
       typeof value === 'string' ? value.split(',') : value,
     );
+    console.log("selected sensor: ", selectedSensorList);
   };
-
 
   const [newStation, setNewStation] = useState({
     name: '',
@@ -142,50 +153,32 @@ const StationList = () => {
 
   //delete station
   const [deletionConfirm, setDeletionConfirm] = useState(false)
-
-  const handelVisibleDeletionConfirm = (stationInfo) => {
-    setDeletionConfirm(!deletionConfirm);
+  const handelVisibleDeletionConfirm = () => {
+    setDeletionConfirm(true);
     setAnchorEl(null);
   }
-
-  //xoa station
   const [stationDeletionLoading, setStationDeletionLoading] = useState(false);
-  const handleDeleteStation = (stationId) => {
-    console.log("stationid: ", stationId);
+  const handleDeleteStation = (station) => {
+    console.log("stationid: ", station?.station?.id);
+    console.log("station: ", station, station.thingId);
+    stationService.deleteStation(station?.station?.id)
+      .then((res) => {
+        thingService.deleteThing(station?.thingId)
+        .then((resThing) => {
+          console.log("resthing: ", resThing);
+        })
+        .then(() => {
+          setDeletionConfirm(false);
+          setStationListChange(!stationListChange);
+        })
+      })
   }
-
-  //sensor list
-  const [displaySensorList, setDisplaySensorList] = useState(false);
-  const [sensorList, setSensorList] = useState([
-    {
-      name: "sensor 1",
-      description: "sensor 1 description"
-    },
-    {
-      name: "sensor 2",
-      description: "sensor 2 description"
-    },
-    {
-      name: "sensor 2",
-      description: "sensor 2 description"
-    },
-    {
-      name: "sensor 2",
-      description: "sensor 2 description"
-    },
-    {
-      name: "sensor 2",
-      description: "sensor 2 description"
-    }
-  ])
 
   useLayoutEffect(() => {
 
   })
 
-  //truyen du lieu giua 2 sibling, use context; singleton 
-  //useRef, useMemo, react memo, useCallback
-
+  //useEffect
   useEffect(() => {
     setStationListLoading (true);
     stationService.getStationList()
@@ -200,11 +193,20 @@ const StationList = () => {
       })
   }, [stationListChange])
 
+  useEffect(() => {
+    sensorService.getSensorList()
+      .then((res) => {
+        console.log("sensor list: ", res);
+        setSensorList(res);
+      })
+  }, [])
+
   const handleChangeStationCreationForm = (e) => {
     setNewStation(prev => ({
       ...prev,
       [e.target.name]: e.target.value
     }))
+    console.log(newStation);
   }
 
   const handelCreateStation = (e) => {
@@ -214,8 +216,6 @@ const StationList = () => {
     newThing.name = newStation.name;
     newThing.description = newStation.description;
 
-    console.log("new thing: ", newThing);
-
     thingService.createThing(newThing)
       .then((res) => {
         //create station
@@ -224,7 +224,16 @@ const StationList = () => {
           console.log("station res: ", resStation);
           
           //link sensor here
-          //...
+          var dataStreamInfo = {
+            name: newStation.name,
+            description: newStation.description
+          }
+          selectedSensorList.map((sensorId) => {
+            multiDataStream.createDataStream(res.data.id, sensorId, dataStreamInfo)
+              .then((resMultiDTS) => {
+                console.log("resMultiDTS: ", resMultiDTS);
+              })
+          })
         })
         .then(() => {
           setStationCreationLoading(false);
@@ -240,12 +249,28 @@ const StationList = () => {
       })
   }
 
+  const handleModifyStation = (stationInfo) => {
+    console.log("station info: ", stationInfo);
+    setNewStation({
+      name: stationInfo?.station.name, 
+      description: stationInfo?.station.description
+    });
+    var sensorIdList = []; 
+    stationInfo?.multiDataStreamDTOs.map((multiDTS) => {
+      sensorIdList.push(multiDTS?.sensor.sensorId);
+      console.log("sensorIdList: ", sensorIdList);
+    })
+    setSelectedSensorList(sensorIdList);
+    handleOpenCreateStationModal();
+    setAnchorEl(null);
+  }
+
     return (
         <>
           <div className="station">
               <div className="station__heading">
                   <div className="station__heading__title">
-                      Danh sách trạm đo mặn  
+                      Danh sách trạm 
                       {
                         stationListLoading && 
                         <Spinner animation="border" role="status" style={{height: '15px', width: '15px', color: 'black', marginLeft: '10px'}}>
@@ -341,11 +366,11 @@ const StationList = () => {
               
             </MenuItem>
             <Divider />
-            <MenuItem onClick={handleClose}>
+            <MenuItem onClick={() => handleModifyStation(stationIsSelected)}>
               Chỉnh sửa
             </MenuItem>
             <Divider />
-            <MenuItem onClick={() => handelVisibleDeletionConfirm("abc")}>
+            <MenuItem onClick={() => handelVisibleDeletionConfirm()}>
               Xóa trạm
             </MenuItem>
             <Divider />
@@ -370,16 +395,16 @@ const StationList = () => {
               <Box sx={style}>
                 <form className="station-creation" onSubmit={handelCreateStation}>
                   <div className="station-creation__title">
-                    Thêm trạm đo mặn
+                    Thêm trạm
                   </div>
                   <div className="station-creation__form">
                     <div className="station-creation__form__name">
                       <label htmlFor="name">Tên</label>
-                      <input id='name' name="name" type="text" onChange={handleChangeStationCreationForm} />
+                      <input id='name' name="name" type="text" value={newStation.name} onChange={handleChangeStationCreationForm} />
                     </div>
                     <div className="station-creation__form__description">
                       <label htmlFor="description">Mô tả</label>
-                      <input id='description' name="description" type="text" onChange={handleChangeStationCreationForm} />
+                      <input id='description' name="description" type="text" value={newStation.description} onChange={handleChangeStationCreationForm} />
                     </div>
                     <div className="station-creation__form__sensor-selection">
                       <label htmlFor="sensor">Cảm biến</label>
@@ -389,19 +414,21 @@ const StationList = () => {
                           labelId="demo-multiple-name-label"
                           id="demo-multiple-name"
                           multiple
-                          value={personName}
+                          value={selectedSensorList}
                           onChange={handleChange}
                           sx={style.select}
                           input={<OutlinedInput label="Name" />}
-                          // MenuProps={MenuProps}
+                          MenuProps={MenuProps}
                         >
-                          {names.map((name) => (
+                          {sensorList.map((sensor) => (
                             <MenuItem
-                              key={name}
-                              value={name}
+                              key={sensor.name}
+                              value={sensor.id}
                               // style={getStyles(name, personName, theme)}
                             >
-                              {name}
+                              {sensor.name}
+                              {/* <Checkbox checked={selectedSensorList.indexOf(sensor.name) > -1} />
+                              <ListItemText primary={sensor.name} /> */}
                             </MenuItem>
                           ))}
                         </Select>
@@ -428,45 +455,6 @@ const StationList = () => {
             </Fade>
           </Modal>
 
-          {/* sensor list modal */}
-          <CModal
-            backdrop="static"
-            alignment="center"
-            visible={displaySensorList}
-            onClose={() => setDisplaySensorList(false)}
-            aria-labelledby="StaticBackdropExampleLabel"
-            className='sensor-list'
-          >
-            <div className="sensor-list">
-              <div className="sensor-list__title">
-                  Danh sách cảm biến Trạm 1
-              </div>
-              <div className="sensor-list__list">
-                {
-                  sensorList.map((sensor) => {
-                    return <>
-                      <div className="sensor-list__list__item">
-                        <div className="sensor-list__list__item__name">
-                          { sensor.name }
-                        </div>
-                        <div className="sensor-list__list__item__description">
-                          { sensor.description }
-                        </div>
-                      </div>
-                    </>
-                  })
-                }
-              </div>
-              <div className="sensor-list__action">
-                <div className="sensor-list__action__cancel-btn"
-                  onClick={() => setDisplaySensorList(false)}
-                >
-                  Đóng
-                </div>
-              </div>
-            </div>
-          </CModal>
-
           {/* confirm delete station */}
           <CModal
             backdrop="static"
@@ -482,7 +470,7 @@ const StationList = () => {
                 <div className="deletion-station-confirm__action__cancel-btn" onClick={() => setDeletionConfirm(false)}>
                   Hủy
                 </div>
-                <div className="deletion-station-confirm__action__accept-btn" onClick={() => handleDeleteStation(stationIsSelected?.station?.id)}>
+                <div className="deletion-station-confirm__action__accept-btn" onClick={() => handleDeleteStation(stationIsSelected)}>
                   Xóa trạm
                 </div>
               </div>

@@ -19,5 +19,14 @@ export default {
         } catch(error) {
             throw error;
         }
+    },
+
+    deleteThing: async function(thingId) {
+        try {
+            const response = await axios.delete(BASE_URL+`ctu/geo/things/${thingId}`);
+            return response;
+        } catch(error) {
+            throw error;
+        }
     }
 }
