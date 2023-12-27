@@ -57,6 +57,7 @@ import thingService from 'src/services/thing';
 //select
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import { useParams } from "react-router-dom";
 const optionss = {
   plotOptions: {
     series: {
@@ -117,37 +118,42 @@ const optionss = {
   };
 
 const StationDetail = () => {
+    const { id } = useParams()
     const [value, setValue] = React.useState([
         dayjs('2022-04-17'),
         dayjs('2022-04-21'),
       ]);
 
-      const random = () => Math.round(Math.random() * 100)
-
-    const [dateRange, setDateRange] = useState([null, null]);
+    const random = () => Math.round(Math.random() * 100)
 
     //sensor list
-    const [displaySensorList, setDisplaySensorList] = useState(false);
     const [sensorList, setSensorList] = useState([])
 
     const [selectedSensorId, setSelectedSensorId] = useState(0); //id
+    const [selectedSensor, setSelectedSensor] = useState();
 
     const [thing, setThing] = useState();
 
     const handleChangeSensor = (event) => {
+      setSelectedSensor(handelChangSelectedSensor(event.target.value))
       setSelectedSensorId(event.target.value);
     } 
 
     //tab
     const [activeKey, setActiveKey] = useState(2);
 
+    const [multiDTSStation, setMultiDTSStation] = useState();
+
 
     useEffect(() => {
+      console.log("id thing: ", id);
       //get sensor list in specific thing/station
       var thingId = JSON.parse(localStorage.getItem('thingInfo'))?.id;
-      thingService.getThingById(thingId)
+      thingService.getThingById(id)
         .then((res) => {
           setThing(res);
+          console.log("thing info: ", res);
+          setMultiDTSStation(res?.multiDataStreamDTOs);
           //loc danh sach station
           var sensorLists = []; 
           res?.multiDataStreamDTOs.map((multiDTS) => {
@@ -160,14 +166,23 @@ const StationDetail = () => {
         })
         .then((res) => {
           setSelectedSensorId(res[0]?.sensorId);
+          setSelectedSensor(handelChangSelectedSensor(res[0].Id))
         })
     }, [])
+
+    const handelChangSelectedSensor = (sensorId) => {
+      for(let i=0; sensorList.length-1; i++) {
+        if(sensorId==sensorList[i]?.sensorId) {
+          return sensorList[i];
+        }
+      }
+    }
 
     return (<>
         <div className="station-detail">
             <div className="station-detail__heading">
                 <div className="station-detail__heading__title">
-                        Trạm đo mặn số 1
+                        { thing?.nameThing }
                 </div>
             </div>
                {/*<div className="station-detail__date-selection">
@@ -268,7 +283,8 @@ const StationDetail = () => {
                         aria-selected={activeKey === 2}
                         onClick={() => setActiveKey(2)}
                       >
-                        Cảm biến độ mặn
+                        Cảm biến
+                        {/* { selectedSensor?.sensorName } */}
                       </CNavLink>
                     </CNavItem>
                   </CNav>
@@ -281,7 +297,19 @@ const StationDetail = () => {
                           <th className="unit">Đơn vị</th>
                           <th className="time">Thời gian</th>
                         </tr>
-                        <tr>
+                        {
+                          sensorList.map((sensor, index) => {
+                            return <>
+                              <tr>
+                                <td>{ sensor.sensorName }</td>
+                                <td className="index">{ 9.6+index }</td>
+                                <td className="unit">ppt</td>
+                                <td className="time">08:00 27/12/2023</td>
+                              </tr>
+                            </>
+                          })
+                        }
+                        {/* <tr>
                           <td>Độ mặn</td>
                           <td className="index">9.6</td>
                           <td className="unit">ppt</td>
@@ -310,7 +338,7 @@ const StationDetail = () => {
                           <td className="index">9.6</td>
                           <td className="unit">ppt</td>
                           <td className="time">12:00 15/12/2023</td>
-                        </tr>
+                        </tr> */}
                       </table>
                     </CTabPane>
                     <CTabPane role="tabpanel" aria-labelledby="profile-tab-pane" visible={activeKey === 2}>
@@ -320,24 +348,24 @@ const StationDetail = () => {
                             <th className="index">Giá trị</th>
                         </tr>
                         <tr>
-                            <td>12:00 15/12/2023</td>
-                            <td className="index">9.6</td>
+                            <td>06:00 27/12/2023</td>
+                            <td className="index">25</td>
                         </tr>
                         <tr>
-                            <td>12:00 15/12/2023</td>
-                            <td className="index">9.6</td>
+                            <td>06:30 27/12/2023</td>
+                            <td className="index">25.5</td>
                         </tr>
                         <tr>
-                            <td>12:00 15/12/2023</td>
-                            <td className="index">9.6</td>
+                            <td>07:00 27/12/2023</td>
+                            <td className="index">26</td>
                         </tr>
                         <tr>
-                            <td>12:00 15/12/2023</td>
-                            <td className="index">9.6</td>
+                            <td>07:30 27/12/2023</td>
+                            <td className="index">26</td>
                         </tr>
                         <tr>
-                            <td>12:00 15/12/2023</td>
-                            <td className="index">9.6</td>
+                            <td>08:00 27/12/2023</td>
+                            <td className="index">28</td>
                         </tr>
                       </table>
                     </CTabPane>
@@ -347,7 +375,7 @@ const StationDetail = () => {
                 <div className="station-detail__content__chart">
                     <div className="station-detail__content__chart__heading">
                         <div className="station-detail__content__chart__heading__title">
-                            Biểu đồ độ mặn
+                            Biểu đồ
                         </div>
                         <div className="station-detail__content__chart__heading__download-btn">
                             {/* <FontAwesomeIcon icon={faDownload}/>         */}

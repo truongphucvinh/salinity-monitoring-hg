@@ -40,6 +40,7 @@ import { Spinner } from 'react-bootstrap';
 
 //modal
 import { CModal} from '@coreui/react';
+import { useNavigate } from 'react-router-dom';
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
 
 //select chip
@@ -309,9 +310,11 @@ const StationList = () => {
     }
   }
 
+  const navigate = useNavigate()
   const handelDirectToDetail = (thingId) => {
     console.log("thingId: ", thingId);
-    localStorage.setItem("thingInfo", JSON.stringify({id: thingId}))
+    localStorage.setItem("thingInfo", JSON.stringify({id: thingId}));
+    navigate(`station-detail/${thingId}`);
   }
 
     return (
@@ -444,7 +447,12 @@ const StationList = () => {
               <Box sx={style}>
                 <form className="station-creation" onSubmit={handelSubmitStationForm}>
                   <div className="station-creation__title">
-                    Thêm trạm
+                    {
+                      isModification ? 
+                        <span>Chỉnh sửa trạm</span>
+                      :
+                        <span>Thêm trạm</span>
+                    }
                   </div>
                   <div className="station-creation__form">
                     <div className="station-creation__form__name">
@@ -495,7 +503,11 @@ const StationList = () => {
                           <span className="visually-hidden">Loading...</span>
                         </Spinner>
                         :
-                        <span>Tạo trạm</span>
+                        isModification ? 
+                          <span>Câp nhật</span>
+                        :
+                          <span>Thêm trạm</span>
+                        // <span>Tạo trạm</span>
                       }
                     </button>
                   </div>
