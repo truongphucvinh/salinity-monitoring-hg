@@ -53,6 +53,12 @@ const _nav = [
     icon: <CIcon icon={cilOptions} customClassName="nav-icon" />,
   },
   {
+    component: CNavItem,
+    name: 'Quản lý sông, kênh, rạch',
+    to: '/river-management',
+    icon: <CIcon icon={cilStream} customClassName="nav-icon" />,
+  },
+  {
     component:  CNavItem,
     name: 'Trạm',
     to: '/station-list',
