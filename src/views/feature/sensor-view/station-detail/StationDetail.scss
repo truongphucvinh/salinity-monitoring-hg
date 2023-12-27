@@ -1,0 +1,267 @@
+@import '../../../../scss/custom';
+
+.station-detail {
+    &__heading {
+        display: flex;
+        justify-content: space-between;
+        &__title {
+            font: {
+                size: 20px;
+                weight: bold;
+            }
+        }
+    }
+    &__sensor-list {
+        margin-top: 20px;
+        width: 100%;
+        .css-1yk1gt9-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root {
+            background-color: white;
+        }
+    }
+    &__date-selection {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background-color: white;
+        @extend %shadow;
+        border-radius: 3px;
+        &__left {
+            display: flex;
+            align-items: center;
+        }
+        &__period {            
+            margin-left: 20px;
+            display: none;
+            align-items: center;
+            background-color: white;
+            padding: 5px;
+            border: 1px solid rgba(0, 0, 0, 0.5);
+            border-radius: 3px;
+            width: 270px;
+            position: relative;
+            .react-datepicker__close-icon {
+                display: none !important;
+            }
+            input {
+                width: 210px;
+                margin-left: 15px;
+                height: 30px;
+                border: none;
+                // border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+                
+                padding: 0 5px;
+                background-color: unset;
+                transition: all 0.3s ease;
+                text-align: center;
+                font: {
+                    weight: bold;
+                }
+                &:focus {
+                    padding: 0 10px;
+                    outline: none;
+                    transition: all 0.3s ease;
+                }
+            }
+        }
+        select {
+            margin-left: 10px;
+            height: 40px;
+            width: 150px;
+            border-radius: 3px;
+            padding: 5px;
+            &:focus {
+                outline: none;
+            }
+        }
+        &__sensor-option {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            .sensor-name {
+                margin-left: 10px;
+                cursor: pointer;
+            }
+            .change-btn {
+                margin-left: 10px;
+                color: $green;
+                cursor: pointer;
+            }
+        }
+        .division {
+            border: 1px solid rgba(0, 0, 0, 0.7);
+            height: 25px;
+            margin:  0 25px;
+            display: none;
+        }
+        &__show-by {
+            display: none;
+            align-items: center;
+            // margin-left: 20px;
+        }
+        &__filter-btn {
+            margin-left: 20px;
+            @include button(100px, 40px, $dark-blue);
+            display: none;
+        }
+        &__download-btn  {
+            cursor: pointer;
+            span {
+                margin-left: 8px;
+            }
+        }
+    }
+    &__content {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        &__table {
+            width: 30%;
+            .nav-link {
+                color: black !important;
+            }
+            table {
+                background-color: white;
+                @extend %shadow;
+                width: 100%;
+                th {
+                    // background-color: rgba(0, 0, 0, 0.1);
+                    padding: 10px;
+                    border-bottom: 1px solid black;
+                }
+                td {
+                    padding: 10px;
+                }
+            }
+            .sensor-value {
+                .index {
+                    width: 40%;
+                    text-align: center;
+                }
+            }
+            .station-value {
+                .type {
+                    width: 30%;
+                }
+                .time {
+                    text-align: right;
+                }
+                .unit, .index {
+                    text-align: center;
+                }
+                .index {
+                    font-weight: bold;
+                }
+            }
+        }
+        &__chart {
+            width: 69%;
+            background-color: white;
+            &__heading {
+                display: flex;
+                justify-content: space-between;
+                padding: 20px;
+                &__title {
+                    font: {
+                        weight: bold;
+                    }
+                }
+            }
+            &__chart {
+                padding: 20px;
+                input {
+                    color: black !important;
+                    fill: black !important;
+                }
+            }
+        }
+    }
+}
+
+//tab
+.tab-content {
+    background-color: white;
+}
+
+//modal
+.modal-content {
+    border: none;
+    border-radius: 1px;
+}
+
+.sensor-list {
+    --cui-modal-width: 820px;
+    padding: 20px;
+    &__title {
+        // text-align: center;
+        padding: 0 5px;
+        font: {
+            size: 20px;
+            weight: bold;
+        }
+    }
+    &__list {
+        margin-top: 20px;
+        // border: 1px solid green;
+        width: 100%;
+        justify-content: center;
+        &__item {
+            padding: 10px;
+            border-radius: 3px;
+            min-width: 250px;
+            height: 120px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            margin: 5px;
+            transition: all 0.5s ease;
+            cursor: pointer;
+            float: left;
+            &:hover {
+                @extend %shadow;
+                transition: all 0.5s ease;
+            }
+            &__name {
+                font: {
+                    weight: bold;
+                }
+            }
+            &--is-selected {
+                border-color: $green;
+                cursor: auto;
+            }
+        }
+    }
+    &__action {
+        margin-top: 140px;
+        padding: 0 5px;
+        display: flex;
+        justify-content: right;
+        clear: left;
+        &__cancel-btn {
+            @include button(100px, 40px, white);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            color: rgba(255, 0, 0, 0.7);
+            &:hover {
+                filter: brightness(99.3%);
+            }
+        }
+    }
+}
+
+//hight chart
+.highcharts-range-selector-buttons, .highcharts-credits {
+    display: none;
+}
+
+.highcharts-navigator-mask-inside {
+    fill: #1a284848;
+}
+
+.highcharts-input-group {
+    text {
+        color: black !important;
+        fill: black !important;
+    }
+}
+

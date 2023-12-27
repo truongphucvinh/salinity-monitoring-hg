@@ -1,1 +1,56 @@
-// Here you can add other styles
+$dark-blue: #1a2848;
+$red: #e32347;
+$green: #23c476;
+$orange: #f1853b;
+$gray: #e9edf0;
+
+@mixin button ($width, $height, $background-color, $border-color: $background-color) {
+    width: $width;
+    height: $height;
+    background-color: $background-color;
+    border: 1px solid $border-color;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color: white;
+    border-radius: 3px;
+    &:hover {
+        filter: brightness(90%);
+    }
+}
+
+.align-center, %align-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.abc {
+    @extend %align-center;
+}
+
+.shadow-bottom, %shadow-bottom {
+    -moz-box-shadow:0 5px 8px rgba(182, 182, 182, 0.75);
+    -webkit-box-shadow: 0 5px 8px rgba(182, 182, 182, 0.75);
+    box-shadow: 0 5px 8px rgba(182, 182, 182, 0.75);
+}
+
+.shadow, %shadow {
+    box-shadow: 0 0 8px 0.5px rgba(128, 128, 128, 0.308);
+}
+
+.heading1, %heading1 {
+    font: {
+        size: 32px;
+        weight: 400;
+    }
+}
+
+.heading2, %heading2 {
+    font: {
+        size: 24px;
+        weight: 400;
+    }
+}
