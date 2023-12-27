@@ -51,6 +51,8 @@ const _nav = [
     name: 'Quản lý loại đập',
     to: '/dam-type-management',
     icon: <CIcon icon={cilOptions} customClassName="nav-icon" />,
+  },
+  {
     component:  CNavItem,
     name: 'Trạm',
     to: '/station-list',
