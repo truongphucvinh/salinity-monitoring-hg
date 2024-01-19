@@ -20,14 +20,6 @@ import { CModal, CNav, CNavItem, CNavLink, CTabContent, CButton } from '@coreui/
 
 //chart
 import { CCard, CCardBody, CCol, CCardHeader, CRow, CTabPane } from '@coreui/react'
-import {
-  CChartBar,
-  CChartDoughnut,
-  CChartLine,
-  CChartPie,
-  CChartPolarArea,
-  CChartRadar,
-} from '@coreui/react-chartjs'
 
 //chart
 import {
@@ -40,25 +32,40 @@ import {
     Tooltip,
     Legend,
   } from 'chart.js';
-  import { Line } from 'react-chartjs-2';
 import { useState } from 'react';
 
 //higth chart 
 import Highcharts from 'highcharts/highstock'
 import HighchartsReact from 'highcharts-react-official'
-import exportingModule from "highcharts/modules/exporting";
-
-//select sensor list
-import FormControl from '@mui/material/FormControl';
-import FormHelperText from '@mui/material/FormHelperText';
 
 //service
 import thingService from 'src/services/thing';
 
-//select
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
 import { useParams } from "react-router-dom";
+
+function zones(colors) {
+  return [{
+    value: 3,
+    dashStyle: 'solid',
+    color: colors[0],
+    fillColor: '#7cb5ec'
+  }, {
+    value: 8,
+    dashStyle: 'dot',
+    color: colors[1]
+  }, {
+    value: 11,
+    dashStyle: 'solid',
+    color: colors[2],
+    fillColor: colors[2]
+  }]
+}
+
+const colors = [
+  ['#7cb5ec', '#FFA262', '#7cb5ec'],
+  ['#7cb5ec', '#8bbc21', '#7cb5ec']
+]
+
 const optionss = {
   chart: {
     height: 550, // Set the desired height here
@@ -74,7 +81,8 @@ const optionss = {
     }
   },
   series: [{
-    data: [[1640269800000,176.28],[1640615400000,180.33],[1640701800000,179.29],[1640788200000,179.38],[1640874600000,178.2],[1640961000000,177.57],[1641220200000,182.01],[1641306600000,179.7],[1641393000000,174.92],[1641479400000,172],[1641565800000,172.17]]
+    data: [[1640269800000,176.28],[1640615400000,180.33],[1640701800000,179.29],[1640788200000,179.38],[1640874600000,178.2],[1640961000000,177.57],[1641220200000,182.01],[1641306600000,179.7],[1641393000000,174.92],[1641479400000,172],[1641565800000,172.17]],
+    zones: zones(colors[0])
   }]
 }
   

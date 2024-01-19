@@ -5,13 +5,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
 
 import Box from '@mui/material/Box';
-import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
 
 import Switch from '@mui/material/Switch';
@@ -20,14 +17,10 @@ import Backdrop from '@mui/material/Backdrop';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 
-//select chip
-// import Select from '@mui/material/Select';
-
 //form
 import { CForm, CFormInput, CTableDataCell } from '@coreui/react';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
-// import { colourOptions } from './doc/data';
 
 //service
 import multiDataStreamSerivce from 'src/services/multi-data-stream';
@@ -44,9 +37,6 @@ import CIcon from '@coreui/icons-react';
 import {
   cilPencil,
   cilTrash,
-  cilMagnifyingGlass,
-  cilReload,
-  cilPlus,
   cilTouchApp
 } from '@coreui/icons'
 
@@ -182,7 +172,7 @@ const StationList = () => {
         })
       })
   }
-  const [sensorIdListByMDT, setSensorIdListByMDT] = useState([]); //{sensorId, multiDTSId}, sensorId va multiDTSId tuong ung => xoa link sensor trong khi modify
+  const [multiDTSOfStation, setMultiDTSOfStation] = useState([]); 
 
   const [isModification, setIsModification] = useState(false); //true: modify, false: create
 
@@ -241,16 +231,13 @@ const StationList = () => {
 
   const handelSubmitStationForm = (e) => { //for creation and modification
     e.preventDefault();
-    // if(isModification) {
-    //   console.log("modify");
-    //   handelModifyStation();
-    // } else {
+    if(isModification) {
+      console.log("modify");
+      handelModifyStation();
+    } else {
       console.log("create");
-      // handelCreateStation();
-    // }
-    console.log("new station: ", newStation);
-
-    console.log("selected sensor listss: ", selectedSensor, selectedSensorBackup);
+      handelCreateStation();
+    }
   }
 
   const handelCreateStation = () => {
@@ -270,11 +257,9 @@ const StationList = () => {
 
     thingService.createThing(newThing)
       .then((res) => {
-        console.log("done");
         //create station
         stationService.createStation(res.data.id, newStationFormating)
           .then((resStation) => {
-            console.log("station res: ", resStation);
           
           //link sensor here
             var dataStreamInfo = {
@@ -282,8 +267,7 @@ const StationList = () => {
               description: newStation.description
             }
             console.log("selected sensor list in: ", selectedSensorList);
-            selectedSensorList.map((sensor) => {
-              console.log("create multi data stream, selected sensor list: ", sensor);
+            selectedSensor.map((sensor) => {
               multiDataStreamSerivce.createDataStream(res.data.id, sensor.value, dataStreamInfo)
                 .then((resMultiDTS) => {
                   console.log("resMultiDTS: ", resMultiDTS);
@@ -305,8 +289,8 @@ const StationList = () => {
   }
 
   const handleDisplayModifyStation = (stationInfo) => {
-    console.log("station infooo: ", stationInfo);
-    setSensorIdListByMDT([]);
+    setIsModification(true);
+    setMultiDTSOfStation([]);
     setNewStation({
       name: stationInfo?.station.name, 
       description: stationInfo?.station.description
@@ -316,43 +300,46 @@ const StationList = () => {
 
     var sensorIdList = [];
     var sensorIdListByMDTs = []; 
+    var multiDTSLIst = [];
     stationInfo?.multiDataStreamDTOs.map((multiDTS) => {
-      console.log("sensorr: ", multiDTS.sensor);
       var sensorMDTId = {
         value: multiDTS?.sensor.sensorId,
         label: multiDTS?.sensor.sensorName
       }
       sensorIdListByMDTs.push(sensorMDTId);
-      console.log("list by MDTs: ", sensorIdListByMDTs);
-      setSensorIdListByMDT(sensorIdListByMDTs);
+      multiDTSLIst.push(multiDTS);
+      setMultiDTSOfStation(multiDTSLIst);
       sensorIdList.push(multiDTS?.sensor.sensorId);
     })
-
     setSelectedSensor(sensorIdListByMDTs);
     setSelectedSensorBackup([...sensorIdList]);
     setOpenCreateStationModal(true);
     setIsModification(true);
-    setAnchorEl(null);
+    setAnchorEl(null);  
   }
 
   const handelModifyStation = async () => {
+    var selectedSensorId = await Promise.all(selectedSensor.map((sensor) => {
+      return sensor.value;
+    }))
+    console.log("change: ", selectedSensorId);
     //cap nhap lien ket sensor
     //neu khong co trong backup => them
     var thingId = stationIsSelected.thingId;
-    const x = await Promise.all(selectedSensor.map(async(sensor, index) => {
-      if (selectedSensorBackup.includes(sensor.value) == 0) {
+    const x = await Promise.all(selectedSensorId.map(async(sensorId) => {
+      if (selectedSensorBackup.includes(sensorId) == 0) {
         var multiDTSInfo = {
-          name: `sensorId ${sensor.value}, thingId ${thingId}`,
+          name: `sensorId ${sensorId}, thingId ${thingId}`,
           description: 'Multi data stream description'
         };
-        await multiDataStreamSerivce.createDataStream(thingId, sensor.value, multiDTSInfo)
+        await multiDataStreamSerivce.createDataStream(thingId, sensorId, multiDTSInfo)
           .then((res) => {});
       }
     })) 
 
     //neu co trong backup nhung khong co trong mang hien tai => xoa
-    const xyz = await Promise.all(selectedSensorListBackup.map(async (sensorId, index) => {
-      if(selectedSensorList.includes(sensorId)==0) {
+    const y = await Promise.all(selectedSensorBackup.map(async(sensorId) => {
+      if(selectedSensorId.includes(sensorId)==0) {
         var multiDataStreamId = handelFindMDTIdBySensorId(sensorId);
         await multiDataStreamSerivce.deleteMultiDataStream(multiDataStreamId)
           .then((res) => {})
@@ -362,16 +349,15 @@ const StationList = () => {
   }
 
   const handelFindMDTIdBySensorId = (sensorId) => {
-    for(let i=0; i<sensorIdListByMDT.length; i++) {
-      if(sensorId==sensorIdListByMDT[i].sensorId) {
-        return sensorIdListByMDT[i].multiDTSId;
+    for(let i=0; i<multiDTSOfStation.length; i++) {
+      if(sensorId==multiDTSOfStation[i]?.sensor?.sensorId) {
+        return multiDTSOfStation[i].multiDataStreamId;
       }
     }
   }
 
   const navigate = useNavigate()
   const handelDirectToDetail = (thingId) => {
-    console.log("thingId: ", thingId);
     localStorage.setItem("thingInfo", JSON.stringify({id: thingId}));
     navigate(`station-detail/${thingId}`);
   }
@@ -570,8 +556,6 @@ const StationList = () => {
                   </div>
                   <div className="station-creation__form">
                     <div className="station-creation__form__name">
-                      {/* <label htmlFor="name">Tên</label> */}
-                      {/* <input id='name' name="name" type="text" value={newStation.name} onChange={handleChangeStationCreationForm} /> */}
                       <CForm>
                         <CFormInput
                           value={newStation.name} 
@@ -585,8 +569,6 @@ const StationList = () => {
                       </CForm>
                     </div>
                     <div className="station-creation__form__description">
-                      {/* <label htmlFor="description">Mô tả</label> */}
-                      {/* <input id='description' name="description" type="text" value={newStation.description} onChange={handleChangeStationCreationForm} /> */}
                       <CForm>
                         <CFormInput
                           value={newStation.description} 
@@ -632,28 +614,6 @@ const StationList = () => {
                     </div>
                     <div className="station-creation__form__sensor-selection">
                       <label htmlFor="sensor">Cảm biến</label>
-                      {/* <FormControl sx={{ m: 1, width: 410 }}>
-                        <Select
-                          labelId="demo-multiple-name-label"
-                          id="demo-multiple-name"
-                          multiple
-                          value={selectedSensorList}
-                          onChange={handleChange}
-                          sx={style.select}
-                          input={<OutlinedInput label="Name" />}
-                          MenuProps={MenuProps}
-                        >
-                          {sensorList.map((sensor) => (
-                            <MenuItem
-                              key={sensor.name}
-                              value={sensor.id}
-                              // style={getStyles(name, personName, theme)}
-                            >
-                              {sensor.name}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl> */}
                       <Select
                         onChange={handleChangeSensorsSelection}
                         closeMenuOnSelect={false}
@@ -691,7 +651,6 @@ const StationList = () => {
                           <span>Câp nhật</span>
                         :
                           <span>Thêm trạm</span>
-                        // <span>Tạo trạm</span>
                       }
                     </button>
                   </div>
