@@ -21,13 +21,13 @@ import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 
 //select chip
-import { useTheme } from '@mui/material/styles';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import { Checkbox } from '@mui/material';
-import ListItemText from '@mui/material/ListItemText';
+// import Select from '@mui/material/Select';
+
+//form
+import { CForm, CFormInput, CTableDataCell } from '@coreui/react';
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
+// import { colourOptions } from './doc/data';
 
 //service
 import multiDataStreamSerivce from 'src/services/multi-data-stream';
@@ -38,21 +38,24 @@ import sensorService from 'src/services/sensor'
 //bootstrap
 import { Spinner } from 'react-bootstrap';
 
+import { CRow, CCol, CCard, CCardHeader, CCardBody, CButton } from '@coreui/react';
+import { CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody } from '@coreui/react';
+import CIcon from '@coreui/icons-react';
+import {
+  cilPencil,
+  cilTrash,
+  cilMagnifyingGlass,
+  cilReload,
+  cilPlus,
+  cilTouchApp
+} from '@coreui/icons'
+
 //modal
 import { CModal} from '@coreui/react';
 import { useNavigate } from 'react-router-dom';
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
 
-//select chip
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },}
+const animatedComponents = makeAnimated();
 
 const StationList = () => {
     
@@ -85,7 +88,7 @@ const StationList = () => {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 450,
+    width: 500,
     bgcolor: 'background.paper',
     p: 0,
     select: {
@@ -112,26 +115,42 @@ const StationList = () => {
   };
 
   const [stationList, setStationList] = useState([]);
+  const [selectedSensor, setSelectedSensor] = useState([]);
+  const [selectedSensorBackup, setSelectedSensorBackup] = useState([]);
+  const [damList, setDamList] = useState([]);
+  const [selectedDam, setSelectedDam] = useState({});
 
   //select chip sensor list
   const [sensorList, setSensorList] = useState([])
   const [selectedSensorList, setSelectedSensorList] = useState([]);
   const [selectedSensorListBackup, setSelectedSensorListBackup] = useState([]);
 
-  const handleChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setSelectedSensorList(
-      typeof value === 'string' ? value.split(',') : value,
-    );
-    console.log("selected sensor: ", selectedSensorList);
+  const handleChangeSensorsSelection = (event) => {
+    setSelectedSensor(event);
+    setNewStation(prev => ({
+      ...prev,
+      sensors: event
+    }))
+    console.log("selected sensor: ", newStation);
   };
+
+  const handleChangeDamSelection = (event) => {
+    setSelectedDam(event);
+    setNewStation(prev => ({
+      ...prev,
+      dam: event.value
+    }))
+  }
 
   const [newStation, setNewStation] = useState({
     name: '',
     description: '',
     node: 'test node',
+    coordination: {
+      longtitude: '',
+      latitude: ''
+    },
+    dam: '',
     status: 'Active'
   })
   const [newThing, setNewThing] = useState({
@@ -188,10 +207,28 @@ const StationList = () => {
   }, [stationListChange])
 
   useEffect(() => {
+    //get sensor list
     sensorService.getSensorList()
       .then((res) => {
-        setSensorList(res);
+        let sensorListVL = [];
+        res.map((sensor) => {
+          let sensorVL = {
+            value: sensor.id,
+            label: sensor.name
+          }
+          sensorListVL.push(sensorVL);
+          console.log("sensorListVL: ", sensorListVL);
+          setSensorList(sensorListVL);
+        })
       })
+    //get dam list
+    setDamList([
+      {value: '1', label: "Đập 1"},
+      {value: '2', label: "Đập 2"},
+      {value: '3', label: "Đập 3"},
+      {value: '4', label: "Đập 4"},
+      {value: '5', label: "Đập 5"},
+    ])
   }, [])
 
   const handleChangeStationCreationForm = (e) => {
@@ -204,13 +241,16 @@ const StationList = () => {
 
   const handelSubmitStationForm = (e) => { //for creation and modification
     e.preventDefault();
-    if(isModification) {
-      console.log("modify");
-      handelModifyStation();
-    } else {
+    // if(isModification) {
+    //   console.log("modify");
+    //   handelModifyStation();
+    // } else {
       console.log("create");
-      handelCreateStation();
-    }
+      // handelCreateStation();
+    // }
+    console.log("new station: ", newStation);
+
+    console.log("selected sensor listss: ", selectedSensor, selectedSensorBackup);
   }
 
   const handelCreateStation = () => {
@@ -219,24 +259,36 @@ const StationList = () => {
     newThing.name = newStation.name;
     newThing.description = newStation.description;
 
+    var newStationFormating = {
+      name: newStation.name,
+      description: newStation.description,
+      node: "Test node",
+      status: true
+    }
+
+    console.log("new station formating", newStationFormating);
+
     thingService.createThing(newThing)
       .then((res) => {
+        console.log("done");
         //create station
-        stationService.createStation(res.data.id, newStation)
-        .then((resStation) => {
-          console.log("station res: ", resStation);
+        stationService.createStation(res.data.id, newStationFormating)
+          .then((resStation) => {
+            console.log("station res: ", resStation);
           
           //link sensor here
-          var dataStreamInfo = {
-            name: newStation.name,
-            description: newStation.description
-          }
-          selectedSensorList.map((sensorId) => {
-            multiDataStreamSerivce.createDataStream(res.data.id, sensorId, dataStreamInfo)
-              .then((resMultiDTS) => {
-                console.log("resMultiDTS: ", resMultiDTS);
-              })
-          })
+            var dataStreamInfo = {
+              name: newStation.name,
+              description: newStation.description
+            }
+            console.log("selected sensor list in: ", selectedSensorList);
+            selectedSensorList.map((sensor) => {
+              console.log("create multi data stream, selected sensor list: ", sensor);
+              multiDataStreamSerivce.createDataStream(res.data.id, sensor.value, dataStreamInfo)
+                .then((resMultiDTS) => {
+                  console.log("resMultiDTS: ", resMultiDTS);
+                })
+            })
         })
         .then(() => {
           setStationCreationLoading(false);
@@ -253,24 +305,31 @@ const StationList = () => {
   }
 
   const handleDisplayModifyStation = (stationInfo) => {
+    console.log("station infooo: ", stationInfo);
     setSensorIdListByMDT([]);
     setNewStation({
       name: stationInfo?.station.name, 
       description: stationInfo?.station.description
     });
+    setSelectedDam({value: 1, label: "Đập 1"});
+    setSelectedSensor([{value: 1, label: 'Cảm biến mực nước'}, {value: 2, label: 'Cảm biến nhiệt độ'}]);
+
     var sensorIdList = [];
     var sensorIdListByMDTs = []; 
     stationInfo?.multiDataStreamDTOs.map((multiDTS) => {
+      console.log("sensorr: ", multiDTS.sensor);
       var sensorMDTId = {
-        sensorId: multiDTS?.sensor.sensorId,
-        multiDTSId: multiDTS?.multiDataStreamId
+        value: multiDTS?.sensor.sensorId,
+        label: multiDTS?.sensor.sensorName
       }
       sensorIdListByMDTs.push(sensorMDTId);
+      console.log("list by MDTs: ", sensorIdListByMDTs);
       setSensorIdListByMDT(sensorIdListByMDTs);
       sensorIdList.push(multiDTS?.sensor.sensorId);
     })
-    setSelectedSensorList(sensorIdList);
-    setSelectedSensorListBackup([...sensorIdList]);
+
+    setSelectedSensor(sensorIdListByMDTs);
+    setSelectedSensorBackup([...sensorIdList]);
     setOpenCreateStationModal(true);
     setIsModification(true);
     setAnchorEl(null);
@@ -280,13 +339,13 @@ const StationList = () => {
     //cap nhap lien ket sensor
     //neu khong co trong backup => them
     var thingId = stationIsSelected.thingId;
-    const x = await Promise.all(selectedSensorList.map(async (sensorId, index) => {
-      if (selectedSensorListBackup.includes(sensorId) == 0) {
+    const x = await Promise.all(selectedSensor.map(async(sensor, index) => {
+      if (selectedSensorBackup.includes(sensor.value) == 0) {
         var multiDTSInfo = {
-          name: `sensorId ${sensorId}, thingId ${thingId}`,
+          name: `sensorId ${sensor.value}, thingId ${thingId}`,
           description: 'Multi data stream description'
         };
-        await multiDataStreamSerivce.createDataStream(thingId, sensorId, multiDTSInfo)
+        await multiDataStreamSerivce.createDataStream(thingId, sensor.value, multiDTSInfo)
           .then((res) => {});
       }
     })) 
@@ -319,6 +378,61 @@ const StationList = () => {
 
     return (
         <>
+          <CRow>
+            <CCol>
+              <CCard>
+                <CCardHeader>Danh sách trạm cảm biến</CCardHeader>
+                <CCardBody>
+                  <CButton 
+                    type="button" 
+                    color="primary"
+                    onClick={handleOpenCreateStationModal}
+                  >Thêm</CButton>
+                  <CTable bordered align="middle" className="mb-0 border" hover responsive style={{'margin-top' : "20px"}}>
+                    <CTableHead className="text-nowrap">
+                      <CTableRow>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Tên trạm</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Mô tả</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Liên kết đập</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Trạng thái</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Thao tác</CTableHeaderCell>
+                      </CTableRow>
+                    </CTableHead>
+                    <CTableBody>
+                      {
+                        stationList?.length !== 0 ? stationList.map((station, index) => {
+                          return <>
+                            <CTableRow onClick={() => setStationIsSelected(station)}>
+                              <CTableDataCell>{ index+1 }</CTableDataCell>
+                              <CTableDataCell style={{'cursor': 'pointer'}} onClick={() => handelDirectToDetail(station?.thingId)}>{ station.station.name }</CTableDataCell>
+                              <CTableDataCell>{ station.station.name }</CTableDataCell>
+                              <CTableDataCell>{ station.station.name }</CTableDataCell>
+                              <CTableDataCell style={{display: "flex", alignItem: 'center'}}>
+                                <div className={station.station.status ? "station-status station-status--active" : "station-status station-status--inactive"}></div>
+                                {
+                                  station.station.status ? <span>Đang hoạt động</span> : <span>Trạm đang khóa</span>
+                                }
+                              </CTableDataCell>
+                              <CTableDataCell>
+                                <CIcon icon={cilTouchApp} onClick={() => {}} className="text-primary mx-1" role="button"/>
+                                <CIcon icon={cilPencil} onClick={() => handleDisplayModifyStation(station)} className="text-success mx-1" role="button"/>
+                                <CIcon icon={cilTrash} onClick={() => handelVisibleDeletionConfirm()}  className="text-danger" role="button"/>
+                              </CTableDataCell>
+                            </CTableRow>
+                          </>
+                        })
+                        :
+                        <CTableRow>
+                          <CTableDataCell colSpan={6}><p className="text-center">{'Không có dữ liệu'}</p></CTableDataCell>
+                        </CTableRow>
+                      }
+                    </CTableBody>
+                  </CTable>
+                </CCardBody>
+              </CCard>
+            </CCol>
+          </CRow>
           <div className="station">
               <div className="station__heading">
                   <div className="station__heading__title">
@@ -456,17 +570,69 @@ const StationList = () => {
                   </div>
                   <div className="station-creation__form">
                     <div className="station-creation__form__name">
-                      <label htmlFor="name">Tên</label>
-                      <input id='name' name="name" type="text" value={newStation.name} onChange={handleChangeStationCreationForm} />
+                      {/* <label htmlFor="name">Tên</label> */}
+                      {/* <input id='name' name="name" type="text" value={newStation.name} onChange={handleChangeStationCreationForm} /> */}
+                      <CForm>
+                        <CFormInput
+                          value={newStation.name} 
+                          name="name"
+                          onChange={handleChangeStationCreationForm}
+                          type="text"
+                          id="exampleFormControlInput1"
+                          label="Tên"
+                          aria-describedby="exampleFormControlInputHelpInline"
+                        />
+                      </CForm>
                     </div>
                     <div className="station-creation__form__description">
-                      <label htmlFor="description">Mô tả</label>
-                      <input id='description' name="description" type="text" value={newStation.description} onChange={handleChangeStationCreationForm} />
+                      {/* <label htmlFor="description">Mô tả</label> */}
+                      {/* <input id='description' name="description" type="text" value={newStation.description} onChange={handleChangeStationCreationForm} /> */}
+                      <CForm>
+                        <CFormInput
+                          value={newStation.description} 
+                          name="description"
+                          onChange={handleChangeStationCreationForm}
+                          type="text"
+                          id="exampleFormControlInput1"
+                          label="Mô tả"
+                          aria-describedby="exampleFormControlInputHelpInline"
+                        />
+                      </CForm>
+                    </div>
+                    <div className="station-creation__form__coordination">
+                      <label>Tọa độ</label>
+                      <div className="station-creation__form__coordination__input">
+                        <div className="station-creation__form__coordination__input__longitude">
+                          <CForm>
+                            <CFormInput
+                              value={newStation.longtitude} 
+                              name="longtitude"
+                              onChange={handleChangeStationCreationForm}
+                              type="text"
+                              placeholder='Kinh độ'
+                              id="exampleFormControlInput1"
+                              aria-describedby="exampleFormControlInputHelpInline"
+                            />
+                          </CForm>
+                        </div>
+                        <div className="station-creation__form__coordination__input__latitude">
+                          <CForm>
+                            <CFormInput
+                              value={newStation.latitude} 
+                              name="latitude"
+                              onChange={handleChangeStationCreationForm}
+                              type="text"
+                              placeholder='Vĩ độ'
+                              id="exampleFormControlInput1"
+                              aria-describedby="exampleFormControlInputHelpInline"
+                            />
+                          </CForm>
+                        </div>
+                      </div>
                     </div>
                     <div className="station-creation__form__sensor-selection">
                       <label htmlFor="sensor">Cảm biến</label>
-                      <FormControl sx={{ m: 1, width: 410 }}>
-                        {/* <InputLabel id="demo-multiple-name-label">Name</InputLabel> */}
+                      {/* <FormControl sx={{ m: 1, width: 410 }}>
                         <Select
                           labelId="demo-multiple-name-label"
                           id="demo-multiple-name"
@@ -484,12 +650,30 @@ const StationList = () => {
                               // style={getStyles(name, personName, theme)}
                             >
                               {sensor.name}
-                              {/* <Checkbox checked={selectedSensorList.indexOf(sensor.name) > -1} />
-                              <ListItemText primary={sensor.name} /> */}
                             </MenuItem>
                           ))}
                         </Select>
-                      </FormControl>
+                      </FormControl> */}
+                      <Select
+                        onChange={handleChangeSensorsSelection}
+                        closeMenuOnSelect={false}
+                        components={animatedComponents}
+                        placeholder=''
+                        isMulti
+                        options={sensorList}
+                        value={selectedSensor}
+                      />
+                    </div>
+                    <div className="station-creation__form__dam-selection">
+                      <label htmlFor="">Liên kết trạm</label>
+                      <Select
+                        onChange={handleChangeDamSelection}
+                        closeMenuOnSelect={false}
+                        components={animatedComponents}
+                        options={damList}
+                        placeholder=''
+                        value={selectedDam}
+                      />
                     </div>
                   </div>
                   <div className="station-creation__action">

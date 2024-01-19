@@ -16,7 +16,7 @@ import { faChartLine } from "@fortawesome/free-solid-svg-icons";
 import { faTableCells } from "@fortawesome/free-solid-svg-icons";
 
 //modal 
-import { CModal, CNav, CNavItem, CNavLink, CTabContent } from '@coreui/react';
+import { CModal, CNav, CNavItem, CNavLink, CTabContent, CButton } from '@coreui/react';
 
 //chart
 import { CCard, CCardBody, CCol, CCardHeader, CRow, CTabPane } from '@coreui/react'
@@ -60,6 +60,9 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { useParams } from "react-router-dom";
 const optionss = {
+  chart: {
+    height: 550, // Set the desired height here
+  },
   plotOptions: {
     series: {
         color: '#1a2848'
@@ -125,7 +128,7 @@ const StationDetail = () => {
         dayjs('2022-04-21'),
       ]);
 
-    const random = () => Math.round(Math.random() * 100)
+    const [showMode, setShowMode] = useState('chart'); //table
 
     //sensor list
     const [sensorList, setSensorList] = useState([])
@@ -167,7 +170,7 @@ const StationDetail = () => {
         })
         .then((res) => {
           setSelectedSensorId(res[0]?.sensorId);
-          setSelectedSensor(handelChangSelectedSensor(res[0].Id))
+          setSelectedSensor(handelChangSelectedSensor(res[0]?.Id))
         })
     }, [])
 
@@ -179,293 +182,169 @@ const StationDetail = () => {
       }
     }
 
+    const handelChangeShowMode = (modeStr) => {
+      setShowMode(modeStr);
+    } 
+
     return (<>
         <CRow className="station-detail2">
         <CCol xs>
           <CCard className="mb-4">
-            <CCardHeader className="station-detail2__header">Danh sách trạm</CCardHeader>
+            <CCardHeader className="station-detail2__header">Danh sách trạm cảm biến/{thing?.nameThing}</CCardHeader>
             <CCardBody className="station-detail2__body">
               <CRow>
                 <CCol xs={12}>
-                  {/* <div className="station-detail">
-                    <div className="station-detail__heading">
-                        <div className="station-detail__heading__title">
-                                { thing?.nameThing }
-                        </div>
-                    </div>
-                    <div className="station-detail__sensor-list">
-                      <FormControl sx={{ m: 0, minWidth: 480 }}>
-                        <Select
-                        sx={{
-                          backgroundColor: "white",
-                          color: "black",
-                          '.MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#00000050',
-                          },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                            border: "1px solid #00000050",
-                            borderColor: '#00000050',
-                          },
-                          '&:hover .MuiOutlinedInput-notchedOutline': {
-                            // borderColor: 'black',
-                            border: "1px solid #00000050",
-                          },
-                          '.MuiSvgIcon-root ': {
-                            fill: "black !important",
-                          }
-                        }}
-                          value={selectedSensorId}
-                          onChange={handleChangeSensor}
-                          displayEmpty
-                          inputProps={{ 'aria-label': 'Without label' }}
-                        >
-                          {
-                            sensorList.map((sensor, index) => {
-                              return <MenuItem value={sensor.sensorId} key={index}>{ sensor.sensorName }</MenuItem>
-                            })
-                          }
-                        </Select>
-                      </FormControl>
-                    </div>
-                    <div className="station-detail__content">
-                        <div className="station-detail__content__table">
-                          <CNav variant="tabs" role="tablist">
-                            <CNavItem role="presentation">
-                              <CNavLink
-                                active={activeKey === 1}
-                                component="button"
-                                role="tab"
-                                aria-controls="home-tab-pane"
-                                aria-selected={activeKey === 1}
-                                onClick={() => setActiveKey(1)}
-                              >
-                                Trạm
-                              </CNavLink>
-                            </CNavItem>
-                            <CNavItem role="presentation">
-                              <CNavLink
-                                active={activeKey === 2}
-                                component="button"
-                                role="tab"
-                                aria-controls="profile-tab-pane"
-                                aria-selected={activeKey === 2}
-                                onClick={() => setActiveKey(2)}
-                              >
-                                Cảm biến
-                              </CNavLink>
-                            </CNavItem>
-                          </CNav>
-                          <CTabContent>
-                            <CTabPane role="tabpanel" aria-labelledby="home-tab-pane" visible={activeKey === 1}>
-                              <table className="station-value">
-                                <tr>
-                                  <th className="type">Cảm biến</th>
-                                  <th className="index">Giá trị</th>
-                                  <th className="unit">Đơn vị</th>
-                                  <th className="time">Thời gian</th>
-                                </tr>
-                                {
-                                  sensorList.map((sensor, index) => {
-                                    return <>
-                                      <tr>
-                                        <td>{ sensor.sensorName }</td>
-                                        <td className="index">{ 9.6+index }</td>
-                                        <td className="unit">ppt</td>
-                                        <td className="time">08:00 27/12/2023</td>
-                                      </tr>
-                                    </>
-                                  })
-                                }
-                              </table>
-                            </CTabPane>
-                            <CTabPane role="tabpanel" aria-labelledby="profile-tab-pane" visible={activeKey === 2}>
-                              <table className="sensor-value">
-                                <tr>
-                                    <th className="time">Thời gian</th>
-                                    <th className="index">Giá trị</th>
-                                </tr>
-                                <tr>
-                                    <td>06:00 27/12/2023</td>
-                                    <td className="index">25</td>
-                                </tr>
-                                <tr>
-                                    <td>06:30 27/12/2023</td>
-                                    <td className="index">25.5</td>
-                                </tr>
-                                <tr>
-                                    <td>07:00 27/12/2023</td>
-                                    <td className="index">26</td>
-                                </tr>
-                                <tr>
-                                    <td>07:30 27/12/2023</td>
-                                    <td className="index">26</td>
-                                </tr>
-                                <tr>
-                                    <td>08:00 27/12/2023</td>
-                                    <td className="index">28</td>
-                                </tr>
-                              </table>
-                            </CTabPane>
-                          </CTabContent>
-                            
-                        </div>
-                        <div className="station-detail__content__chart">
-                            <div className="station-detail__content__chart__heading">
-                                <div className="station-detail__content__chart__heading__title">
-                                    Biểu đồ
-                                </div>
-                                <div className="station-detail__content__chart__heading__download-btn">
-                                </div>
-                            </div>
-                            <div className="station-detail__content__chart__chart">
-                                <HighchartsReact
-                                  highcharts={Highcharts}
-                                  constructorType={'stockChart'}
-                                  options={optionss}
-                                />
-
-                            </div>
-                        </div>
-                    </div>
-                  </div> */}
-
                   <CRow>
                     <CCol xs={12} className="station-detail2__body__formating">
-                      <div className="station-detail2__body__formating__item">
+                      <div 
+                        className={showMode=='table'? "station-detail2__body__formating__item station-detail2__body__formating__item--active" : "station-detail2__body__formating__item"} 
+                        onClick={() => handelChangeShowMode('table')}
+                      >
                         <FontAwesomeIcon icon={faTableCells}/>
                       </div>
-                      <div className="station-detail2__body__formating__item station-detail2__body__formating__item--active">
+                      <div 
+                        className={showMode=='chart'? "station-detail2__body__formating__item station-detail2__body__formating__item--active" : "station-detail2__body__formating__item"} 
+                        onClick={() => handelChangeShowMode('chart')}
+                      >
                         <FontAwesomeIcon icon={faChartLine}/>
                       </div>
                     </CCol>
                   </CRow>
-                  <CRow className="station-detail2__body__table">
-                    <CCol xs={6} className="station-detail2__body__table__general-index">
-                      <div className="station-detail2__body__table__general-index__header">
-                        Chỉ số chung
-                      </div>
-                      <div className="station-detail2__body__table__general-index__table">
-                        <table className="station-value">
-                              <tr>
-                                <th className="time">Thời gian</th>
-                                <th className="type">Cảm biến</th>
-                                <th className="index">Giá trị</th>
-                                <th className="unit">Đơn vị</th>
-                              </tr>
-                              {
-                                sensorList.map((sensor, index) => {
-                                  return <>
-                                    <tr>
-                                      <td className="time">08:00 27/12/2023</td>
-                                      <td>{ sensor.sensorName }</td>
-                                      <td className="index">{ 9.6+index }</td>
-                                      <td className="unit">ppt</td>
-                                    </tr>
-                                  </>
-                                })
-                              }
-                        </table>
-                      </div>
-                    </CCol>
-                    <CCol xs={6}>
-                      <CNav variant="tabs" role="tablist">
-                        {
-                          sensorList.map((sensor, index) => {
-                            return <>
-                              <CNavItem role="presentation">
-                                <CNavLink
-                                  active={activeKey === index}
-                                  component="button"
-                                  role="tab"
-                                  aria-controls="home-tab-pane"
-                                  aria-selected={activeKey === index}
-                                  onClick={() => setActiveKey(index)}
-                                >
-                                  { sensor.sensorName }
-                                </CNavLink>
-                              </CNavItem>
-                            </>
-                          })
-                        }
-                      </CNav>
-                      <CTabContent>
-                        {
-                          sensorList.map((sensor, index) => {
-                            return <>
-                              <CTabPane role="tabpanel" aria-labelledby="profile-tab-pane" visible={activeKey === index}>
-                                <table className="sensor-value__specific-sensor">
+                  {
+                    showMode=='chart' && <div>
+                      <CRow>
+                        <CCol>
+                          <CNav variant="tabs" role="tablist">
+                            {
+                              sensorList.map((sensor, index) => {
+                                return <>
+                                  <CNavItem role="presentation">
+                                    <CNavLink
+                                      active={activeKey === index}
+                                      component="button"
+                                      role="tab"
+                                      aria-controls="home-tab-pane"
+                                      aria-selected={activeKey === index}
+                                      onClick={() => setActiveKey(index)}
+                                    >
+                                      { sensor.sensorName }
+                                    </CNavLink>
+                                  </CNavItem>
+                                </>
+                              })
+                            }
+                          </CNav>
+                          <CTabContent>
+                            {
+                              sensorList.map((sensor, index) => {
+                                return <>
+                                  <CTabPane role="tabpanel" aria-labelledby="profile-tab-pane" visible={activeKey === index}>
+                                    <HighchartsReact
+                                      highcharts={Highcharts}
+                                      constructorType={'stockChart'}
+                                      options={optionss}
+                                    />
+                                  </CTabPane>
+                                </>
+                              })
+                            }
+                          </CTabContent>
+                        </CCol>
+                      </CRow>
+                    </div>
+                  }
+                  {
+                    showMode=='table' && <div>
+                      <CRow className="station-detail2__body__table">
+                        <CCol xs={6} className="station-detail2__body__table__general-index">
+                          <div className="station-detail2__body__table__general-index__header">
+                            Chỉ số chung
+                          </div>
+                          <div className="station-detail2__body__table__general-index__table">
+                            <table className="station-value">
                                   <tr>
-                                      <th className="time">Thời gian</th>
-                                      <th className="index">Giá trị</th>
-                                      <th></th>
+                                    <th className="time">Thời gian</th>
+                                    <th className="type">Cảm biến</th>
+                                    <th className="index">Giá trị</th>
+                                    <th className="unit">Đơn vị</th>
                                   </tr>
-                                  <tr>
-                                      <td>06:00 27/12/2023</td>
-                                      <td className="index">25</td>
-                                  </tr>
-                                  <tr>
-                                      <td>06:30 27/12/2023</td>
-                                      <td className="index">25.5</td>
-                                  </tr>
-                                  <tr>
-                                      <td>07:00 27/12/2023</td>
-                                      <td className="index">26</td>
-                                  </tr>
-                                  <tr>
-                                      <td>07:30 27/12/2023</td>
-                                      <td className="index">26</td>
-                                  </tr>
-                                  <tr>
-                                      <td>08:00 27/12/2023</td>
-                                      <td className="index">28</td>
-                                  </tr>
-                                </table>
-                              </CTabPane>
-                            </>
-                          })
-                        }
-                      </CTabContent>
-                    </CCol>
-                  </CRow>
-                  <CRow>
-                    <CCol>
-                      <CNav variant="tabs" role="tablist">
-                        {
-                          sensorList.map((sensor, index) => {
-                            return <>
-                              <CNavItem role="presentation">
-                                <CNavLink
-                                  active={activeKey === index}
-                                  component="button"
-                                  role="tab"
-                                  aria-controls="home-tab-pane"
-                                  aria-selected={activeKey === index}
-                                  onClick={() => setActiveKey(index)}
-                                >
-                                  { sensor.sensorName }
-                                </CNavLink>
-                              </CNavItem>
-                            </>
-                          })
-                        }
-                      </CNav>
-                      <CTabContent>
-                        {
-                          sensorList.map((sensor, index) => {
-                            return <>
-                              <CTabPane role="tabpanel" aria-labelledby="profile-tab-pane" visible={activeKey === index}>
-                                <HighchartsReact
-                                  highcharts={Highcharts}
-                                  constructorType={'stockChart'}
-                                  options={optionss}
-                                />
-                              </CTabPane>
-                            </>
-                          })
-                        }
-                      </CTabContent>
-                    </CCol>
-                  </CRow>
+                                  {
+                                    sensorList.map((sensor, index) => {
+                                      return <>
+                                        <tr>
+                                          <td className="time">08:00 27/12/2023</td>
+                                          <td>{ sensor.sensorName }</td>
+                                          <td className="index">{ 9.6+index }</td>
+                                          <td className="unit">ppt</td>
+                                        </tr>
+                                      </>
+                                    })
+                                  }
+                            </table>
+                          </div>
+                        </CCol>
+                        <CCol xs={6}>
+                          <CNav variant="tabs" role="tablist">
+                            {
+                              sensorList.map((sensor, index) => {
+                                return <>
+                                  <CNavItem role="presentation">
+                                    <CNavLink
+                                      active={activeKey === index}
+                                      component="button"
+                                      role="tab"
+                                      aria-controls="home-tab-pane"
+                                      aria-selected={activeKey === index}
+                                      onClick={() => setActiveKey(index)}
+                                    >
+                                      { sensor.sensorName }
+                                    </CNavLink>
+                                  </CNavItem>
+                                </>
+                              })
+                            }
+                          </CNav>
+                          <CTabContent>
+                            {
+                              sensorList.map((sensor, index) => {
+                                return <>
+                                  <CTabPane role="tabpanel" aria-labelledby="profile-tab-pane" visible={activeKey === index}>
+                                    <table className="sensor-value__specific-sensor">
+                                      <tr>
+                                          <th className="time">Thời gian</th>
+                                          <th className="index">Giá trị</th>
+                                          <th></th>
+                                      </tr>
+                                      <tr>
+                                          <td>06:00 27/12/2023</td>
+                                          <td className="index">25</td>
+                                      </tr>
+                                      <tr>
+                                          <td>06:30 27/12/2023</td>
+                                          <td className="index">25.5</td>
+                                      </tr>
+                                      <tr>
+                                          <td>07:00 27/12/2023</td>
+                                          <td className="index">26</td>
+                                      </tr>
+                                      <tr>
+                                          <td>07:30 27/12/2023</td>
+                                          <td className="index">26</td>
+                                      </tr>
+                                      <tr>
+                                          <td>08:00 27/12/2023</td>
+                                          <td className="index">28</td>
+                                      </tr>
+                                    </table>
+                                  </CTabPane>
+                                </>
+                              })
+                            }
+                          </CTabContent>
+                        </CCol>
+                      </CRow>  
+                    </div>
+                  }
                 </CCol>
               </CRow>
             </CCardBody>
