@@ -27,7 +27,6 @@ import {
 import CIcon from '@coreui/icons-react'
 import {
     cilPencil,
-    cilTrash,
     cilMagnifyingGlass,
     cilReload,
     cilPlus
@@ -38,7 +37,7 @@ import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import CustomSpinner from "src/views/customs/my-spinner"
-import { createPermission, createRole, getAllModules, getAllPermissions, getAllRoles, getRoleById, updatePermission, updateRole } from "src/services/authentication-services"
+import { createPermission, createRole, getAllModules, getAllModulesOfPermission, getAllPermissions, getPermissionById, updatePermission, updateRole } from "src/services/authentication-services"
 
 const RoleManagement = () => {
 
@@ -47,6 +46,7 @@ const RoleManagement = () => {
     const [listRole, setListRoles] = useState([])
     const [isLoadedRoles, setIsLoadedRoles] = useState(false)
     const [listModules, setListModules] = useState([])
+    // It is used for the update also - think about changing its name
     const [addModules, setAddModules] = useState([])
     const handleSetIsLoadedRoles = (value) => {
         setIsLoadedRoles(prev => {
@@ -120,7 +120,7 @@ const RoleManagement = () => {
     }
     useEffect(() => {
        rebaseAllData()
-    },[])
+    },[]) // eslint-disable-line react-hooks/exhaustive-deps
 
     // Searching data
     const [filteredRoles, setFilteredRoles] = useState([])
@@ -190,7 +190,7 @@ const RoleManagement = () => {
                                     <CTableDataCell>{role?.name}</CTableDataCell>
                                     <CTableDataCell>{role?.description}</CTableDataCell>
                                     <CTableDataCell>
-                                        <CIcon icon={cilPencil} onClick={() => openUpdateModal(role?._id)} className="text-success mx-1" role="button"/>
+                                        <CIcon icon={cilPencil} onClick={() => openUpdateModal(role?._id, role?.permission_id)} className="text-success mx-1" role="button"/>
                                         {/* <CIcon icon={cilTrash} onClick={() => openDeleteModal(role?._id)}  className="text-danger" role="button"/> */}
                                     </CTableDataCell>
                                 </CTableRow>    
@@ -269,6 +269,7 @@ const RoleManagement = () => {
                 .then(res1 => {
                     const newPermission = res1?.data?.data
                     const permissionModules = {
+                        // To filter all parent without children modules
                         modules: addModules.filter(module => Array.isArray(module?.children) && module?.children?.length !== 0)
                     }
                     console.log(permissionModules)
@@ -318,7 +319,9 @@ const RoleManagement = () => {
         if (!addVisible) {
             rebaseAddModules(listModules)
         }
-    }, [addVisible])
+    }, [addVisible]) // eslint-disable-line react-hooks/exhaustive-deps
+
+
 
     const addForm = () => {
         return <>
@@ -405,25 +408,48 @@ const RoleManagement = () => {
     const [updateState, setUpdateState] = useState(updateData)
     const { updateRoleId, updateRoleDescription, updateRoleName } = updateState
     const [updateValidated, setUpdateValidated] = useState(false)
-    const getRoleDataById = (roleId) => {
-        if (roleId) {
-            getRoleById(roleId)
-            .then(res => {
-                const role = res?.data?.data
-                if (role) {
-                    const updateRoleFetchedData = {
-                        updateRoleId: role?._id,
-                        updateRoleName: role?.name,
-                        updateRoleDescription: role?.description
+    const matchingAddModulesForUpdate = (modules) => {
+        let customModules = addModules
+        if (modules && Array.isArray(modules) && modules?.length !== 0) {
+            for (let i = 0; i < modules?.length; i++) {
+                for (let j = 0; j < customModules?.length; j++) {
+                    if (customModules[j]?.parent === modules[i]?._id) {
+                        if (Array.isArray(customModules[j]?.children) && Array.isArray(modules[i]?.children)) {
+                            customModules[j].children = [... new Set([...customModules[j]?.children, ...modules[i]?.children])]
+                        }
                     }
-                    setUpdateState(updateRoleFetchedData)
-                }else {
+                }
+            }
+        }
+        return customModules
+    } 
+    const getRoleDataById = (roleId, permissionId) => {
+        if (roleId && permissionId) {
+            getPermissionById(permissionId)
+            .then(res => {
+                console.log(res)
+                const foundPermission = res?.data?.data
+                const roleOfPermission = foundPermission?.role
+                const updateRoleFetchedData = {
+                    updateRoleId: roleOfPermission?._id,
+                    updateRoleName: roleOfPermission?.name,
+                    updateRoleDescription: roleOfPermission?.description
+                }
+                setUpdateState(updateRoleFetchedData)
+                getAllModulesOfPermission(permissionId)
+                .then(res1 => {
+                    const modules = res1?.data?.data?.result
+                    console.log(res1);
+                    const customModules = matchingAddModulesForUpdate(modules)
+                    console.log(customModules)
+                })
+                .catch(err1 => {
                     addToast(createToast({
                         title: 'Cập nhật vai trò',
                         content: "Thông tin vai trò không đúng",
                         icon: createFailIcon()
                     }))
-                }
+                })
             })
             .catch(err => {
                 addToast(createToast({
@@ -439,9 +465,9 @@ const RoleManagement = () => {
             return { ...prev, updateRoleId: value }
         })
     }
-    const openUpdateModal = (roleId) => {
+    const openUpdateModal = (roleId, permissionId) => {
         handleSetUpdateRoleId(roleId)
-        getRoleDataById(roleId)
+        getRoleDataById(roleId, permissionId)
         setUpdateVisible(true)
     }
     const handleSetUpdateRoleName = (value) => {
@@ -487,6 +513,11 @@ const RoleManagement = () => {
         setUpdateValidated(true)
     }
     const [updateVisible, setUpdateVisible] = useState(false)
+    useEffect(() => {
+        if (!updateVisible) {
+            rebaseAddModules(listModules)
+        }
+    }, [updateVisible]) // eslint-disable-line react-hooks/exhaustive-deps
     const updateForm = (isLoaded) => { 
         return (
             <>
@@ -535,6 +566,7 @@ const RoleManagement = () => {
             </>
         )
     }
+    
 
     // Delete will be fixed later !
     /*
