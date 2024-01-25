@@ -16,7 +16,13 @@ import {
     CForm,
     CToaster,
     CSpinner,
-    CFormTextarea
+    CFormTextarea,
+    CFormLabel,
+    CAccordion,
+    CAccordionItem,
+    CAccordionHeader,
+    CAccordionBody,
+    CFormCheck
   } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -32,32 +38,79 @@ import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import CustomSpinner from "src/views/customs/my-spinner"
-import { createRole, getAllRoles, getRoleById, updateRole } from "src/services/authentication-services"
+import { createRole, getAllModules, getAllPermissions, getAllRoles, getRoleById, updateRole } from "src/services/authentication-services"
 
 const RoleManagement = () => {
 
-    // Dam Type Management
+    // Role Management
     const [listRole, setListRoles] = useState([])
     const [isLoadedRoles, setIsLoadedRoles] = useState(false)
+    const [listModules, setListModules] = useState([])
+    const [addModules, setAddModules] = useState([])
     const handleSetIsLoadedRoles = (value) => {
         setIsLoadedRoles(prev => {
             return { ...prev, isLoadedRoles: value }
         })
     }
+
+    
+
     useEffect(() => {
         handleSetIsLoadedRoles(true)
     }, [listRole])
+
+    const rebaseAddModules = (modules) => {
+        if (modules?.length !== 0) {
+            setAddModules(modules.map(module => {
+                return {
+                    parent: module?._id,
+                    children: []
+                }
+            }))
+        }
+    }
+
+    useEffect(() => {
+        rebaseAddModules(listModules)
+    }, [listModules])
     
     // Call inital APIs
+    const domainFilter = (permissions) => {
+        const domainId = '65b0cbba526ef32c8be05f1d' || process.env.HG_DOMAIN_ID
+        const filteredPermissions = permissions.filter(permission => permission?.domain?._id === domainId)
+        return filteredPermissions.map(permission => {
+            return {
+                _id: permission?.role?._id,
+                name: permission?.role?.name,
+                description: permission?.role?.description,
+                permission_id: permission?._id
+            }
+        })
+    }
+    const moduleFilter = (modules) => {
+        const moduleCode = 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ' || process.env.HG_MODULE_CODE
+        return modules.filter(module => module?.URL.includes(moduleCode))
+    }
     const rebaseAllData = () => {
         if (JSON.parse(localStorage.getItem("_isAuthenticated"))) {
             // Setting up access token
             setAuthApiHeader()
-            getAllRoles()
+            getAllPermissions()
             .then(res => {
-                const roles = res?.data?.data?.result
-                setListRoles(roles)
-                setFilteredRoles(roles)
+                const permissions = res?.data?.data?.result
+                const filteredRoles = domainFilter(permissions)
+                setListRoles(filteredRoles)
+                setFilteredRoles(filteredRoles)
+            })
+            .catch(err => {
+                // Do nothing
+            })
+
+            getAllModules()
+            .then(res => {
+                const modules = res?.data?.data?.result
+                const filteredModules = moduleFilter(modules)
+                setListModules(filteredModules)
             })
             .catch(err => {
                 // Do nothing
@@ -160,6 +213,28 @@ const RoleManagement = () => {
     const [addState, setAddState] = useState(addData)
     const { addRoleName, addRoleDescription } = addState
     const [addValidated, setAddValidated] = useState(false)
+    const addModuleItem = (parentModuleId, childModuleId) => {
+        let flagIndex = -1
+        for (let i = 0; i<=addModules?.length; i++) {
+            if (addModules[i]?.parent === parentModuleId) {
+                flagIndex = i
+                break
+            }
+        }
+        if (flagIndex !== -1 ) { // The parent id is existed !
+            if (!addModules[flagIndex]?.children.includes(childModuleId)) {
+                // The child element is not existed !
+                addModules[flagIndex]?.children.push(childModuleId)
+            }else {
+                // The child element is existed ! --> We just remove is out of the children list
+                const removeIndex = addModules[flagIndex]?.children?.indexOf(childModuleId)
+                if (removeIndex !== -1) {
+                    addModules[flagIndex]?.children.splice(removeIndex, 1)
+                }
+            }
+        }
+    }
+
     const handleSetAddRoleName = (value) => {
         setAddState(prev => {
             return { ...prev, addRoleName: value }
@@ -205,6 +280,14 @@ const RoleManagement = () => {
     }
 
     const [addVisible, setAddVisible] = useState(false)
+
+    // Reset the addModules --> Just save each element when the popup is showing
+    useEffect(() => {
+        if (!addVisible) {
+            rebaseAddModules(listModules)
+        }
+    }, [addVisible])
+
     const addForm = () => {
         return <>
                 <CForm 
@@ -240,6 +323,35 @@ const RoleManagement = () => {
                                 rows={3}
                                 aria-describedby="exampleFormControlInputHelpInline"
                             ></CFormTextarea>
+                        </CCol>
+                    </CRow>
+                    <CRow>
+                        <CCol lg={12}>
+                            <CFormLabel></CFormLabel>
+                            {
+                                listModules?.length !== 0 ? <CAccordion>
+                                    {
+                                        listModules.map((module, index) => {
+                                            return <CAccordionItem itemID={module?._id} key={index}>
+                                                <CAccordionHeader>
+                                                    {module?.name}
+                                                </CAccordionHeader>
+                                                <CAccordionBody>
+                                                    {
+                                                        module?.children?.length !== 0 ? <>
+                                                            {
+                                                                module?.children.map((childModule, index) => {
+                                                                    return <CFormCheck id="flexCheckDefault" onClick={() => addModuleItem(module?._id, childModule?._id)} label={childModule?.name} key={index} value={childModule?._id}/>
+                                                                })
+                                                            }
+                                                        </> : "Không có dữ liệu"
+                                                    }
+                                                </CAccordionBody>
+                                            </CAccordionItem> 
+                                        })
+                                    }
+                                </CAccordion> : <CSpinner />
+                            }
                         </CCol>
                     </CRow>
                     <CRow>

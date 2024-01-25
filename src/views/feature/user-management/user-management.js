@@ -42,7 +42,7 @@ const UserManagement = () => {
     // const [listDomains, setListDomains] = useState([])
     const [listRoles, setListRoles] = useState([])
     const secretKey = process.env.AUTH_TOKEN || 'oda_dev'
-    const defaultDomainId = process.env.HG_DOMAIN_ID || '6585900cf7ed98f198697653'
+    const defaultDomainId = process.env.HG_DOMAIN_ID || '65b0cbba526ef32c8be05f1d'
     const defaultAdminId = process.env.ADMIN_ROLE_ID || '6588e34a6f4d6dd9d37c8a01'
     const defaultClientId = process.env.CLIENT_ROLE_ID || '6588e2806f4d6dd9d37c89bd'
     

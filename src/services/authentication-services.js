@@ -7,6 +7,7 @@ export const getAllRoles = () => authApi.get('/roles')
 export const getRoleById = (roleId) => authApi.get(`/roles/${roleId}`)
 export const getAllDomains = () => authApi.get('/domains')
 export const getAllPermissions = () => authApi.get('/permissions')
+export const getAllModules = () => authApi.get('/modules')
 
 export const createUser = (user) => authApi.post('/users', user)
 export const updateUser = (user, userId) => authApi.patch(`/users/${userId}`, user)
