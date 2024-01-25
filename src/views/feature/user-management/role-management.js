@@ -17,7 +17,6 @@ import {
     CToaster,
     CSpinner,
     CFormTextarea,
-    CFormLabel,
     CAccordion,
     CAccordionItem,
     CAccordionHeader,
@@ -28,6 +27,7 @@ import CIcon from '@coreui/icons-react'
 import {
     cilPencil,
     cilMagnifyingGlass,
+    cilTrash,
     cilReload,
     cilPlus
   } from '@coreui/icons'
@@ -37,7 +37,7 @@ import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import CustomSpinner from "src/views/customs/my-spinner"
-import { createPermission, createRole, getAllModules, getAllModulesOfPermission, getAllPermissions, getPermissionById, updatePermission, updateRole } from "src/services/authentication-services"
+import { createPermission, createRole, deletePermission, deleteRole, getAllModules, getAllModulesOfPermission, getAllPermissions, getPermissionById, updatePermission, updateRole } from "src/services/authentication-services"
 
 const RoleManagement = () => {
 
@@ -53,8 +53,6 @@ const RoleManagement = () => {
             return { ...prev, isLoadedRoles: value }
         })
     }
-
-    
 
     useEffect(() => {
         handleSetIsLoadedRoles(true)
@@ -163,8 +161,6 @@ const RoleManagement = () => {
     // Toast
     const [toast, addToast] = useState(0)
     const toaster = useRef()
-
-
     // Pagination + Filtering
     const showFilteredTable = (filteredRoles, duration, isLoaded) => {
         return (
@@ -191,7 +187,7 @@ const RoleManagement = () => {
                                     <CTableDataCell>{role?.description}</CTableDataCell>
                                     <CTableDataCell>
                                         <CIcon icon={cilPencil} onClick={() => openUpdateModal(role?._id, role?.permission_id)} className="text-success mx-1" role="button"/>
-                                        {/* <CIcon icon={cilTrash} onClick={() => openDeleteModal(role?._id)}  className="text-danger" role="button"/> */}
+                                        <CIcon icon={cilTrash} onClick={() => openDeleteModal(role?._id, role?.permission_id)}  className="text-danger" role="button"/>
                                     </CTableDataCell>
                                 </CTableRow>    
                             )
@@ -235,7 +231,6 @@ const RoleManagement = () => {
             }
         }
     }
-
     const handleSetAddRoleName = (value) => {
         setAddState(prev => {
             return { ...prev, addRoleName: value }
@@ -246,7 +241,6 @@ const RoleManagement = () => {
             return { ...prev, addRoleDescription: value }
         })
     }
-
     const createNewRole = (e) => {
         // validation
         const form = e.currentTarget
@@ -272,7 +266,6 @@ const RoleManagement = () => {
                         // To filter all parent without children modules
                         modules: addModules.filter(module => Array.isArray(module?.children) && module?.children?.length !== 0)
                     }
-                    console.log(permissionModules)
                     updatePermission(permissionModules, newPermission?._id)
                     .then(res2 => {
                         console.log(res2)
@@ -311,17 +304,13 @@ const RoleManagement = () => {
         }
         setAddValidated(true)
     }
-
     const [addVisible, setAddVisible] = useState(false)
-
     // Reset the addModules --> Just save each element when the popup is showing
     useEffect(() => {
         if (!addVisible) {
             rebaseAddModules(listModules)
         }
     }, [addVisible]) // eslint-disable-line react-hooks/exhaustive-deps
-
-
 
     const addForm = () => {
         return <>
@@ -361,8 +350,7 @@ const RoleManagement = () => {
                         </CCol>
                     </CRow>
                     <CRow>
-                        <CCol lg={12}>
-                            <CFormLabel></CFormLabel>
+                        <CCol lg={12} className="pt-4">
                             {
                                 listModules?.length !== 0 ? <CAccordion>
                                     {
@@ -398,24 +386,30 @@ const RoleManagement = () => {
         </>
 
     }
- 
     // Updating Model
     const updateData = {
         updateRoleId: '',
         updateRoleDescription: '',
-        updateRoleName: ''
+        updateRoleName: '',
+        updatePermissionId: ''
     }
     const [updateState, setUpdateState] = useState(updateData)
-    const { updateRoleId, updateRoleDescription, updateRoleName } = updateState
+    const { updateRoleId, updateRoleDescription, updateRoleName, updatePermissionId } = updateState
     const [updateValidated, setUpdateValidated] = useState(false)
     const matchingAddModulesForUpdate = (modules) => {
         let customModules = addModules
         if (modules && Array.isArray(modules) && modules?.length !== 0) {
+            // 1. Convert modules children list to addModule children list format
+
+
             for (let i = 0; i < modules?.length; i++) {
                 for (let j = 0; j < customModules?.length; j++) {
                     if (customModules[j]?.parent === modules[i]?._id) {
                         if (Array.isArray(customModules[j]?.children) && Array.isArray(modules[i]?.children)) {
-                            customModules[j].children = [... new Set([...customModules[j]?.children, ...modules[i]?.children])]
+                            const convertedModuleChildrenList = modules[i]?.children.map(m => {
+                                return m?._id
+                            })
+                            customModules[j].children = [... new Set([...customModules[j]?.children, ...convertedModuleChildrenList])]
                         }
                     }
                 }
@@ -423,25 +417,27 @@ const RoleManagement = () => {
         }
         return customModules
     } 
+    const [isUpdateModule, setIsUpdateModule] = useState(false) // UPDATE FEATURE
     const getRoleDataById = (roleId, permissionId) => {
         if (roleId && permissionId) {
             getPermissionById(permissionId)
             .then(res => {
-                console.log(res)
                 const foundPermission = res?.data?.data
                 const roleOfPermission = foundPermission?.role
                 const updateRoleFetchedData = {
                     updateRoleId: roleOfPermission?._id,
                     updateRoleName: roleOfPermission?.name,
-                    updateRoleDescription: roleOfPermission?.description
+                    updateRoleDescription: roleOfPermission?.description,
+                    updatePermissionId: permissionId
                 }
                 setUpdateState(updateRoleFetchedData)
                 getAllModulesOfPermission(permissionId)
                 .then(res1 => {
                     const modules = res1?.data?.data?.result
-                    console.log(res1);
                     const customModules = matchingAddModulesForUpdate(modules)
-                    console.log(customModules)
+                    setAddModules(customModules)
+                    setIsUpdateModule(true) // 1. Render the checked list for update feature: UPDATE FEATURE
+                    // It looks like the addModules format --> Array of {parent_id and children: [id,...]}
                 })
                 .catch(err1 => {
                     addToast(createToast({
@@ -480,7 +476,7 @@ const RoleManagement = () => {
             return { ...prev, updateRoleDescription: value }
         })
     }
-    const updateADamType = (e) => {
+    const updateAPermission = (e) => {
         // validation
         const form = e.currentTarget
         if (form.checkValidity() === false) {
@@ -493,14 +489,27 @@ const RoleManagement = () => {
             }
             updateRole(role, updateRoleId)
             .then(res => {
-                setUpdateVisible(false)
-                rebaseAllData()
-                addToast(createToast({
-                    title: 'Cập nhật vai trò',
-                    content: 'Cập nhật vai trò thành công',
-                    icon: createSuccessIcon()
-                }))
-                setUpdateValidated(false)
+                const updatingPermission = {
+                    modules: addModules.filter(module => Array.isArray(module?.children) && module?.children.length !== 0)
+                }
+                updatePermission(updatingPermission, updatePermissionId)
+                .then(res1 => {
+                    setUpdateVisible(false)
+                    rebaseAllData()
+                    addToast(createToast({
+                        title: 'Cập nhật vai trò',
+                        content: 'Cập nhật vai trò thành công',
+                        icon: createSuccessIcon()
+                    }))
+                    setUpdateValidated(false)
+                })
+                .catch(err1 => {
+                    addToast(createToast({
+                        title: 'Cập nhật vai trò',
+                        content: "Cập nhật vai trò không thành công",
+                        icon: createFailIcon()
+                    }))
+                })
             })
             .catch(err => {
                 addToast(createToast({
@@ -516,6 +525,7 @@ const RoleManagement = () => {
     useEffect(() => {
         if (!updateVisible) {
             rebaseAddModules(listModules)
+            setIsUpdateModule(false) // 2. UPDATE FEATURE
         }
     }, [updateVisible]) // eslint-disable-line react-hooks/exhaustive-deps
     const updateForm = (isLoaded) => { 
@@ -523,7 +533,7 @@ const RoleManagement = () => {
             <>
                 {  isLoaded ? 
                     <CForm 
-                        onSubmit={e => updateADamType(e)} 
+                        onSubmit={e => updateAPermission(e)} 
                         noValidate
                         validated={updateValidated}
                     >
@@ -557,6 +567,52 @@ const RoleManagement = () => {
                             </CCol>
                         </CRow>
                         <CRow>
+                            <CCol lg={12} className="pt-4">
+                            {
+                                listModules?.length !== 0 ? <CAccordion>
+                                    {
+                                        listModules.map((module, index) => {
+                                            return <CAccordionItem itemID={module?._id} key={index}>
+                                                <CAccordionHeader>
+                                                    {module?.name}
+                                                </CAccordionHeader>
+                                                <CAccordionBody>
+                                                    {
+                                                        module?.children?.length !== 0 ? <>
+                                                            {
+                                                                module?.children.map((childModule, index) => {
+                                                                    const parentItems = addModules.filter(module1 => module1?.parent === module?._id)
+                                                                    let isChecked = false
+                                                                    if (parentItems?.length !== 0) {
+                                                                        isChecked = parentItems[0].children.includes(childModule?._id)
+                                                                    }
+                                                                    return isChecked ? <CFormCheck 
+                                                                        id="flexCheckDefault" 
+                                                                        onClick={() => addModuleItem(module?._id, childModule?._id)} 
+                                                                        label={childModule?.name} 
+                                                                        key={index} 
+                                                                        value={childModule?._id}
+                                                                        defaultChecked
+                                                                    />: <CFormCheck 
+                                                                        id="flexCheckDefault" 
+                                                                        onClick={() => addModuleItem(module?._id, childModule?._id)} 
+                                                                        label={childModule?.name} 
+                                                                        key={index} 
+                                                                        value={childModule?._id}
+                                                                    />
+                                                                })
+                                                            }
+                                                        </> : "Không có dữ liệu"
+                                                    }
+                                                </CAccordionBody>
+                                            </CAccordionItem> 
+                                        })
+                                    }
+                                </CAccordion> : <CSpinner />
+                            }
+                            </CCol>
+                        </CRow>
+                        <CRow>
                             <CCol lg={12} className="d-flex justify-content-end">
                                 <CButton type="submit" className="mt-4" color="primary">Hoàn tất</CButton>
                             </CCol>
@@ -567,21 +623,36 @@ const RoleManagement = () => {
         )
     }
     
-
     // Delete will be fixed later !
-    /*
-    const deleteARole = (roleId) => {
-        if (roleId) {
-            delete(roleId)
+    const deleteData = {
+        deleteRoleId: '',
+        deletePermissionId: ''
+    }
+    const [deletePermissionState, setDeletePermission] = useState(deleteData)
+    const {deleteRoleId, deletePermissionId} = deletePermissionState
+    const [deleteVisible, setDeleteVisible] = useState(false)
+    const deleteARole = (roleId, permissionId) => {
+        if (roleId && permissionId) {
+            deletePermission(permissionId)
             .then(res => {
-                setDeleteVisible(false)
-                rebaseAllData()
-                addToast(createToast({
-                    title: 'Xóa vai trò',
-                    content: 'Xóa vai trò thành công',
-                    icon: createSuccessIcon()
-                }))
-                setUpdateValidated(false)
+                deleteRole(roleId)
+                .then(res1 => {
+                    setDeleteVisible(false)
+                    rebaseAllData()
+                    addToast(createToast({
+                        title: 'Xóa vai trò',
+                        content: 'Xóa vai trò thành công',
+                        icon: createSuccessIcon()
+                    }))
+                    setUpdateValidated(false)
+                })
+                .catch(err1 => {
+                    addToast(createToast({
+                        title: 'Xóa vai trò',
+                        content: "Xóa vai trò không thành công",
+                        icon: createFailIcon()
+                    }))
+                })
             })
             .catch(err => {
                 addToast(createToast({
@@ -592,14 +663,12 @@ const RoleManagement = () => {
             })
         }
     }
-    const [deleteVisible, setDeleteVisible] = useState(false)
-    const [deleteIdDamTypeId, setDeleteDamTypeId] = useState(0)
-    const deleteForm = (damTypeId) => {
+    const deleteForm = (roleId, permissionId) => {
         return (
             <>
                 {   
-                    damTypeId ? 
-                    <CForm onSubmit={() => deleteARole(damTypeId)}>
+                    permissionId && roleId ? 
+                    <CForm onSubmit={() => deleteARole(roleId, permissionId)}>
                         <CRow>
                             <CCol md={12}>
                                 <p>Bạn có chắc muốn xóa vai trò này ?</p>
@@ -614,11 +683,15 @@ const RoleManagement = () => {
             </>
         )
     }
-    const openDeleteModal = (damTypeId) => {
-        setDeleteDamTypeId(damTypeId)
+    const openDeleteModal = (roleId, permissionId) => {
+        const customPermission = {
+            deleteRoleId: roleId,
+            deletePermissionId: permissionId
+        }
+        setDeletePermission(customPermission)
         setDeleteVisible(true)
     }
-    */
+    
     useEffect(() => {
         // To reset all add state
         setAddState(addData)
@@ -634,8 +707,8 @@ const RoleManagement = () => {
             <CCardHeader>Danh sách vai trò</CCardHeader>
             <CCardBody>
                 <CustomModal visible={addVisible} title={'Thêm vai trò'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
-                <CustomModal visible={updateVisible} title={'Cập nhật vai trò'} body={updateForm(updateRoleId)} setVisible={(value) => setUpdateVisible(value)}/>
-                {/* <CustomModal visible={deleteVisible} title={'Xóa người vai trò'} body={deleteForm(deleteIdDamTypeId)} setVisible={(value) => setDeleteVisible(value)}/> */}
+                <CustomModal visible={updateVisible} title={'Cập nhật vai trò'} body={updateForm(isUpdateModule)} setVisible={(value) => setUpdateVisible(value)}/>
+                <CustomModal visible={deleteVisible} title={'Xóa người vai trò'} body={deleteForm(deleteRoleId, deletePermissionId)} setVisible={(value) => setDeleteVisible(value)}/>
                 <CForm onSubmit={onFilter}>
                     <CRow>
                         <CCol md={12} lg={3}>
