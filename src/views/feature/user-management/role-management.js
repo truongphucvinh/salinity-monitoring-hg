@@ -38,11 +38,12 @@ import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import CustomSpinner from "src/views/customs/my-spinner"
-import { createRole, getAllModules, getAllPermissions, getAllRoles, getRoleById, updateRole } from "src/services/authentication-services"
+import { createPermission, createRole, getAllModules, getAllPermissions, getAllRoles, getRoleById, updatePermission, updateRole } from "src/services/authentication-services"
 
 const RoleManagement = () => {
 
     // Role Management
+    const defaultDomainId = '65b0cbba526ef32c8be05f1d' || process.env.HG_DOMAIN_ID
     const [listRole, setListRoles] = useState([])
     const [isLoadedRoles, setIsLoadedRoles] = useState(false)
     const [listModules, setListModules] = useState([])
@@ -76,7 +77,7 @@ const RoleManagement = () => {
     
     // Call inital APIs
     const domainFilter = (permissions) => {
-        const domainId = '65b0cbba526ef32c8be05f1d' || process.env.HG_DOMAIN_ID
+        const domainId = defaultDomainId
         const filteredPermissions = permissions.filter(permission => permission?.domain?._id === domainId)
         return filteredPermissions.map(permission => {
             return {
@@ -259,14 +260,45 @@ const RoleManagement = () => {
             }
             createRole(role)
             .then(res => {
-                setAddVisible(false)
-                rebaseAllData()
-                addToast(createToast({
-                    title: 'Thêm vai trò',
-                    content: 'Thêm vai trò thành công',
-                    icon: createSuccessIcon()
-                }))
-                setAddValidated(false)
+                const newRole = res?.data?.data
+                const permission = {
+                    role: newRole?._id,
+                    domain: defaultDomainId
+                }
+                createPermission(permission)
+                .then(res1 => {
+                    const newPermission = res1?.data?.data
+                    const permissionModules = {
+                        modules: addModules.filter(module => Array.isArray(module?.children) && module?.children?.length !== 0)
+                    }
+                    console.log(permissionModules)
+                    updatePermission(permissionModules, newPermission?._id)
+                    .then(res2 => {
+                        console.log(res2)
+                        setAddVisible(false)
+                        rebaseAllData()
+                        addToast(createToast({
+                            title: 'Thêm vai trò',
+                            content: 'Thêm vai trò thành công',
+                            icon: createSuccessIcon()
+                        }))
+                        setAddValidated(false)
+                    })
+                    .catch(err2 => {
+                        addToast(createToast({
+                            title: 'Thêm vai trò',
+                            content: "Thêm vai trò không thành công",
+                            icon: createFailIcon()
+                        }))
+                    })
+                })
+                .catch(err1 => {
+                    addToast(createToast({
+                        title: 'Thêm vai trò',
+                        content: "Thêm vai trò không thành công",
+                        icon: createFailIcon()
+                    }))
+                })
             })
             .catch(err => {
                 addToast(createToast({
