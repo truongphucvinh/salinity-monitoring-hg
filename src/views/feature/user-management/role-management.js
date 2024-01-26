@@ -43,6 +43,11 @@ const RoleManagement = () => {
 
     // Role Management
     const defaultDomainId = '65b0cbba526ef32c8be05f1d' || process.env.HG_DOMAIN_ID
+    const defaultModuleCode = 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ' || process.env.HG_MODULE_CODE
+    const defaultModuleAddFeature = 'add' || process.env.HG_MODULE_ADD_FEATURE
+    const defaultModuleViewFeature = 'view' || process.env.HG_MODULE_VIEW_FEATURE
+    const defaultModuleUpdateFeature = 'update' || process.env.HG_MODULE_UPDATE_FEATURE
+    const defaultModuleDeleteFeature = 'delete' || process.env.HG_MODULE_DELETE_FEATURE
     const [listRole, setListRoles] = useState([])
     const [isLoadedRoles, setIsLoadedRoles] = useState(false)
     const [listModules, setListModules] = useState([])
@@ -87,7 +92,7 @@ const RoleManagement = () => {
         })
     }
     const moduleFilter = (modules) => {
-        const moduleCode = 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ' || process.env.HG_MODULE_CODE
+        const moduleCode = defaultModuleCode
         return modules.filter(module => module?.URL.includes(moduleCode))
     }
     const rebaseAllData = () => {
@@ -241,6 +246,31 @@ const RoleManagement = () => {
             return { ...prev, addRoleDescription: value }
         })
     }
+    const addingViewModule = (modules) => {
+        // Non-empty children
+        let permissionModules = modules
+        // Based on get modules APIs
+        let allModules = listModules?.length !== 0 && listModules?.map(module => {
+            const childrens = module?.children?.length !== 0 && module?.children?.filter(childModule => childModule?.URL.includes(defaultModuleCode) && childModule?.URL.includes(defaultModuleViewFeature))
+            console.log(childrens);
+            return {
+                parent: module?._id,
+                view: childrens?.length !== 0 && childrens[0]?._id
+            }
+        })
+        for (let i=0;i<permissionModules?.length;i++) {
+            if (allModules?.length !== 0) {
+                allModules.forEach(convertedModule => {
+                    if (convertedModule?.parent === permissionModules[i]?.parent) {
+                        if (permissionModules[i]?.children?.length !== 0 && !permissionModules[i]?.children.includes(convertedModule?.view)) {
+                            permissionModules[i]?.children.push(convertedModule?.view)
+                        }
+                    }
+                })
+            }
+        }
+        return permissionModules
+    }
     const createNewRole = (e) => {
         // validation
         const form = e.currentTarget
@@ -259,13 +289,18 @@ const RoleManagement = () => {
                     role: newRole?._id,
                     domain: defaultDomainId
                 }
+                console.log({
+                    message: "Created Role",
+                    instance: newRole
+                })
                 createPermission(permission)
                 .then(res1 => {
                     const newPermission = res1?.data?.data
                     const permissionModules = {
                         // To filter all parent without children modules
-                        modules: addModules.filter(module => Array.isArray(module?.children) && module?.children?.length !== 0)
+                        modules: addingViewModule(addModules.filter(module => Array.isArray(module?.children) && module?.children?.length !== 0))
                     }
+                    console.log(permissionModules)
                     updatePermission(permissionModules, newPermission?._id)
                     .then(res2 => {
                         console.log(res2)
@@ -279,6 +314,7 @@ const RoleManagement = () => {
                         setAddValidated(false)
                     })
                     .catch(err2 => {
+                        console.log(err2);
                         addToast(createToast({
                             title: 'Thêm vai trò',
                             content: "Thêm vai trò không thành công",
@@ -287,6 +323,7 @@ const RoleManagement = () => {
                     })
                 })
                 .catch(err1 => {
+                    console.log(err1)
                     addToast(createToast({
                         title: 'Thêm vai trò',
                         content: "Thêm vai trò không thành công",
@@ -295,6 +332,7 @@ const RoleManagement = () => {
                 })
             })
             .catch(err => {
+                console.log(err)
                 addToast(createToast({
                     title: 'Thêm vai trò',
                     content: "Thêm vai trò không thành công",
@@ -490,7 +528,7 @@ const RoleManagement = () => {
             updateRole(role, updateRoleId)
             .then(res => {
                 const updatingPermission = {
-                    modules: addModules.filter(module => Array.isArray(module?.children) && module?.children.length !== 0)
+                    modules: addingViewModule(addModules.filter(module => Array.isArray(module?.children) && module?.children?.length !== 0))
                 }
                 updatePermission(updatingPermission, updatePermissionId)
                 .then(res1 => {
