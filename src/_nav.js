@@ -16,6 +16,7 @@ import {
   cilSpeedometer,
   cilStar,
   cilStream,
+  cilTask,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -35,6 +36,12 @@ const _nav = [
     name: 'Quản lý tài khoản',
     to: '/user-management',
     icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Quản lý vai trò',
+    to: '/role-management',
+    icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
   },
   {
     component: CNavTitle,

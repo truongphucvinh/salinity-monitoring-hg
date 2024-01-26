@@ -21,6 +21,7 @@ import CIcon from "@coreui/icons-react"
 import { cilPencil, cilTrash, cilTouchApp } from "@coreui/icons"
 import DamScheduleManagement from "./dam-schedule-management"
 import { damStatusConverter } from "src/tools"
+import CustomGoogleMap from "src/views/customs/my-google-map"
 
 const DamDetail = () => {
     // Got the id of URL
@@ -129,10 +130,15 @@ const DamDetail = () => {
                             <CRow>
                                 <CCol lg={12}>
                                     <h4 className="text-center my-4 fw-bold" style={{'color': 'black'}}>Vị trí trên bản đồ</h4>
-                                    <CustomMap 
+                                    {/* <CustomMap 
                                         longtitude={dam?.damLongtitude} 
                                         latitude={dam?.damLatitude} 
                                         zoom={15}    
+                                    /> */}
+                                    <CustomGoogleMap 
+                                        longtitude={dam?.damLongtitude} 
+                                        latitude={dam?.damLatitude} 
+                                        zoom={15}
                                     />
                                 </CCol>
                             </CRow>

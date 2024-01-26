@@ -246,7 +246,6 @@ const DamTypeManagement = () => {
                 </CForm> 
         </>
 
-
     }
  
     // Updating Model
