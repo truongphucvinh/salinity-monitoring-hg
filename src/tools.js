@@ -35,3 +35,19 @@ export const getLoggedUserRole = () => {
     const loggedUser = JSON.parse(localStorage.getItem('_authenticatedUser'))
     return loggedUser?.permission?.role
 }
+
+
+export const getLoggedUserInformation = () => {
+    const information = JSON.parse(localStorage.getItem('_authenticatedUser'))
+    return information
+}
+
+export const checkItemCode = (code, modules) => {
+    let flag = false
+    modules?.forEach(element => {
+      if (element?.URL === code) {
+        flag = true
+      }
+    });
+    return flag
+  }
