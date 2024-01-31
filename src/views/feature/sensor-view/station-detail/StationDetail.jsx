@@ -130,21 +130,13 @@ const optionss = {
 
 const StationDetail = () => {
     const { id } = useParams()
-    const [value, setValue] = React.useState([
-        dayjs('2022-04-17'),
-        dayjs('2022-04-21'),
-      ]);
 
     const [showMode, setShowMode] = useState('chart'); //table
 
     //sensor list
     const [sensorList, setSensorList] = useState([])
 
-    const [selectedSensorId, setSelectedSensorId] = useState(0); //id
-    const [selectedSensor, setSelectedSensor] = useState();
-
     const [thing, setThing] = useState();
-    const [multiDataStream, setMultiDataStream] = useState();
 
     // const handleChangeSensor = (event) => {
     //   setSelectedSensor(handelChangSelectedSensor(event.target.value))
@@ -154,10 +146,12 @@ const StationDetail = () => {
     //tab
     const [activeKey, setActiveKey] = useState(0);
     const [selectingSensor, setSelectingSensor] = useState();  //luu tru id sensor dang duoc chon hay dang xem
-    const [selectingMultiDTS, setSelectingMultiDTS] = useState();
-    const [selectingMultiDTSValue, setSelectingMultiDTSValue] = useState();
+    const [selectingMultiDTS, setSelectingMultiDTS] = useState(); //id multidatastream
+    const [selectingMultiDTSValue, setSelectingMultiDTSValue] = useState(); //manng gia trị sensor/multidatastreamid hien tai
 
     const [multiDTSStation, setMultiDTSStation] = useState();
+
+    const [latestValueSensorList, setLatestValueSensorList] = useState([]);
 
     //option chart
     const [optionsss, setOptionsss] = useState(
@@ -178,23 +172,7 @@ const StationDetail = () => {
         },
       
         series: [{
-          data: [{x: 1707294600000, y: 33, color: '#1a2848'},
-                {x: 1707208200000, y: 33, color: '#1a2848'}, 
-                {x: 1707121800000, y: 33, color: '#1a2848'},
-                {x: 1707035400000, y: 33, color: '#1a2848'},
-                {x: 1706949000000, y: 33, color: '#1a2848'},
-                {x: 1706862600000, y: 33, color: '#1a2848'},
-                {x: 1706776200000, y: 33, color: '#1a2848'}, 
-                {x: 1706774400000, y: 28, color: '#1a2848'},
-                {x: 1706700600000, y: 32, color: '#1a2848'},
-                {x: 1706698800000, y: 29.5, color: '#1a2848'},
-                {x: 1706697000000, y: 30, color: '#1a2848'},
-                {x: 1706695200000, y: 30.5, color: '#1a2848'},
-                {x: 1706693400000, y: 29, color: '#1a2848'},
-                {x: 1706691600000, y: 28, color: '#1a2848'},
-                {x: 1706689800000, y: 31, color: '#1a2848'},
-                {x: 1706688000000, y: 29.5, color: '#1a2848'},
-                {x: 1706686999971, y: 29, color: '#1a2848'}],
+          data: [],
           zoneAxis: 'x',
           marker: {
             symbol: "circle",
@@ -202,7 +180,7 @@ const StationDetail = () => {
             enabled: true
           },
           // zones: [{value: 3}, {value: 5, color: 'red'}]
-          // zones: zones(colors[0])
+          zones: zones(colors[0])
         }]
       }
     )
@@ -293,6 +271,9 @@ const StationDetail = () => {
 
     const handelChangeShowMode = (modeStr) => {
       setShowMode(modeStr);
+      if(modeStr==='table') {
+        handleGetLatestValueAllSensor();
+      }
     } 
 
     const handleChangeSelectingSensor = (index, sensorId) => {  // change tab
@@ -304,11 +285,23 @@ const StationDetail = () => {
 
     const handleFindMultiDTSIdBySensorId = (sensorId) => { //ham tim multi datastreamid dua vao sensor id
       for(let i=0; i<multiDTSStation?.length; i++) {
-        if(sensorId==multiDTSStation[i].sensor.sensorId) {
+        if(sensorId===multiDTSStation[i].sensor.sensorId) {
           console.log("multiId: ", multiDTSStation[i].multiDataStreamId);
           return multiDTSStation[i].multiDataStreamId;
         }
       }
+    }
+
+    const handleGetLatestValueAllSensor = () => {
+      var latestValueSL=[];
+      sensorList.map((sensor) => {
+        observation.getLatestValueByDataStreamId(sensor.sensorId)
+          .then((res) => {
+            // setLatestValueSensorList(...latestValueSensorList, res);
+            latestValueSL.push(res);
+            setLatestValueSensorList(latestValueSL);
+          })
+      })
     }
 
     return (<>
@@ -440,7 +433,15 @@ const StationDetail = () => {
                                           <th className="index">Giá trị</th>
                                           <th></th>
                                       </tr>
-                                      <tr>
+                                      {
+                                        selectingMultiDTSValue.map((multiData, index) => {
+                                          return  <tr key={'multi'+index}>
+                                                    <td>{ multiData.resultTime }</td>
+                                                    <td className="index">{ multiData.result}</td>
+                                                  </tr>
+                                        })
+                                      }
+                                      {/* <tr>
                                           <td>06:00 27/12/2023</td>
                                           <td className="index">25</td>
                                       </tr>
@@ -459,7 +460,7 @@ const StationDetail = () => {
                                       <tr>
                                           <td>08:00 27/12/2023</td>
                                           <td className="index">28</td>
-                                      </tr>
+                                      </tr> */}
                                     </table>
                                   </CTabPane>
                                 </>

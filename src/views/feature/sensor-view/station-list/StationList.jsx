@@ -345,6 +345,9 @@ const StationList = () => {
           .then((res) => {})
       }
     })) 
+
+    setStationCreationLoading(false);
+    handleCloseCreateStationModal();
     setStationListChange(!stationListChange);
   }
 
