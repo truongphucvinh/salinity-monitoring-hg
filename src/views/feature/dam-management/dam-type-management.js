@@ -26,7 +26,6 @@ import {
     cilReload,
     cilPlus
   } from '@coreui/icons'
-import { setAuthApiHeader } from "src/services/global-axios"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
@@ -449,7 +448,7 @@ const DamTypeManagement = () => {
     const defaultAuthorizationCode = process.env.HG_MODULE_DAM_TYPE_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_type_management"
     return (
         <CRow>
-        <CustomAuthorizationChecker code={defaultAuthorizationCode}/>
+        <CustomAuthorizationChecker isRedirect={true} code={defaultAuthorizationCode}/>
         <CCol xs>
           <CCard className="mb-4">
             <CToaster ref={toaster} push={toast} placement="top-end" />

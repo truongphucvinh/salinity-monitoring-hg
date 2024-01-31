@@ -1,4 +1,4 @@
-import { GoogleMap, LoadScript, Marker, Polygon } from "@react-google-maps/api"
+import { GoogleMap, LoadScript, Polygon } from "@react-google-maps/api"
 import React from "react"
 
 const CustomGoogleMap = ({
