@@ -9,18 +9,15 @@ import {
     CTable,
     CTableBody,
     CTableRow,
-    CTableDataCell,
-    CTableHead,
-    CTableHeaderCell,
-
+    CTableDataCell
   } from '@coreui/react'
 import { getAllDamSchedules, getDamById } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
-import CustomMap from "src/views/customs/my-map"
 import CIcon from "@coreui/icons-react"
-import { cilPencil, cilTrash, cilTouchApp } from "@coreui/icons"
 import DamScheduleManagement from "./dam-schedule-management"
 import { damStatusConverter } from "src/tools"
+import CustomGoogleMap from "src/views/customs/my-google-map"
+import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 
 const DamDetail = () => {
     // Got the id of URL
@@ -77,6 +74,10 @@ const DamDetail = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    // To desire if have a permission to view schedule
+    const [isSchedule, setIsSchedule] = useState(true)
+    const defaultAuthorizationCode = process.env.HG_MODULE_DAM_SCHEDULE_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_schedule_management"
+
     return (
         <>
             {
@@ -129,19 +130,27 @@ const DamDetail = () => {
                             <CRow>
                                 <CCol lg={12}>
                                     <h4 className="text-center my-4 fw-bold" style={{'color': 'black'}}>Vị trí trên bản đồ</h4>
-                                    <CustomMap 
+                                    {/* <CustomMap 
                                         longtitude={dam?.damLongtitude} 
                                         latitude={dam?.damLatitude} 
                                         zoom={15}    
+                                    /> */}
+                                    <CustomGoogleMap 
+                                        longtitude={dam?.damLongtitude} 
+                                        latitude={dam?.damLatitude} 
+                                        zoom={15}
                                     />
                                 </CCol>
                             </CRow>
-                            <CRow>
-                                <CCol lg={12}>
-                                    <h4 className="text-center my-4 fw-bold" style={{'color': 'black'}}>Lịch mở đập</h4>
-                                    <DamScheduleManagement damInstance={dam} rebaseDetailPage={rebaseAllData}/>
-                                </CCol>
-                            </CRow>
+                            <CustomAuthorizationChecker code={defaultAuthorizationCode} isRedirect={false} setExternalState={setIsSchedule} />
+                            {
+                                isSchedule && <CRow>
+                                    <CCol lg={12}>
+                                        <h4 className="text-center my-4 fw-bold" style={{'color': 'black'}}>Lịch mở đập</h4>
+                                        <DamScheduleManagement damInstance={dam} rebaseDetailPage={rebaseAllData}/>
+                                    </CCol>
+                                </CRow>
+                            }
                         </CCardBody>
                     </CCard>
                     </CCol>

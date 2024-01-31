@@ -26,13 +26,13 @@ import {
     cilReload,
     cilPlus
   } from '@coreui/icons'
-import { setAuthApiHeader } from "src/services/global-axios"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import { createDamType, deleteDamType, getAllDamTypes, getDamTypeById, updateDamType } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
+import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 
 const DamTypeManagement = () => {
 
@@ -246,7 +246,6 @@ const DamTypeManagement = () => {
                 </CForm> 
         </>
 
-
     }
  
     // Updating Model
@@ -446,9 +445,10 @@ const DamTypeManagement = () => {
         setUpdateState(updateData)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addVisible, updateVisible])
-
+    const defaultAuthorizationCode = process.env.HG_MODULE_DAM_TYPE_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_type_management"
     return (
         <CRow>
+        <CustomAuthorizationChecker isRedirect={true} code={defaultAuthorizationCode}/>
         <CCol xs>
           <CCard className="mb-4">
             <CToaster ref={toaster} push={toast} placement="top-end" />

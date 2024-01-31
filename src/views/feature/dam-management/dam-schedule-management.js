@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from "react"
 import {
     CCard,
     CCardBody,
-    CCardHeader,
     CCol,
     CRow,
     CTable,
@@ -30,7 +29,7 @@ import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
-import { createDamSchedule, createDamType, defaultDamStatusId, deleteDamSchedule, deleteDamType, getAllDamSchedules, getAllDamTypes, getDamScheduleId, getDamTypeById, updateDamSchedule, updateDamType } from "src/services/dam-services"
+import { createDamSchedule,  defaultDamStatusId, deleteDamSchedule,  getAllDamSchedules,  getDamScheduleId,  updateDamSchedule } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
 import CustomDateTimePickerV2 from "src/views/customs/my-datetimepicker/my-datetimepicker-time"
 import { formatDate } from "src/tools"
@@ -67,7 +66,7 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
     }
     useEffect(() => {
        rebaseAllData()
-    },[])
+    },[]) // eslint-disable-line react-hooks/exhaustive-deps
 
     // Searching data
     const [filteredDamSchedules, setFilteredDamSchedules] = useState([])
@@ -514,6 +513,7 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addVisible, updateVisible])
 
+    
     return (
         <CCard className="mb-4">
         <CToaster ref={toaster} push={toast} placement="top-end" />
