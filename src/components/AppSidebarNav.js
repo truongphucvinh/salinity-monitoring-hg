@@ -1,8 +1,12 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 import { CBadge } from '@coreui/react'
+import { setAuthApiHeader } from 'src/services/global-axios'
+import { useState } from 'react'
+import { checkItemCode, getLoggedUserInformation } from 'src/tools'
+import { getAllModulesOfPermission } from 'src/services/authentication-services'
 
 export const AppSidebarNav = ({ items }) => {
   const location = useLocation()
@@ -60,11 +64,38 @@ export const AppSidebarNav = ({ items }) => {
       </Component>
     )
   }
+  const [listModules, setListModules] = useState([])
+  const [filteredItems, setFilteredItems] = useState([])
+  const filterNavItems = (modules, items) => {
+    return items && items?.filter(item => checkItemCode(item?.code, modules))
+  }
+  const rebaseAllData = () => {
+    const user = getLoggedUserInformation()
+    if (user) {
+      const permissionId = user?.permission?._id
+      setAuthApiHeader()
+      getAllModulesOfPermission(permissionId)
+      .then(res => {
+        const allModules = res?.data?.data?.result
+        setFilteredItems(filterNavItems(allModules, items))
+        setListModules(allModules)
+      })
+      .catch(err => {
+        // Do nothing
+      })
+    }
+  }
+  useEffect(() => {
+    if (Array.isArray(listModules) && listModules?.length === 0) {
+      // Just call api for the first time
+      rebaseAllData()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <React.Fragment>
-      {items &&
-        items.map((item, index) => (item.items ? navGroup(item, index) : navItem(item, index)))}
+      {filteredItems &&
+        filteredItems.map((item, index) => (item.items ? navGroup(item, index) : navItem(item, index)))}
     </React.Fragment>
   )
 }

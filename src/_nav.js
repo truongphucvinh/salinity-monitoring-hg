@@ -25,51 +25,49 @@ const _nav = [
     component: CNavItem,
     name: 'Trang chủ',
     to: '/dashboard',
-    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavTitle,
-    name: 'Người dùng',
+    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />
   },
   {
     component: CNavItem,
     name: 'Quản lý tài khoản',
     to: '/user-management',
     icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
+    code: 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_user_management'
   },
   {
     component: CNavItem,
     name: 'Quản lý vai trò',
     to: '/role-management',
     icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavTitle,
-    name: 'Cơ sở hạ tầng',
+    code: 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_role_management'
   },
   {
     component: CNavItem,
     name: 'Quản lý đập',
     to: '/dam-management',
     icon: <CIcon icon={cilLineWeight} customClassName="nav-icon" />,
+    code: 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management'
   },
   {
     component: CNavItem,
     name: 'Quản lý loại đập',
     to: '/dam-type-management',
     icon: <CIcon icon={cilOptions} customClassName="nav-icon" />,
+    code: 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_type_management'
   },
   {
     component: CNavItem,
     name: 'Quản lý sông, kênh, rạch',
     to: '/river-management',
     icon: <CIcon icon={cilStream} customClassName="nav-icon" />,
+    code: 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_river_management'
   },
   {
     component:  CNavItem,
     name: 'Quản lý trạm',
     to: '/station-list',
-    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />
+    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+    code: 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_sensor_station_management'
   }
 ]
 

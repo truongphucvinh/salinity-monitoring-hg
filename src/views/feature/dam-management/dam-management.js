@@ -28,7 +28,6 @@ import {
     cilPlus,
     cilTouchApp
   } from '@coreui/icons'
-import { setAuthApiHeader } from "src/services/global-axios"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
@@ -38,6 +37,7 @@ import CustomSpinner from "src/views/customs/my-spinner"
 import CustomDateTimePicker from "src/views/customs/my-datetimepicker/my-datetimepicker"
 import { useNavigate } from "react-router-dom"
 import { damStatusConverter } from "src/tools"
+import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 
 const DamManagement = () => {
 
@@ -802,8 +802,11 @@ const DamManagement = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addVisible, updateVisible])
 
+    const defaultAuthorizationCode = process.env.HG_MODULE_DAM_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management"
+    
     return (
         <CRow>
+        <CustomAuthorizationChecker isRedirect={true} code={defaultAuthorizationCode} />
         <CCol xs>
           <CCard className="mb-4">
             <CToaster ref={toaster} push={toast} placement="top-end" />

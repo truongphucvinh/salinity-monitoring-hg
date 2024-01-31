@@ -27,13 +27,12 @@ import {
     cilReload,
     cilPlus
   } from '@coreui/icons'
-import { createUser, deleteUser, /*getAllDomains*/ getAllRoles, getAllUsers, getUserById, updateUser } from "src/services/authentication-services"
+import { createUser, deleteUser, /*getAllDomains*/ getAllRoles, getAllUsers, getPermissionsOfDomain, getUserById, updateUser } from "src/services/authentication-services"
 import { setAuthApiHeader } from "src/services/global-axios"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
-import CustomAdminChecker from "src/views/customs/my-adminchecker"
 
 const UserManagement = () => {
 
@@ -51,6 +50,11 @@ const UserManagement = () => {
     const onFilterUsers = (listUsers, domainId) => {
         return listUsers.filter(user => {
             return user?.permission?.domain === domainId
+        })
+    }
+    const convertResultToRoleList = (results) => {
+        return results?.length !== 0 && results?.map(item => {
+            return item?.role
         })
     }
     const rebaseAllData = () => {
@@ -78,12 +82,13 @@ const UserManagement = () => {
             //     // Do nothing
             // })
 
-            getAllRoles()
-            .then((res) => {
-                const roles = res?.data?.data?.result
+            getPermissionsOfDomain(defaultDomainId)
+            .then(res => {
+                const permissions = res?.data?.data?.result
+                const roles = convertResultToRoleList(permissions)
                 setListRoles(roles)
             })
-            .catch((err) => {
+            .catch(err => {
                 // Do nothing
             })
         }
@@ -384,9 +389,7 @@ const UserManagement = () => {
                     >
                         <option selected="" value="" >Vai trò</option>
                         {
-                            listRoles.filter(role => {
-                                return role?._id === defaultAdminId || role?._id === defaultClientId
-                            }).map((role) => {
+                            listRoles && Array.isArray(listRoles) && listRoles.map((role) => {
                                 return  <option key={role?._id} value={role?._id}>{role?.name}</option>
                             })
                         }
@@ -635,9 +638,7 @@ const UserManagement = () => {
                                 >
                                     <option selected="" value="" >Vai trò</option>
                                     {
-                                        listRoles.filter(role => {
-                                            return role?._id === defaultAdminId || role?._id === defaultClientId
-                                        }).map((role) => {
+                                        listRoles && Array.isArray(listRoles) && listRoles.map((role) => {
                                             return  <option key={role?._id} value={role?._id}>{role?.name}</option>
                                         })
                                     }
@@ -722,7 +723,6 @@ const UserManagement = () => {
 
     return (
         <CRow>
-        <CustomAdminChecker />
         <CCol xs>
           <CCard className="mb-4">
             <CToaster ref={toaster} push={toast} placement="top-end" />
