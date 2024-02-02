@@ -40,25 +40,25 @@ import HighchartsReact from 'highcharts-react-official'
 
 //service
 import thingService from 'src/services/thing';
+import observation from "src/services/observation";
 
 import { useParams } from "react-router-dom";
 
 function zones(colors) {
   return [{
-    value: 3,
-    dashStyle: 'solid',
-    color: colors[0],
-    fillColor: '#7cb5ec'
-  }, {
-    value: 8,
+    value: 1707294600000,
     dashStyle: 'dot',
-    color: colors[1]
+    color: colors[0],
+    // fillColor: '#7cb5ec'
   }, {
-    value: 11,
+    value: 1706776200000,
     dashStyle: 'solid',
-    color: colors[2],
-    fillColor: colors[2]
+    color: colors[1]
   }]
+}
+
+const getTime = (date) => {
+  return new Date(date).getTime();
 }
 
 const colors = [
@@ -68,6 +68,7 @@ const colors = [
 
 const optionss = {
   chart: {
+    type: 'line',
     height: 550, // Set the desired height here
   },
   plotOptions: {
@@ -80,11 +81,29 @@ const optionss = {
         return 'Thời gian: <b>' + new Date(this.x).toLocaleString() + '</b>' + '<br/>Giá trị: <b>' +  this.y + '</b>';
     }
   },
+
   series: [{
-    data: [[1640269800000,176.28],[1640615400000,180.33],[1640701800000,179.29],[1640788200000,179.38],[1640874600000,178.2],[1640961000000,177.57],[1641220200000,182.01],[1641306600000,179.7],[1641393000000,174.92],[1641479400000,172],[1641565800000,172.17]],
+    data: [{x: 1640269800000, y: 435, color:'#1a2848'}, {x: 1640615400000, y: 437, color:'#1a2848'}, {x: 1640701800000, y: 455, color:'#1a2848'}, {x: 1640788200000, y: 475, color:'#1a2848'}, {x: 1640874600000, y: 555, color:'#1a2848'},{x: 1640961000000, y: 435, color:'#1a2848'}],
+    zoneAxis: 'x',
+    marker: {
+			symbol: "circle",
+			radius: 3,
+      enabled: true
+		},
+    // zones: [{value: 3}, {value: 5, color: 'red'}]
     zones: zones(colors[0])
   }]
 }
+
+// (() => {
+//   let i = 0
+
+//   setInterval(() => {
+//     optionss.series[0].update({
+//       zones: zones(colors[++i % 2])
+//     })
+//   }, 2000)
+// })()
   
   ChartJS.register(
     CategoryScale,
@@ -108,65 +127,81 @@ const optionss = {
       },
     },
   };
-  
-  const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'January', 'February', 'March', 'April', 'May', 'June', 'July'];
-  
-  export const data = {
-    labels,
-    datasets: [
-      {
-        label: 'Dataset 1',
-        data: labels.map(() => Math.round(Math.random() * 5)),
-        borderColor: 'rgb(255, 99, 132)',
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-      },
-      {
-        label: 'Dataset 2',
-        data: labels.map(() => Math.round(Math.random() * 5)),
-        borderColor: 'rgb(53, 162, 235)',
-        backgroundColor: 'rgba(53, 162, 235, 0.5)',
-      },
-    ],
-  };
 
 const StationDetail = () => {
     const { id } = useParams()
-    const [value, setValue] = React.useState([
-        dayjs('2022-04-17'),
-        dayjs('2022-04-21'),
-      ]);
 
     const [showMode, setShowMode] = useState('chart'); //table
 
     //sensor list
     const [sensorList, setSensorList] = useState([])
 
-    const [selectedSensorId, setSelectedSensorId] = useState(0); //id
-    const [selectedSensor, setSelectedSensor] = useState();
-
     const [thing, setThing] = useState();
 
-    const handleChangeSensor = (event) => {
-      setSelectedSensor(handelChangSelectedSensor(event.target.value))
-      setSelectedSensorId(event.target.value);
-    } 
+    // const handleChangeSensor = (event) => {
+    //   setSelectedSensor(handelChangSelectedSensor(event.target.value))
+    //   setSelectedSensorId(event.target.value);
+    // } 
 
     //tab
     const [activeKey, setActiveKey] = useState(0);
+    const [selectingSensor, setSelectingSensor] = useState();  //luu tru id sensor dang duoc chon hay dang xem
+    const [selectingMultiDTS, setSelectingMultiDTS] = useState(); //id multidatastream
+    const [selectingMultiDTSValue, setSelectingMultiDTSValue] = useState(); //manng gia trị sensor/multidatastreamid hien tai
 
     const [multiDTSStation, setMultiDTSStation] = useState();
 
+    const [latestValueSensorList, setLatestValueSensorList] = useState([]);
+
+    //option chart
+    const [optionsss, setOptionsss] = useState(
+      {
+        chart: {
+          type: 'line',
+          height: 550, // Set the desired height here
+        },
+        plotOptions: {
+          series: {
+              color: '#1a2848'
+          }
+        },
+        tooltip: {
+          formatter: function() {
+              return 'Thời gian: <b>' + new Date(this.x).toLocaleString() + '</b>' + '<br/>Giá trị: <b>' +  this.y + '</b>';
+          }
+        },
+      
+        series: [{
+          data: [],
+          zoneAxis: 'x',
+          marker: {
+            symbol: "circle",
+            radius: 3,
+            enabled: true
+          },
+          // zones: [{value: 3}, {value: 5, color: 'red'}]
+          zones: zones(colors[0])
+        }]
+      }
+    )
+
+
+    //test
+    console.log("date: ", new Date(1640615400000).toLocaleString());
+    console.log("time ", new Date("12/27/2023").getTime())
 
     useEffect(() => {
       console.log("id thing: ", id);
       //get sensor list in specific thing/station
-      var thingId = JSON.parse(localStorage.getItem('thingInfo'))?.id;
       thingService.getThingById(id)
         .then((res) => {
           setThing(res);
           console.log("thing info: ", res);
           setMultiDTSStation(res?.multiDataStreamDTOs);
+          setSelectingMultiDTS(res?.multiDataStreamDTOs[1]?.multiDataStreamId)
           //loc danh sach station
+          console.log("selecting sensor id: ", res?.multiDataStreamDTOs[0]?.sensor?.sensorId);
+          setSelectingSensor(res?.multiDataStreamDTOs[0]?.sensor?.sensorId);
           var sensorLists = []; 
           res?.multiDataStreamDTOs.map((multiDTS) => {
             sensorLists.push(multiDTS.sensor);
@@ -177,22 +212,98 @@ const StationDetail = () => {
           return sensorLists;
         })
         .then((res) => {
-          setSelectedSensorId(res[0]?.sensorId);
-          setSelectedSensor(handelChangSelectedSensor(res[0]?.Id))
+          setSelectingSensor(res[0]?.sensorId);
         })
     }, [])
 
-    const handelChangSelectedSensor = (sensorId) => {
-      for(let i=0; sensorList.length-1; i++) {
-        if(sensorId==sensorList[i]?.sensorId) {
-          return sensorList[i];
+    useEffect(() => {
+      console.log("selecting: ", selectingMultiDTS)
+      observation.getAllValueByDataStreamId(selectingMultiDTS)
+        .then((res) => {
+          var d = new Date(res[0]?.resultTime.substring(0, res[0]?.resultTime.length-5));
+          console.log("d: ", d.getTime());
+          var pointArray = [];
+          res.map((multi) => {
+            var point = {
+              x: new Date(multi.resultTime.substring(0, multi.resultTime.length-5)).getTime(),
+              y: Number(multi.result),
+              color: '#1a2848'
+            }
+            pointArray.push(point);
+          })
+          setSelectingMultiDTSValue(res);
+          return pointArray;
+        })
+        .then((res) => {
+          console.log("dataa: ", res);
+          setOptionsss(
+            {
+              chart: {
+                type: 'line',
+                height: 550, // Set the desired height here
+              },
+              plotOptions: {
+                series: {
+                    color: '#1a2848'
+                }
+              },
+              tooltip: {
+                formatter: function() {
+                    return 'Thời gian: <b>' + new Date(this.x).toLocaleString() + '</b>' + '<br/>Giá trị: <b>' +  this.y + '</b>';
+                }
+              },
+            
+              series: [{
+                data: res,
+                zoneAxis: 'x',
+                marker: {
+                  symbol: "circle",
+                  radius: 3,
+                  enabled: true
+                },
+                // zones: [{value: 3}, {value: 5, color: 'red'}]
+                // zones: zones(colors[0])
+              }]
+            }
+          )
+          console.log("optionsss: ", optionsss);
+        })
+    }, [selectingMultiDTS])
+
+    const handelChangeShowMode = (modeStr) => {
+      setShowMode(modeStr);
+      if(modeStr==='table') {
+        handleGetLatestValueAllSensor();
+      }
+    } 
+
+    const handleChangeSelectingSensor = (index, sensorId) => {  // change tab
+      setActiveKey(index);
+      setSelectingSensor(sensorId);
+      setSelectingMultiDTS(handleFindMultiDTSIdBySensorId(sensorId));
+      console.log("data: ", optionsss.series.data);
+    }
+
+    const handleFindMultiDTSIdBySensorId = (sensorId) => { //ham tim multi datastreamid dua vao sensor id
+      for(let i=0; i<multiDTSStation?.length; i++) {
+        if(sensorId===multiDTSStation[i].sensor.sensorId) {
+          console.log("multiId: ", multiDTSStation[i].multiDataStreamId);
+          return multiDTSStation[i].multiDataStreamId;
         }
       }
     }
 
-    const handelChangeShowMode = (modeStr) => {
-      setShowMode(modeStr);
-    } 
+    const handleGetLatestValueAllSensor = () => {
+      var latestValueSL=[];
+      sensorList.map((sensor) => {
+        observation.getLatestValueByDataStreamId(sensor.sensorId)
+          .then((res) => {
+            // setLatestValueSensorList(...latestValueSensorList, res);
+            latestValueSL.push(res);
+            setLatestValueSensorList(latestValueSL);
+          })
+      })
+    }
 
     return (<>
         <CRow className="station-detail2">
@@ -233,7 +344,7 @@ const StationDetail = () => {
                                       role="tab"
                                       aria-controls="home-tab-pane"
                                       aria-selected={activeKey === index}
-                                      onClick={() => setActiveKey(index)}
+                                      onClick={() => handleChangeSelectingSensor(index, sensor.sensorId)}
                                     >
                                       { sensor.sensorName }
                                     </CNavLink>
@@ -250,7 +361,7 @@ const StationDetail = () => {
                                     <HighchartsReact
                                       highcharts={Highcharts}
                                       constructorType={'stockChart'}
-                                      options={optionss}
+                                      options={optionsss}
                                     />
                                   </CTabPane>
                                 </>
@@ -303,7 +414,7 @@ const StationDetail = () => {
                                       role="tab"
                                       aria-controls="home-tab-pane"
                                       aria-selected={activeKey === index}
-                                      onClick={() => setActiveKey(index)}
+                                      onClick={() => handleChangeSelectingSensor(index, sensor.sensorId)}
                                     >
                                       { sensor.sensorName }
                                     </CNavLink>
@@ -323,7 +434,15 @@ const StationDetail = () => {
                                           <th className="index">Giá trị</th>
                                           <th></th>
                                       </tr>
-                                      <tr>
+                                      {
+                                        selectingMultiDTSValue.map((multiData, index) => {
+                                          return  <tr key={'multi'+index}>
+                                                    <td>{ multiData.resultTime }</td>
+                                                    <td className="index">{ multiData.result}</td>
+                                                  </tr>
+                                        })
+                                      }
+                                      {/* <tr>
                                           <td>06:00 27/12/2023</td>
                                           <td className="index">25</td>
                                       </tr>
@@ -342,7 +461,7 @@ const StationDetail = () => {
                                       <tr>
                                           <td>08:00 27/12/2023</td>
                                           <td className="index">28</td>
-                                      </tr>
+                                      </tr> */}
                                     </table>
                                   </CTabPane>
                                 </>
