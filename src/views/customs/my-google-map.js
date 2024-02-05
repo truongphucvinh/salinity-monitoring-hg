@@ -1,5 +1,5 @@
-import { GoogleMap, LoadScript, Polygon } from "@react-google-maps/api"
-import React from "react"
+import { GoogleMap, LoadScript, Marker, Polygon } from "@react-google-maps/api"
+import React, { useState } from "react"
 
 const CustomGoogleMap = ({
     longtitude, latitude, zoom
@@ -19,17 +19,39 @@ const CustomGoogleMap = ({
         { lat: 41.3951, lng: 2.1834 },
         { lat: 41.3751, lng: 2.1634 }
     ]
+    const [coords, setCoords] = useState([])
+    const showLngLat = (e) => {
+        setCoords((prev) => {
+            return [...prev, { id: 0, lat: e.latLng.lat(), lng: e.latLng.lng() }]
+        })
+    }
+    const destroyMarker = (id) => {
+        const newCoords = coords.filter(coord => coord?.id !== id)
+        console.log();
+        setCoords(newCoords)
+    }
 
     return <LoadScript googleMapsApiKey={apiKey}>
         <GoogleMap
             mapContainerStyle={mapStyles}
             center={defaultCenter}
             zoom={13}
+            onClick={(e) => showLngLat(e)}
         >
-            <Polygon 
-                paths={polygonCoords}
-                options={{ fillColor: "#red", fillOpacity: 1, strokeColor: "#000", strokeOpacity: 3, strokeWeight: 3 }}
-            />
+            {
+                coords && coords.map((coord, index) => {
+                    coord.id = index
+                    return <Marker onClick={() => destroyMarker(index)} key={index} position={{
+                            lat: coord?.lat,
+                            lng: coord?.lng
+                        }} />
+                })
+                    
+            }
+            {/* <Polygon 
+                    paths={coords}
+                    options={{ fillColor: "#red", fillOpacity: 0, strokeColor: "yellow", strokeOpacity: 3, strokeWeight: 3 }}
+                /> */}
         </GoogleMap>
     </LoadScript>
 
