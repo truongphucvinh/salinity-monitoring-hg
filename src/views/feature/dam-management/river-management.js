@@ -16,7 +16,8 @@ import {
     CForm,
     CToaster,
     CSpinner,
-    CFormTextarea
+    CFormTextarea,
+    CInputGroup
   } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -24,7 +25,8 @@ import {
     cilTrash,
     cilMagnifyingGlass,
     cilReload,
-    cilPlus
+    cilPlus,
+    cilLocationPin
   } from '@coreui/icons'
 import { setAuthApiHeader } from "src/services/global-axios"
 import CustomPagination from "src/views/customs/my-pagination"
@@ -33,6 +35,7 @@ import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import { createRiver,  deleteRiver,  getAllRivers,  getRiverById,  updateRiver } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
+import { splitCoordinates } from "src/tools"
 
 const RiverManagement = () => {
 
@@ -132,6 +135,9 @@ const RiverManagement = () => {
                                     <CTableDataCell>{river?.riverName}</CTableDataCell>
                                     <CTableDataCell>{river?.riverLocation}</CTableDataCell>
                                     <CTableDataCell>
+                                        <a href={`https://www.google.com/maps/?q=${river?.riverLatitude},${river?.riverLongitude}`} rel="noopener noreferrer" target="_blank">
+                                            <CIcon icon={cilLocationPin} className="text-danger mx-1" role="button"/>
+                                        </a>
                                         <CIcon icon={cilPencil} onClick={() => openUpdateModal(river?.riverId)} className="text-success mx-1" role="button"/>
                                         <CIcon icon={cilTrash} onClick={() => openDeleteModal(river?.riverId)}  className="text-danger" role="button"/>
                                     </CTableDataCell>
@@ -151,10 +157,12 @@ const RiverManagement = () => {
     // Adding Modal
     const addData = {
         addRiverName: "",
-        addRiverLocation: ""
+        addRiverLocation: "",
+        addRiverLatitude: "",
+        addRiverLongitude: ""
     }
     const [addState, setAddState] = useState(addData)
-    const { addRiverName, addRiverLocation } = addState
+    const { addRiverName, addRiverLocation, addRiverLatitude, addRiverLongitude } = addState
     const [addValidated, setAddValidated] = useState(false)
     const handleSetAddRiverName = (value) => {
         setAddState(prev => {
@@ -164,6 +172,22 @@ const RiverManagement = () => {
     const handleSetAddRiverLocation = (value) => {
         setAddState(prev => {
             return { ...prev, addRiverLocation: value }
+        })
+    }
+    const handleSetAddRiverLatitude = (value) => {
+        setAddState(prev => {
+            return { ...prev, addRiverLatitude: value }
+        })
+    }
+    const handleSetAddRiverLongitude = (value) => {
+        setAddState(prev => {
+            return { ...prev, addRiverLongitude: value }
+        })
+    }
+    const handleSetAddLatLngAutomatically = (value) => {
+        const coordinates = splitCoordinates(value)
+        setAddState(prev => {
+            return { ...prev, addRiverLatitude:  coordinates?.lat, addRiverLongitude: coordinates?.lng }
         })
     }
 
@@ -176,7 +200,9 @@ const RiverManagement = () => {
         } else {
             const river = {
                 riverName: addRiverName.trim(),
-                riverLocation: addRiverLocation.trim()
+                riverLocation: addRiverLocation.trim(),
+                riverLatitude: addRiverLatitude,
+                riverLongitude: addRiverLongitude
             }
             createRiver(river)
             .then(res => {
@@ -221,6 +247,7 @@ const RiverManagement = () => {
                                 aria-describedby="exampleFormControlInputHelpInline"
                                 required
                             />
+                            
                         </CCol>
                     </CRow>
                     <CRow>
@@ -241,6 +268,52 @@ const RiverManagement = () => {
                         </CCol>
                     </CRow>
                     <CRow>
+                        <CCol xs={12} lg={12}>
+                            <CInputGroup className="mt-4">
+                                <CFormInput 
+                                    type="text"
+                                    placeholder="Tọa độ"
+                                    feedbackInvalid="Không bỏ trống và phải là một cặp số gồm vĩ độ và kinh độ"
+                                    onChange={(e) => handleSetAddLatLngAutomatically(e.target.value)}
+                                    aria-describedby="exampleFormControlInputHelpInline"
+                                    required
+                                    id="button-addon2"
+                                />
+                                <CButton type="button" className="text-white" color="primary" id="button-addon2">
+                                    <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">
+                                        <CIcon icon={cilLocationPin} style={{color: "white", width: "18px",  height: "18px"}}/>
+                                    </a>
+                                </CButton>
+                            </CInputGroup>
+                        </CCol>
+                    </CRow>
+                    <CRow>
+                        <CCol xs={12} lg={6}>
+                            <CFormInput
+                                className="mt-4"
+                                type="number"
+                                placeholder="Vĩ độ"
+                                readOnly
+                                feedbackInvalid="Không bỏ trống và phải là số lớn hơn 0"
+                                value={addRiverLatitude}
+                                aria-describedby="exampleFormControlInputHelpInline"
+                                required
+                            />
+                        </CCol>
+                        <CCol xs={12} lg={6}>
+                            <CFormInput
+                                className="mt-4"
+                                type="number"
+                                placeholder="Kinh độ"
+                                readOnly
+                                feedbackInvalid="Không bỏ trống và phải là số lớn hơn 0"
+                                value={addRiverLongitude}
+                                aria-describedby="exampleFormControlInputHelpInline"
+                                required
+                            />
+                        </CCol>
+                    </CRow>
+                    <CRow>
                         <CCol lg={12} className="d-flex justify-content-end">
                             <CButton type="submit" className="mt-4" color="primary">Hoàn tất</CButton>
                         </CCol>
@@ -255,10 +328,12 @@ const RiverManagement = () => {
     const updateData = {
         updateRiverId: '',
         updateRiverName: '',
-        updateRiverLocation: ''
+        updateRiverLocation: '',
+        updateRiverLatitude: '',
+        updateRiverLongitude: ''
     }
     const [updateState, setUpdateState] = useState(updateData)
-    const { updateRiverId, updateRiverName, updateRiverLocation } = updateState
+    const { updateRiverId, updateRiverName, updateRiverLocation, updateRiverLatitude, updateRiverLongitude } = updateState
     const [updateValidated, setUpdateValidated] = useState(false)
     const geRiverDataById = (riverId) => {
         if (riverId) {
@@ -269,7 +344,9 @@ const RiverManagement = () => {
                     const updateRiverFetchData = {
                         updateRiverId: river?.riverId,
                         updateRiverName: river?.riverName,
-                        updateRiverLocation: river?.riverLocation
+                        updateRiverLocation: river?.riverLocation,
+                        updateRiverLatitude: river?.riverLatitude,
+                        updateRiverLongitude: river?.riverLongitude
                     }
                     setUpdateState(updateRiverFetchData)
                 }else {
@@ -309,6 +386,12 @@ const RiverManagement = () => {
             return { ...prev, updateRiverLocation: value }
         })
     }
+    const handleSetUpdateLatLngAutomatically = (value) => {
+        const coordinates = splitCoordinates(value)
+        setUpdateState(prev => {
+            return { ...prev, updateRiverLatitude:  coordinates?.lat, updateRiverLongitude: coordinates?.lng }
+        })
+    }
     const updateARiver = (e) => {
         // validation
         const form = e.currentTarget
@@ -319,7 +402,9 @@ const RiverManagement = () => {
             const river = {
                 riverId: updateRiverId,
                 riverName: updateRiverName,
-                riverLocation: updateRiverLocation
+                riverLocation: updateRiverLocation,
+                riverLatitude: updateRiverLatitude,
+                riverLongitude: updateRiverLongitude
             }
             updateRiver(river)
             .then(res => {
@@ -377,6 +462,50 @@ const RiverManagement = () => {
                                     rows={3}
                                     aria-describedby="exampleFormControlInputHelpInline"
                                 ></CFormTextarea>
+                            </CCol>
+                        </CRow>
+                        <CRow>
+                            <CCol xs={12} lg={12}>
+                                <CInputGroup className="mt-4">
+                                    <CFormInput 
+                                        type="text"
+                                        placeholder="Tọa độ"
+                                        feedbackInvalid="Không bỏ trống và phải là một cặp số gồm vĩ độ và kinh độ"
+                                        onChange={(e) => handleSetUpdateLatLngAutomatically(e.target.value)}
+                                        aria-describedby="exampleFormControlInputHelpInline"
+                                        required
+                                        id="button-addon2"
+                                    />
+                                    <CButton type="button" className="text-white" color="primary" id="button-addon2">
+                                        <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">
+                                            <CIcon icon={cilLocationPin} style={{color: "white", width: "18px",  height: "18px"}}/>
+                                        </a>
+                                    </CButton>
+                                </CInputGroup>
+                            </CCol>
+                        </CRow>
+                        <CRow>
+                            <CCol xs={12} lg={6}>
+                                <CFormInput
+                                    className="mt-4"
+                                    type="number"
+                                    placeholder="Vĩ độ"
+                                    readOnly
+                                    feedbackInvalid="Là một số"
+                                    value={updateRiverLatitude}
+                                    aria-describedby="exampleFormControlInputHelpInline"
+                                />
+                            </CCol>
+                            <CCol xs={12} lg={6}>
+                                <CFormInput
+                                    className="mt-4"
+                                    type="number"
+                                    placeholder="Kinh độ"
+                                    readOnly
+                                    feedbackInvalid="Là một số"
+                                    value={updateRiverLongitude}
+                                    aria-describedby="exampleFormControlInputHelpInline"
+                                />
                             </CCol>
                         </CRow>
                         <CRow>

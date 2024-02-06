@@ -51,3 +51,26 @@ export const checkItemCode = (code, modules) => {
     });
     return flag
   }
+
+export const splitCoordinates = (val) => {
+    const coordinates = val.split(',')
+    const splitCoordinates = {
+        lat: coordinates[0]?.trim(),
+        lng: coordinates[1]?.trim()
+    }
+    return splitCoordinates
+}
+
+export const addZeroToDate = (day, month, year) => {
+    let strDate = ""
+    while (year.length < 4) {
+        year = "0"+year
+    }
+    if (month.length < 2) {
+        month = "0"+month
+    }
+    if (day.length < 2) {
+        day = "0"+day
+    }
+    return `${year}-${month}-${day}`
+}

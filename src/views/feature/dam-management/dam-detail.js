@@ -15,9 +15,9 @@ import { getAllDamSchedules, getDamById } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
 import CIcon from "@coreui/icons-react"
 import DamScheduleManagement from "./dam-schedule-management"
-import { damStatusConverter } from "src/tools"
-import CustomGoogleMap from "src/views/customs/my-google-map"
+import { addZeroToDate, damStatusConverter, splitCoordinates } from "src/tools"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
+import CustomEmbeddedMap from "src/views/customs/my-embedded-map"
 
 const DamDetail = () => {
     // Got the id of URL
@@ -99,7 +99,11 @@ const DamDetail = () => {
                                                 </CTableRow>  
                                                 <CTableRow>
                                                     <CTableDataCell className="bg-body-tertiary fw-bold" style={{'width' : '20%'}}>Ngày xây dựng</CTableDataCell>
-                                                    <CTableDataCell>{`${dam?.damConstructedAt[0]}-${dam?.damConstructedAt[1]}-${dam?.damConstructedAt[2]}`}</CTableDataCell>
+                                                    <CTableDataCell>
+                                                        {
+                                                            addZeroToDate(dam?.damConstructedAt[2].toString(), dam?.damConstructedAt[1].toString(), dam?.damConstructedAt[0].toString())
+                                                        }
+                                                    </CTableDataCell>
                                                 </CTableRow>     
                                                 <CTableRow>
                                                     <CTableDataCell className="bg-body-tertiary fw-bold" style={{'width' : '20%'}}>Kích thước</CTableDataCell>
@@ -130,15 +134,10 @@ const DamDetail = () => {
                             <CRow>
                                 <CCol lg={12}>
                                     <h4 className="text-center my-4 fw-bold" style={{'color': 'black'}}>Vị trí trên bản đồ</h4>
-                                    {/* <CustomMap 
-                                        longtitude={dam?.damLongtitude} 
-                                        latitude={dam?.damLatitude} 
-                                        zoom={15}    
-                                    /> */}
-                                    <CustomGoogleMap 
-                                        longtitude={dam?.damLongtitude} 
-                                        latitude={dam?.damLatitude} 
-                                        zoom={15}
+                                    <CustomEmbeddedMap 
+                                        isLoaded={isLoaded}
+                                        lat={dam?.damLatitude}
+                                        lng={dam?.damLongitude}
                                     />
                                 </CCol>
                             </CRow>
