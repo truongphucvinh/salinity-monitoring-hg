@@ -84,3 +84,16 @@ export const addZeroToDate = (day, month, year) => {
     }
     return `${year}-${month}-${day}`
 }
+
+    // To prevent update current user's role
+export const checkCurrentRoleOfUser = (roleId) => {
+    const user = getLoggedUserInformation()
+    const currentRoleId = user?.permission?.role
+    return roleId === currentRoleId
+}
+
+export const checkCurrentUser = (userId) => {
+    const user = getLoggedUserInformation()
+    const currentUserId = user?._id
+    return currentUserId === userId
+}

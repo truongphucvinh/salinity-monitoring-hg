@@ -38,7 +38,7 @@ import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import CustomSpinner from "src/views/customs/my-spinner"
 import { createPermission, createRole, deletePermission, deleteRole, getAllModules, getAllModulesOfPermission, getAllPermissions, getPermissionById, updatePermission, updateRole } from "src/services/authentication-services"
-import { getLoggedUserInformation } from "src/tools"
+import { checkCurrentRoleOfUser, getLoggedUserInformation } from "src/tools"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 
@@ -199,14 +199,16 @@ const RoleManagement = () => {
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
                                     <CTableDataCell>{role?.name}</CTableDataCell>
                                     <CTableDataCell>{role?.description}</CTableDataCell>
-                                    <CTableDataCell>
-                                        {
-                                            haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(role?._id, role?.permission_id)} className="text-success mx-1" role="button"/>
-                                        }
-                                        {
-                                            haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(role?._id, role?.permission_id)}  className="text-danger" role="button"/>
-                                        }
-                                    </CTableDataCell>
+                                    {
+                                        checkCurrentRoleOfUser(role?._id) ? <CTableDataCell>Vai trò hiện tại</CTableDataCell> : <CTableDataCell>
+                                            {
+                                                haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(role?._id, role?.permission_id)} className="text-success mx-1" role="button"/>
+                                            }
+                                            {
+                                                haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(role?._id, role?.permission_id)}  className="text-danger" role="button"/>
+                                            }
+                                        </CTableDataCell>
+                                    }
                                 </CTableRow>    
                             )
                         }) : <CTableRow>

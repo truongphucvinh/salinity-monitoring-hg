@@ -35,6 +35,7 @@ import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
+import { checkCurrentRoleOfUser, checkCurrentUser } from "src/tools"
 
 const UserManagement = () => {
 
@@ -634,24 +635,26 @@ const UserManagement = () => {
                                 </CFormSelect>
                             </CCol>
                         </CRow> */}
-                        <CRow>
-                            <CCol lg={12}>
-                                <CFormSelect 
-                                    aria-label="Default select example" 
-                                    className="mt-4"
-                                    onChange={(e) => handleSetUpdateRoleId(e.target.value)} 
-                                    value={updateRoleId}
-                                    feedbackInvalid="Chưa chọn vai trò!"
-                                >
-                                    <option selected="" value="" >Vai trò</option>
-                                    {
-                                        listRoles && Array.isArray(listRoles) && listRoles.map((role) => {
-                                            return  <option key={role?._id} value={role?._id}>{role?.name}</option>
-                                        })
-                                    }
-                                </CFormSelect>
-                            </CCol>
-                        </CRow>
+                        {
+                            !checkCurrentUser(updateId) && <CRow>
+                                <CCol lg={12}>
+                                    <CFormSelect 
+                                        aria-label="Default select example" 
+                                        className="mt-4"
+                                        onChange={(e) => handleSetUpdateRoleId(e.target.value)} 
+                                        value={updateRoleId}
+                                        feedbackInvalid="Chưa chọn vai trò!"
+                                    >
+                                        <option selected="" value="" >Vai trò</option>
+                                        {
+                                            listRoles && Array.isArray(listRoles) && listRoles.map((role) => {
+                                                return  <option key={role?._id} value={role?._id}>{role?.name}</option>
+                                            })
+                                        }
+                                    </CFormSelect>
+                                </CCol>
+                            </CRow>
+                        }
                         <CRow>
                             <CCol lg={12} className="d-flex justify-content-end">
                                 <CButton type="submit" className="mt-4" color="primary">Hoàn tất</CButton>
