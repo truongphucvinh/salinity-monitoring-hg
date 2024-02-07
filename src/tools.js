@@ -42,15 +42,25 @@ export const getLoggedUserInformation = () => {
     return information
 }
 
+
+
 export const checkItemCode = (code, modules) => {
+  let flag = false
+  modules?.forEach(element => {
+    if (element?.URL === code) {
+      flag = true
+    }
+  });
+  return flag
+}
+
+export const authorizationChecker = (code, modules) => {
     let flag = false
-    modules?.forEach(element => {
-      if (element?.URL === code) {
-        flag = true
-      }
-    });
+    if (modules) {
+        flag = checkItemCode(code, modules)
+    }
     return flag
-  }
+}
 
 export const splitCoordinates = (val) => {
     const coordinates = val.split(',')

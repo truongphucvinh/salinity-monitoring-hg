@@ -41,9 +41,16 @@ import { useNavigate } from "react-router-dom"
 import { addZeroToDate, damStatusConverter, splitCoordinates } from "src/tools"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import { red } from "@mui/material/colors"
+import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 
 const DamManagement = () => {
-
+    const defaultAuthorizationCode = process.env.HG_MODULE_DAM_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management"
+    const defaultModuleAddFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management_add_dam"
+    const defaultModuleUpdateFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management_update_dam"
+    const defaultModuleDeleteFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management_delete_dam"
+    const [haveAdding, setHaveAdding] = useState(false)
+    const [haveUpdating, setHaveUpdating] = useState(false)
+    const [haveDeleting, setHaveDeleting] = useState(false)
     // Dam Type Management
     const [listDams, setListDams] = useState([])
     const [listDamTypes, setListDamTypes] = useState([])
@@ -189,8 +196,8 @@ const DamManagement = () => {
                                     <CTableDataCell><CIcon icon={damStatusConverter(dam)?.icon} className="me-2"/>{damStatusConverter(dam)?.status}</CTableDataCell>
                                     <CTableDataCell>
                                         <CIcon icon={cilTouchApp} onClick={() => openDamDetail(dam?.damId)} className="text-primary mx-1" role="button"/>
-                                        <CIcon icon={cilPencil} onClick={() => openUpdateModal(dam?.damId)} className="text-success mx-1" role="button"/>
-                                        <CIcon icon={cilTrash} onClick={() => openDeleteModal(dam?.damId)}  className="text-danger" role="button"/>
+                                        {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(dam?.damId)} className="text-success mx-1" role="button"/>}
+                                        {haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(dam?.damId)}  className="text-danger" role="button"/>}
                                     </CTableDataCell>
                                 </CTableRow>    
                             )
@@ -842,11 +849,13 @@ const DamManagement = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addVisible, updateVisible])
 
-    const defaultAuthorizationCode = process.env.HG_MODULE_DAM_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management"
     
     return (
         <CRow>
         <CustomAuthorizationChecker isRedirect={true} code={defaultAuthorizationCode} />
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleAddFeature} setExternalState={setHaveAdding}/>
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateFeature} setExternalState={setHaveUpdating}/>
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleDeleteFeature} setExternalState={setHaveDeleting}/>
         <CCol xs>
           <CCard className="mb-4">
             <CToaster ref={toaster} push={toast} placement="top-end" />
@@ -900,7 +909,7 @@ const DamManagement = () => {
               <br />
               <CRow>
                 <CCol xs={12}>
-                    <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>
+                    {haveAdding && <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>}
                 </CCol>
               </CRow>
               <br />

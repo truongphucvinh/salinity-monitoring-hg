@@ -38,16 +38,25 @@ import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import CustomSpinner from "src/views/customs/my-spinner"
 import { createPermission, createRole, deletePermission, deleteRole, getAllModules, getAllModulesOfPermission, getAllPermissions, getPermissionById, updatePermission, updateRole } from "src/services/authentication-services"
+import { getLoggedUserInformation } from "src/tools"
+import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
+import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 
 const RoleManagement = () => {
 
     // Role Management
     const defaultDomainId = '65b0cbba526ef32c8be05f1d' || process.env.HG_DOMAIN_ID
     const defaultModuleCode = 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ' || process.env.HG_MODULE_CODE
-    const defaultModuleAddFeature = 'add' || process.env.HG_MODULE_ADD_FEATURE
+    const defaultAuthorizationCode = process.env.HG_MODULE_ROLE_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_role_management"
     const defaultModuleViewFeature = 'view' || process.env.HG_MODULE_VIEW_FEATURE
-    const defaultModuleUpdateFeature = 'update' || process.env.HG_MODULE_UPDATE_FEATURE
-    const defaultModuleDeleteFeature = 'delete' || process.env.HG_MODULE_DELETE_FEATURE
+    // Checking feature's module
+    const defaultModuleAddFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_role_management_add_role"
+    const defaultModuleUpdateFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_role_management_update_role"
+    const defaultModuleDeleteFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_role_management_delete_role"
+    const [haveAdding, setHaveAdding] = useState(false)
+    const [haveUpdating, setHaveUpdating] = useState(false)
+    const [haveDeleting, setHaveDeleting] = useState(false) 
+
     const [listRole, setListRoles] = useState([])
     const [isLoadedRoles, setIsLoadedRoles] = useState(false)
     const [listModules, setListModules] = useState([])
@@ -191,8 +200,12 @@ const RoleManagement = () => {
                                     <CTableDataCell>{role?.name}</CTableDataCell>
                                     <CTableDataCell>{role?.description}</CTableDataCell>
                                     <CTableDataCell>
-                                        <CIcon icon={cilPencil} onClick={() => openUpdateModal(role?._id, role?.permission_id)} className="text-success mx-1" role="button"/>
-                                        <CIcon icon={cilTrash} onClick={() => openDeleteModal(role?._id, role?.permission_id)}  className="text-danger" role="button"/>
+                                        {
+                                            haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(role?._id, role?.permission_id)} className="text-success mx-1" role="button"/>
+                                        }
+                                        {
+                                            haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(role?._id, role?.permission_id)}  className="text-danger" role="button"/>
+                                        }
                                     </CTableDataCell>
                                 </CTableRow>    
                             )
@@ -252,7 +265,6 @@ const RoleManagement = () => {
         // Based on get modules APIs
         let allModules = listModules?.length !== 0 && listModules?.map(module => {
             const childrens = module?.children?.length !== 0 && module?.children?.filter(childModule => childModule?.URL.includes(defaultModuleCode) && childModule?.URL.includes(defaultModuleViewFeature))
-            console.log(childrens);
             return {
                 parent: module?._id,
                 view: childrens?.length !== 0 && childrens[0]?._id
@@ -737,9 +749,14 @@ const RoleManagement = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addVisible, updateVisible])
 
+ 
     return (
         <CRow>
         <CCol xs>
+        <CustomAuthorizationChecker isRedirect={true} code={defaultAuthorizationCode} />
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleAddFeature} setExternalState={setHaveAdding}/>
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateFeature} setExternalState={setHaveUpdating}/>
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleDeleteFeature} setExternalState={setHaveDeleting}/>
           <CCard className="mb-4">
             <CToaster ref={toaster} push={toast} placement="top-end" />
             <CCardHeader>Danh sách vai trò</CCardHeader>
@@ -780,7 +797,9 @@ const RoleManagement = () => {
               <br />
               <CRow>
                 <CCol xs={12}>
-                    <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>
+                    {
+                        haveAdding && <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>
+                    }
                 </CCol>
               </CRow>
               <br />

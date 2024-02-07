@@ -33,10 +33,18 @@ import { createDamSchedule,  defaultDamStatusId, deleteDamSchedule,  getAllDamSc
 import CustomSpinner from "src/views/customs/my-spinner"
 import CustomDateTimePickerV2 from "src/views/customs/my-datetimepicker/my-datetimepicker-time"
 import { formatDate } from "src/tools"
+import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 
 const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
     
-
+    const defaultAuthorizationCode = process.env.HG_MODULE_DAM_SCHEDULE_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_schedule_management"
+    // Checking feature's module
+    const defaultModuleAddFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_schedule_management_add_dam_schedule"
+    const defaultModuleUpdateFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=dam_schedule_management_update_dam_schedule"
+    const defaultModuleDeleteFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=dam_schedule_management_delete_dam_schedule"
+    const [haveAdding, setHaveAdding] = useState(false)
+    const [haveUpdating, setHaveUpdating] = useState(false)
+    const [haveDeleting, setHaveDeleting] = useState(false)
     // Dam Schedule Management
     const [listDamSchedules, setListDamSchedules] = useState([])
     const [isLoadedDamSchedules, setIsLoadedDamSchedules] = useState(false)
@@ -148,14 +156,14 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
                                     <CTableDataCell>{`${damSchedule?.damScheduleBeginAt[0]}-${damSchedule?.damScheduleBeginAt[1]}-${damSchedule?.damScheduleBeginAt[2]} lúc ${damSchedule?.damScheduleBeginAt[3]}:${damSchedule?.damScheduleBeginAt[4]}:${damSchedule?.damScheduleBeginAt[5] ? damSchedule?.damScheduleBeginAt[5] : '00'}`}</CTableDataCell>
                                     <CTableDataCell>{`${damSchedule?.damScheduleEndAt[0]}-${damSchedule?.damScheduleEndAt[1]}-${damSchedule?.damScheduleEndAt[2]} lúc ${damSchedule?.damScheduleEndAt[3]}:${damSchedule?.damScheduleEndAt[4]}:${damSchedule?.damScheduleEndAt[5] ? damSchedule?.damScheduleEndAt[5] : '00'}`}</CTableDataCell>
                                     <CTableDataCell>
-                                        <CIcon icon={cilPencil} 
+                                        {haveUpdating && <CIcon icon={cilPencil} 
                                             onClick={() => openUpdateModal(damSchedule?.damScheduleId)} 
                                             className="text-success mx-1" role="button"
-                                        />
-                                        <CIcon icon={cilTrash} 
+                                        />}
+                                        {haveDeleting && <CIcon icon={cilTrash} 
                                             onClick={() => openDeleteModal(damSchedule?.damScheduleId)}  
                                             className="text-danger" role="button"
-                                        />
+                                        />}
                                     </CTableDataCell>
                                 </CTableRow>    
                             )
@@ -517,6 +525,9 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
     return (
         <CCard className="mb-4">
         <CToaster ref={toaster} push={toast} placement="top-end" />
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleAddFeature} setExternalState={setHaveAdding}/>
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateFeature} setExternalState={setHaveUpdating}/>
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleDeleteFeature} setExternalState={setHaveDeleting}/>
         <CCardBody>
             <CustomModal visible={addVisible} title={'Thêm lịch mở đập'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
             <CustomModal visible={updateVisible} title={'Cập nhật lịch mở đập'} body={updateForm(updateDamScheduleBeginAt)} setVisible={(value) => setUpdateVisible(value)}/>
@@ -563,7 +574,7 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
           <br />
           <CRow>
             <CCol xs={12}>
-                <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>
+                {haveAdding && <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>}
             </CCol>
           </CRow>
           <br />
