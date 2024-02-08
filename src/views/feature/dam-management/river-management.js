@@ -36,9 +36,20 @@ import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import { createRiver,  deleteRiver,  getAllRivers,  getRiverById,  updateRiver } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
 import { splitCoordinates } from "src/tools"
+import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
+import CustomAuthChecker from "src/views/customs/my-authchecker"
+import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 
 const RiverManagement = () => {
 
+    const defaultAuthorizationCode = process.env.HG_MODULE_RIVER_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_river_management"
+    // Checking feature's module
+    const defaultModuleAddFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_river_management_add_river"
+    const defaultModuleUpdateFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_river_management_update_river"
+    const defaultModuleDeleteFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_river_management_delete_river"
+    const [haveAdding, setHaveAdding] = useState(false)
+    const [haveUpdating, setHaveUpdating] = useState(false)
+    const [haveDeleting, setHaveDeleting] = useState(false)
     // Dam Type Management
     const [listRivers, setListRivers] = useState([])
     const [isLoadedRivers, setIsLoadedRivers] = useState(false)
@@ -118,14 +129,14 @@ const RiverManagement = () => {
                 {
                     !isLoaded ? <CustomSpinner /> :
                     <CTable bordered align="middle" className="mb-0 border" hover responsive>
-                <CTableHead className="text-nowrap">
-                  <CTableRow>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Tên sông, kênh, rạch</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '50%'}}>Mô tả</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Thao tác</CTableHeaderCell>
-                  </CTableRow>
-                </CTableHead>
+                    <CTableHead className="text-nowrap">
+                    <CTableRow>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Tên sông, kênh, rạch</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '50%'}}>Mô tả</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Thao tác</CTableHeaderCell>
+                    </CTableRow>
+                    </CTableHead>
                 <CTableBody>
                     {
                         filteredRivers?.length !== 0 ? filteredRivers.map((river, index) => {
@@ -138,8 +149,8 @@ const RiverManagement = () => {
                                         <a href={`https://www.google.com/maps/?q=${river?.riverLatitude},${river?.riverLongitude}`} rel="noopener noreferrer" target="_blank">
                                             <CIcon icon={cilLocationPin} className="text-danger mx-1" role="button"/>
                                         </a>
-                                        <CIcon icon={cilPencil} onClick={() => openUpdateModal(river?.riverId)} className="text-success mx-1" role="button"/>
-                                        <CIcon icon={cilTrash} onClick={() => openDeleteModal(river?.riverId)}  className="text-danger" role="button"/>
+                                        {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(river?.riverId)} className="text-success mx-1" role="button"/>}
+                                        {haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(river?.riverId)}  className="text-danger" role="button"/>}
                                     </CTableDataCell>
                                 </CTableRow>    
                             )
@@ -580,6 +591,10 @@ const RiverManagement = () => {
         <CRow>
         <CCol xs>
           <CCard className="mb-4">
+            <CustomAuthorizationChecker isRedirect={true} code={defaultAuthorizationCode}/>
+            <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleAddFeature} setExternalState={setHaveAdding}/>
+            <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateFeature} setExternalState={setHaveUpdating}/>
+            <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleDeleteFeature} setExternalState={setHaveDeleting}/>
             <CToaster ref={toaster} push={toast} placement="top-end" />
             <CCardHeader>Danh sách sông, kênh, rạch</CCardHeader>
             <CCardBody>
@@ -619,7 +634,7 @@ const RiverManagement = () => {
               <br />
               <CRow>
                 <CCol xs={12}>
-                    <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>
+                    {haveAdding && <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>}
                 </CCol>
               </CRow>
               <br />

@@ -15,7 +15,8 @@ import {
     CForm,
     CToaster,
     CSpinner,
-    CFormTextarea
+    CFormTextarea,
+    CFormSelect
   } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -33,10 +34,18 @@ import { createDamSchedule,  defaultDamStatusId, deleteDamSchedule,  getAllDamSc
 import CustomSpinner from "src/views/customs/my-spinner"
 import CustomDateTimePickerV2 from "src/views/customs/my-datetimepicker/my-datetimepicker-time"
 import { formatDate } from "src/tools"
+import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 
 const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
     
-
+    const defaultAuthorizationCode = process.env.HG_MODULE_DAM_SCHEDULE_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_schedule_management"
+    // Checking feature's module
+    const defaultModuleAddFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_schedule_management_add_dam_schedule"
+    const defaultModuleUpdateFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management_update_dam_schedule"
+    const defaultModuleDeleteFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management_delete_dam_schedule"
+    const [haveAdding, setHaveAdding] = useState(false)
+    const [haveUpdating, setHaveUpdating] = useState(false)
+    const [haveDeleting, setHaveDeleting] = useState(false)
     // Dam Schedule Management
     const [listDamSchedules, setListDamSchedules] = useState([])
     const [isLoadedDamSchedules, setIsLoadedDamSchedules] = useState(false)
@@ -52,10 +61,12 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
     // Call inital APIs
     const rebaseAllData = () => {
         if (damInstance) {
+            console.log(damInstance);
             getAllDamSchedules(damInstance?.damId)
             .then(res => {
                 // Install filter users here
                 const damSchedules = res?.data
+                console.log(damSchedules);
                 setListDamSchedules(damSchedules)
                 setFilteredDamSchedules(damSchedules)
             })
@@ -73,10 +84,11 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
     const initSearch = {
         damScheduleDay: "",
         damScheduleMonth: "",
-        damScheduleYear: ""
+        damScheduleYear: "",
+        damScheduleIsLock: "all"
     }
     const [searchState, setSearchState] = useState(initSearch)
-    const {damScheduleDay,damScheduleMonth, damScheduleYear} = searchState
+    const {damScheduleDay,damScheduleMonth, damScheduleYear, damScheduleIsLock} = searchState
     const handleSetDamScheduleDay = (value) => {
         setSearchState(prev => {
             return {...prev, damScheduleDay: value}
@@ -92,8 +104,13 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
             return {...prev, damScheduleYear: value}
         })
     }
+    const handleSetDamScheduleIsLock = (value) => {
+        setSearchState(prev => {
+            return { ...prev, damScheduleIsLock: value }
+        })
+    }
     const onFilter = () => {
-        if (damScheduleDay || damScheduleMonth || damScheduleYear) {
+        if (damScheduleDay || damScheduleMonth || damScheduleYear || damScheduleIsLock) {
             setFilteredDamSchedules(listDamSchedules)
             if (damScheduleYear) {
                 setFilteredDamSchedules(prev => {
@@ -108,6 +125,15 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
             if (damScheduleDay) {
                 setFilteredDamSchedules(prev => {
                     return prev.filter(damSchedule => damSchedule?.damScheduleBeginAt[2] === parseFloat(damScheduleDay) || damSchedule?.damScheduleEndAt[2] === parseFloat(damScheduleDay))
+                })
+            }
+            if (damScheduleIsLock === "lock") {
+                setFilteredDamSchedules(prev => {
+                    return prev.filter(damSchedule => damSchedule?.damScheduleIsLock === true)
+                })
+            }else if (damScheduleIsLock === "unlock") {
+                setFilteredDamSchedules(prev => {
+                    return prev.filter(damSchedule => damSchedule?.damScheduleIsLock === false)
                 })
             }
         }else {
@@ -147,16 +173,21 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
                                     <CTableDataCell>{damSchedule?.damScheduleDescription}</CTableDataCell>
                                     <CTableDataCell>{`${damSchedule?.damScheduleBeginAt[0]}-${damSchedule?.damScheduleBeginAt[1]}-${damSchedule?.damScheduleBeginAt[2]} lúc ${damSchedule?.damScheduleBeginAt[3]}:${damSchedule?.damScheduleBeginAt[4]}:${damSchedule?.damScheduleBeginAt[5] ? damSchedule?.damScheduleBeginAt[5] : '00'}`}</CTableDataCell>
                                     <CTableDataCell>{`${damSchedule?.damScheduleEndAt[0]}-${damSchedule?.damScheduleEndAt[1]}-${damSchedule?.damScheduleEndAt[2]} lúc ${damSchedule?.damScheduleEndAt[3]}:${damSchedule?.damScheduleEndAt[4]}:${damSchedule?.damScheduleEndAt[5] ? damSchedule?.damScheduleEndAt[5] : '00'}`}</CTableDataCell>
-                                    <CTableDataCell>
-                                        <CIcon icon={cilPencil} 
-                                            onClick={() => openUpdateModal(damSchedule?.damScheduleId)} 
-                                            className="text-success mx-1" role="button"
-                                        />
-                                        <CIcon icon={cilTrash} 
-                                            onClick={() => openDeleteModal(damSchedule?.damScheduleId)}  
-                                            className="text-danger" role="button"
-                                        />
-                                    </CTableDataCell>
+                                    {
+                                        damSchedule?.damScheduleIsLock ? <CTableDataCell>
+                                            Đã vô hiệu    
+                                        </CTableDataCell> :  <CTableDataCell>
+                                            {haveUpdating && <CIcon icon={cilPencil} 
+                                                onClick={() => openUpdateModal(damSchedule?.damScheduleId)} 
+                                                className="text-success mx-1" role="button"
+                                            />}
+                                            {haveDeleting && <CIcon icon={cilTrash} 
+                                                onClick={() => openDeleteModal(damSchedule?.damScheduleId)}  
+                                                className="text-danger" role="button"
+                                            />}
+                                        </CTableDataCell>
+                                    }
+
                                 </CTableRow>    
                             )
                         }) : <CTableRow>
@@ -175,8 +206,7 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
         addDamScheduleBeginAt: "",
         addDamScheduleEndAt: "",
         addDamScheduleDescription: "",
-        addDamScheduleDamId: damInstance?.damId,
-        addDamScheduleDamStatusId: defaultDamStatusId
+        addDamScheduleDamId: damInstance?.damId
     }
     const [addState, setAddState] = useState(addData)
     const {
@@ -184,7 +214,6 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
         addDamScheduleEndAt,
         addDamScheduleDescription,
         addDamScheduleDamId,
-        addDamScheduleDamStatusId
     } = addState
     const [addValidated, setAddValidated] = useState(false)
     const handleSetAddDamScheduleBeginAt = (value) => {
@@ -214,8 +243,8 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
                 damScheduleBeginAt: addDamScheduleBeginAt,
                 damScheduleEndAt: addDamScheduleEndAt,
                 damScheduleDescription: addDamScheduleDescription?.trim(),
-                damScheduleDamId: addDamScheduleDamId,
-                damScheduleDamStatusId: addDamScheduleDamStatusId 
+                damScheduleIsLock: false,
+                damScheduleDamId: addDamScheduleDamId
             }
             createDamSchedule(damSchedule)
             .then(res => {
@@ -299,8 +328,8 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
         updateDamScheduleBeginAt: "",
         updateDamScheduleEndAt: "",
         updateDamScheduleDescription: "",
-        updateDamScheduleDamId: damInstance?.damId,
-        updateDamScheduleDamStatusId: defaultDamStatusId
+        updateDamScheduleIsLock: false,
+        updateDamScheduleDamId: damInstance?.damId
     }
     const [updateState, setUpdateState] = useState(updateData)
     const { 
@@ -309,7 +338,7 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
         updateDamScheduleEndAt,
         updateDamScheduleDescription,
         updateDamScheduleDamId,
-        updateDamScheduleDamStatusId
+        updateDamScheduleIsLock
     } = updateState
     const [updateValidated, setUpdateValidated] = useState(false)
     const getDamScheduleDataById = (damScheduleId) => {
@@ -324,7 +353,7 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
                         updateDamScheduleEndAt: formatDate(damSchedule?.damScheduleEndAt),
                         updateDamScheduleDescription: damSchedule?.damScheduleDescription,
                         updateDamScheduleDamId: damInstance?.damId,
-                        updateDamScheduleDamStatusId: defaultDamStatusId
+                        updateDamScheduleIsLock: damSchedule?.damScheduleIsLock
                     }
                     setUpdateState(updateDamScheduleFetchData)
                     rebaseDetailPage()
@@ -364,6 +393,11 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
             return { ...prev, updateDamScheduleEndAt: value }
         })
     }
+    const handleSetUpdateDamScheduleIsLock = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateDamScheduleIsLock: value }
+        })
+    }
     const updateADamSchedule = (e) => {
         // validation
         const form = e.currentTarget
@@ -371,13 +405,14 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
             e.preventDefault()
             e.stopPropagation()
         } else {
+            // Re-use the previous isLock status 
             const damSchedule = {
                 damScheduleId: updateDamScheduleId,
                 damScheduleBeginAt: updateDamScheduleBeginAt,
                 damScheduleEndAt: updateDamScheduleEndAt,
                 damScheduleDescription: updateDamScheduleDescription,
                 damScheduleDamId: updateDamScheduleDamId,
-                damScheduleDamStatusId: updateDamScheduleDamStatusId
+                damScheduleIsLock: updateDamScheduleIsLock
             }
             updateDamSchedule(damSchedule)
             .then(res => {
@@ -458,13 +493,17 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
     // Delete
     const deleteADamSchedule = (damScheduleId) => {
         if (damScheduleId) {
-            deleteDamSchedule(damScheduleId)
+            const damSchedule = {
+                damScheduleId: damScheduleId,
+                damScheduleIsLock: true
+            }
+            updateDamSchedule(damSchedule)
             .then(res => {
                 setDeleteVisible(false)
                 rebaseAllData()
                 addToast(createToast({
-                    title: 'Xóa lịch mở đập',
-                    content: 'Xóa lịch mở đập thành công',
+                    title: 'Vô hiệu lịch mở đập',
+                    content: 'Vô hiệu lịch mở đập thành công',
                     icon: createSuccessIcon()
                 }))
                 setUpdateValidated(false)
@@ -472,8 +511,8 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
             })
             .catch(err => {
                 addToast(createToast({
-                    title: 'Xóa lịch mở đập',
-                    content: "Xóa lịch mở đập không thành công",
+                    title: 'Vô hiệu lịch mở đập',
+                    content: "Vô hiệu lịch mở đập không thành công",
                     icon: createFailIcon()
                 }))
             })
@@ -513,17 +552,35 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addVisible, updateVisible])
 
+    // select options default values
+    const options = [
+        {
+            name: "Tất cả",
+            code: "all"
+        },
+        {
+            name: "Đã vô hiệu",
+            code: "lock"
+        },
+        {
+            name: "Đang hoạt động",
+            code: "unlock"
+        }
+    ]
     
     return (
         <CCard className="mb-4">
         <CToaster ref={toaster} push={toast} placement="top-end" />
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleAddFeature} setExternalState={setHaveAdding}/>
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateFeature} setExternalState={setHaveUpdating}/>
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleDeleteFeature} setExternalState={setHaveDeleting}/>
         <CCardBody>
             <CustomModal visible={addVisible} title={'Thêm lịch mở đập'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
             <CustomModal visible={updateVisible} title={'Cập nhật lịch mở đập'} body={updateForm(updateDamScheduleBeginAt)} setVisible={(value) => setUpdateVisible(value)}/>
             <CustomModal visible={deleteVisible} title={'Xóa người lịch mở đập'} body={deleteForm(deleteDamScheduleId)} setVisible={(value) => setDeleteVisible(value)}/>
             <CForm onSubmit={onFilter}>
                 <CRow>
-                    <CCol md={12} lg={3}>
+                    <CCol md={12} lg={2}>
                         <CFormInput
                             className="mb-2"
                             type="text"
@@ -532,7 +589,7 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
                             aria-describedby="exampleFormControlInputHelpInline"
                         />
                     </CCol>
-                    <CCol md={12} lg={3}>
+                    <CCol md={12} lg={2}>
                         <CFormInput
                             className="mb-2"
                             type="text"
@@ -541,7 +598,7 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
                             aria-describedby="exampleFormControlInputHelpInline"
                         />
                     </CCol>
-                    <CCol md={12} lg={3}>
+                    <CCol md={12} lg={2}>
                         <CFormInput
                             className="mb-2"
                             type="text"
@@ -550,7 +607,21 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
                             aria-describedby="exampleFormControlInputHelpInline"
                         />
                     </CCol>
-                    <CCol md={12} lg={3}>
+                    <CCol md={12} lg={2}>
+                        <CFormSelect 
+                            aria-label="Default select example" 
+                            className="mb-2"
+                            onChange={(e) => handleSetDamScheduleIsLock(e.target.value)} 
+                            value={damScheduleIsLock}
+                        >
+                            {
+                                options && options.map((option, index) => {
+                                    return <option key={index} value={option?.code}>{option?.name}</option>
+                                })
+                            }
+                        </CFormSelect>
+                    </CCol>
+                    <CCol md={12} lg={2}>
                         <CButton color="primary" className="me-2 " type="submit">
                             <CIcon icon={cilMagnifyingGlass} className="text-white"/>                             
                         </CButton>
@@ -563,7 +634,7 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
           <br />
           <CRow>
             <CCol xs={12}>
-                <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>
+                {haveAdding && <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>}
             </CCol>
           </CRow>
           <br />

@@ -20,7 +20,7 @@ export const damStatusConverter = (dam) => {
     if (dam?.damCurrentStatus?.damStatusName === "OPEN") {
         return {
             icon: cilLockUnlocked,
-            class: "primary",
+            class: "success",
             status: "Đang mở"
         }
     }
@@ -42,15 +42,25 @@ export const getLoggedUserInformation = () => {
     return information
 }
 
+
+
 export const checkItemCode = (code, modules) => {
+  let flag = false
+  modules?.forEach(element => {
+    if (element?.URL === code) {
+      flag = true
+    }
+  });
+  return flag
+}
+
+export const authorizationChecker = (code, modules) => {
     let flag = false
-    modules?.forEach(element => {
-      if (element?.URL === code) {
-        flag = true
-      }
-    });
+    if (modules) {
+        flag = checkItemCode(code, modules)
+    }
     return flag
-  }
+}
 
 export const splitCoordinates = (val) => {
     const coordinates = val.split(',')
@@ -73,4 +83,17 @@ export const addZeroToDate = (day, month, year) => {
         day = "0"+day
     }
     return `${year}-${month}-${day}`
+}
+
+    // To prevent update current user's role
+export const checkCurrentRoleOfUser = (roleId) => {
+    const user = getLoggedUserInformation()
+    const currentRoleId = user?.permission?.role
+    return roleId === currentRoleId
+}
+
+export const checkCurrentUser = (userId) => {
+    const user = getLoggedUserInformation()
+    const currentUserId = user?._id
+    return currentUserId === userId
 }
