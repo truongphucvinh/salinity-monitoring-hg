@@ -20,7 +20,7 @@ export const damStatusConverter = (dam) => {
     if (dam?.damCurrentStatus?.damStatusName === "OPEN") {
         return {
             icon: cilLockUnlocked,
-            class: "primary",
+            class: "success",
             status: "Đang mở"
         }
     }

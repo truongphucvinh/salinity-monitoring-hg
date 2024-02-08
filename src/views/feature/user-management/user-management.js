@@ -516,13 +516,24 @@ const UserManagement = () => {
             //     domain: updateDomainId,
             //     role: updateRoleId
             // }
-            const user = {
-                username: updateUsername,
-                fullName: updateFullname,
-                password: CryptoJS.AES.encrypt(updatePassword || '', secretKey).toString(),
-                email: updateEmail,
-                domain: defaultDomainId,
-                role: updateRoleId
+            let user = {}
+            if (updatePassword){
+                user = {
+                    username: updateUsername,
+                    fullName: updateFullname,
+                    password: CryptoJS.AES.encrypt(updatePassword || '', secretKey).toString(),
+                    email: updateEmail,
+                    domain: defaultDomainId,
+                    role: updateRoleId
+                }
+            }else {
+                user = {
+                    username: updateUsername,
+                    fullName: updateFullname,
+                    email: updateEmail,
+                    domain: defaultDomainId,
+                    role: updateRoleId
+                }
             }
             updateUser(user, updateId)
             .then(res => {

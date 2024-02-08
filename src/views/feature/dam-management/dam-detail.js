@@ -123,7 +123,7 @@ const DamDetail = () => {
                                                 </CTableRow> 
                                                 <CTableRow>
                                                     <CTableDataCell className="bg-body-tertiary fw-bold" style={{'width' : '20%'}}>Trạng thái</CTableDataCell>
-                                                    <CTableDataCell><CIcon icon={damStatusConverter(dam)?.icon} className="me-2"/>{damStatusConverter(dam)?.status}</CTableDataCell>
+                                                    <CTableDataCell className={`text-${damStatusConverter(dam)?.class}`}><CIcon icon={damStatusConverter(dam)?.icon} className="me-2"/>{damStatusConverter(dam)?.status}</CTableDataCell>
                                                 </CTableRow> 
                                             </CTableBody>
                                         </CTable> : <CustomSpinner />

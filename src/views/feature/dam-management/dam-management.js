@@ -193,7 +193,7 @@ const DamManagement = () => {
                                     <CTableDataCell>{dam?.damName}</CTableDataCell>
                                     <CTableDataCell>{dam?.damRiver?.riverName}</CTableDataCell>
                                     <CTableDataCell>{`${dam?.damCapacity} x ${dam?.damHeight} (mét)`}</CTableDataCell>
-                                    <CTableDataCell><CIcon icon={damStatusConverter(dam)?.icon} className="me-2"/>{damStatusConverter(dam)?.status}</CTableDataCell>
+                                    <CTableDataCell className={`text-${damStatusConverter(dam)?.class}`}><CIcon icon={damStatusConverter(dam)?.icon} className="me-2"/>{damStatusConverter(dam)?.status}</CTableDataCell>
                                     <CTableDataCell>
                                         <CIcon icon={cilTouchApp} onClick={() => openDamDetail(dam?.damId)} className="text-primary mx-1" role="button"/>
                                         {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(dam?.damId)} className="text-success mx-1" role="button"/>}
