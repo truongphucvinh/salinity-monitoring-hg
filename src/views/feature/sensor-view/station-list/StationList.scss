@@ -230,8 +230,6 @@
         justify-content: right;
         padding: 15px 20px;
         background-color: rgba(0, 0, 0, 0.08);
-        &__cancel-btn, &__accept-btn {
-        }
         &__accept-btn {
             @include button(100px, 40px, $red);
         }
@@ -300,6 +298,49 @@
     }
 }
 
+// view station detail
+.view-station-detail {
+    padding: 20px;
+    &__header {
+        font-weight: bold;
+        font-size: 20px;
+    }
+    &__body {
+        margin-top: 10px;
+        table {
+            width: 100%;
+            td {
+                padding: 10px 0;
+            }
+            .key {
+                width: 30%;
+                font-weight: bold;
+            }
+            .value {
+                width: 70%;
+            }
+        }
+    }
+    &__footer {
+        display: flex;
+        justify-content: right;
+        &__close-btn {
+            @include button(100px, 40px, white);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            color: black;
+            &:hover {
+                filter: brightness(99.3%);
+            }
+        }
+    }
+}
+
 .css-kk1bwy-MuiButtonBase-root-MuiMenuItem-root.Mui-selected {
     font-weight: bold;
+}
+
+.defined-station-table-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }

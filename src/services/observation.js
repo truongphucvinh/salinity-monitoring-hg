@@ -1,4 +1,5 @@
 import axios from 'axios'
+import station from './station';
 
 const BASE_URL = "http://103.221.220.183:8089/"
 
@@ -21,14 +22,16 @@ export default  {
         }
     },
 
+    //Rynan
     getDataStation: async function(serialStation, startDate, endDate, page, limit) { //serialStation: L2177R1M001F001, startDate: 2024%2F01%2F10, endDate: 2024%2F01%2F18, limit: 1000
         try {
             startDate = startDate.replace("/", "%");
             endDate = endDate.replace("/", "%");
+            const responseLogin = await station.login();
             const response = await axios.get(`https://document.rynangate.com/api/v1/get-data-stations?so_serial=${serialStation}&tu_ngay=2024%2F01%2F10&den_ngay=2024%2F01%2F18&limit=${limit}`,
                 {
                     headers: {
-                        "x-access-token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJDb2RlIjoiREVNT1BBUlRORVIiLCJEYXRlU2lnbiI6IjIwMjQtMDItMjJUMDM6NDE6MTQuNjk2WiIsImlhdCI6MTcwODU3MzI3NCwiZXhwIjoxNzA4NjU5Njc0fQ.TtX_WxLfQSfQrfP6ETUvxtSKEYqF48NAj3zkk5ok8kA",
+                        "x-access-token" : responseLogin.token,
                         "x-api-key" : "baK5nWEBD6ARJNU8uPSMTrfq"
                     }
                 }
@@ -38,7 +41,4 @@ export default  {
             throw error;
         }
     }
-
-
-
 }
