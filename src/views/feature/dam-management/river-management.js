@@ -37,7 +37,6 @@ import { createRiver,  deleteRiver,  getAllRivers,  getRiverById,  updateRiver }
 import CustomSpinner from "src/views/customs/my-spinner"
 import { splitCoordinates } from "src/tools"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
-import CustomAuthChecker from "src/views/customs/my-authchecker"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 
 const RiverManagement = () => {
