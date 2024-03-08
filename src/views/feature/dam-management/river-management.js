@@ -467,7 +467,7 @@ const RiverManagement = () => {
                                     placeholder="Mô tả vị trí sông, kênh, rạch"
                                     onChange={(e) => handleSetUpdateRiverLocation(e.target.value)}
                                     value={updateRiverLocation}
-                                    feedbackInvalid="Phải ít hơn 250 ký tự"
+                                    // feedbackInvalid="Phải ít hơn 250 ký tự"
                                     maxLength={250}
                                     rows={3}
                                     aria-describedby="exampleFormControlInputHelpInline"
@@ -598,7 +598,7 @@ const RiverManagement = () => {
             <CCardHeader>Danh sách sông, kênh, rạch</CCardHeader>
             <CCardBody>
                 <CustomModal visible={addVisible} title={'Thêm sông, kênh, rạch'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
-                <CustomModal visible={updateVisible} title={'Cập nhật sông, kênh, rạch'} body={updateForm(updateRiverName)} setVisible={(value) => setUpdateVisible(value)}/>
+                <CustomModal visible={updateVisible} title={'Cập nhật sông, kênh, rạch'} body={updateForm(updateRiverId)} setVisible={(value) => setUpdateVisible(value)}/>
                 <CustomModal visible={deleteVisible} title={'Xóa người sông, kênh, rạch'} body={deleteForm(deleteRiverId)} setVisible={(value) => setDeleteVisible(value)}/>
                 <CForm onSubmit={onFilter}>
                     <CRow>

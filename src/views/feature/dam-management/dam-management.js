@@ -492,7 +492,8 @@ const DamManagement = () => {
         updateDamRiverId: ""
     }
     const [updateState, setUpdateState] = useState(updateData)
-    const { updateId,
+    const { 
+        updateId,
         updateDamName,
         updateDamConstructedAt,
         updateDamDescription,
@@ -862,7 +863,7 @@ const DamManagement = () => {
             <CCardHeader>Danh sách đập</CCardHeader>
             <CCardBody>
                 <CustomModal visible={addVisible} title={'Thêm đập'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
-                <CustomModal visible={updateVisible} title={'Cập nhật đập'} body={updateForm(updateDamName)} setVisible={(value) => setUpdateVisible(value)}/>
+                <CustomModal visible={updateVisible} title={'Cập nhật đập'} body={updateForm(updateId)} setVisible={(value) => setUpdateVisible(value)}/>
                 <CustomModal visible={deleteVisible} title={'Xóa người đập'} body={deleteForm(deleteIdDamId)} setVisible={(value) => setDeleteVisible(value)}/>
                 <CForm onSubmit={onFilter}>
                     <CRow>
