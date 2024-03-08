@@ -49,6 +49,7 @@ const Login = () => {
   // Login logic
   const secretKey = process.env.AUTH_TOKEN || 'oda_dev'
   const onFinish = (e) => {
+    e.preventDefault()
     const form = e.currentTarget
     if (form.checkValidity() === true) {
       const loginRequest = {
@@ -64,7 +65,6 @@ const Login = () => {
         addToast(exampleToast)
       })
     }else {
-      e.preventDefault()
       e.stopPropagation()
       setValidated(true)
     }
@@ -90,7 +90,11 @@ const Login = () => {
             <CCardGroup>
               <CCard className="p-4">
                 <CCardBody>
-                  <CForm noValidate validated={validated} onSubmit={(e) => onFinish(e)}>
+                  <CForm 
+                    // noValidate 
+                    // validated={validated} 
+                    onSubmit={(e) => onFinish(e)}
+                  >
                     <h1>Đăng nhập</h1>
                     <p className="text-body-secondary">Xác thực tài khoản của bạn</p>
                     <CInputGroup className="mb-3">
