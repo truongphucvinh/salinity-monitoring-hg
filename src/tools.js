@@ -1,5 +1,23 @@
 import { cilLockLocked, cilLockUnlocked } from "@coreui/icons";
 
+export const searchRelatives = (sourceValue, searchValue) => {
+    const processedSearch = removeVietnameseAccents(searchValue?.trim()).toLowerCase()
+    const processedSource = removeVietnameseAccents(sourceValue?.trim()).toLowerCase()
+    return processedSource?.includes(processedSearch)
+}
+
+export const removeVietnameseAccents = (str) => {
+    const from = "àáãảạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệđùúủũụưừứửữựòóỏõọôồốổỗộơờớởỡợìíỉĩịäëïîöüûñçýỳỹỵỷ";
+    const to = "aaaaaaaaaaaaaaaaaeeeeeeeeeeeduuuuuuuuuuuoooooooooooooooooiiiiiaeiiouuncyyyyy";
+
+    for (let i = 0; i < from.length; i++) {
+        str = str.replace(new RegExp(from[i], "gi"), to[i]);
+    }
+
+    return str;
+}
+
+
 export const isDecimal = (n) => {
     // This regex matches any number, including integers, decimals, floats, and doubles
     var regex = /^-?[0-9]*\.?[0-9]+$/;

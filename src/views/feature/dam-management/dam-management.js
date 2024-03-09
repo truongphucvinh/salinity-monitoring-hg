@@ -38,7 +38,7 @@ import { createDam, deleteDam, getAllDamTypes, getAllDams, getAllRivers, getDamB
 import CustomSpinner from "src/views/customs/my-spinner"
 import CustomDateTimePicker from "src/views/customs/my-datetimepicker/my-datetimepicker"
 import { useNavigate } from "react-router-dom"
-import { addZeroToDate, damStatusConverter, splitCoordinates } from "src/tools"
+import { addZeroToDate, damStatusConverter, searchRelatives, splitCoordinates } from "src/tools"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import { red } from "@mui/material/colors"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
@@ -134,12 +134,12 @@ const DamManagement = () => {
             setFilteredDams(listDams)
             if (damName) {
                 setFilteredDams(prev => {
-                    return prev.filter(dam => dam?.damName?.includes(damName.trim()))
+                    return prev.filter(dam => dam?.damName && searchRelatives(dam?.damName, damName))
                 })
             }
             if (damRiverName) {
                 setFilteredDams(prev => {
-                    return prev.filter(dam => dam?.damRiver?.riverName.includes(damRiverName.trim()))
+                    return prev.filter(dam => dam?.damRiver?.riverName && searchRelatives(dam?.damRiver?.riverName, damRiverName))
                 })
             }
             if (damSize) {
