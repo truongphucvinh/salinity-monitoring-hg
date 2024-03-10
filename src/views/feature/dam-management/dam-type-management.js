@@ -34,6 +34,7 @@ import { createDamType, deleteDamType, getAllDamTypes, getDamTypeById, updateDam
 import CustomSpinner from "src/views/customs/my-spinner"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
+import { searchRelatives } from "src/tools"
 
 const DamTypeManagement = () => {
 
@@ -97,12 +98,12 @@ const DamTypeManagement = () => {
             setFilteredDamTypes(listDamTypes)
             if (damTypeName) {
                 setFilteredDamTypes(prev => {
-                    return prev.filter(damType => damType?.damTypeName?.includes(damTypeName.trim()))
+                    return prev.filter(damType => damType?.damTypeName && searchRelatives(damType?.damTypeName, damTypeName))
                 })
             }
             if (damTypeDescription) {
                 setFilteredDamTypes(prev => {
-                    return prev.filter(damType => damType?.damTypeDescription?.includes(damTypeDescription.trim()))
+                    return prev.filter(damType => damType?.damTypeDescription && searchRelatives(damType?.damTypeDescription, damTypeDescription))
                 })
             }
         }else {

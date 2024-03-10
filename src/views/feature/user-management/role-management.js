@@ -38,7 +38,7 @@ import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import CustomSpinner from "src/views/customs/my-spinner"
 import { createPermission, createRole, deletePermission, deleteRole, getAllModules, getAllModulesOfPermission, getAllPermissions, getPermissionById, updatePermission, updateRole } from "src/services/authentication-services"
-import { checkCurrentRoleOfUser, getLoggedUserInformation } from "src/tools"
+import { checkCurrentRoleOfUser, getLoggedUserInformation, searchRelatives } from "src/tools"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 
@@ -157,12 +157,12 @@ const RoleManagement = () => {
             setFilteredRoles(listRole)
             if (roleName) {
                 setFilteredRoles(prev => {
-                    return prev.filter(role => role?.name?.includes(roleName.trim()))
+                    return prev.filter(role => role?.name && searchRelatives(role?.name, roleName))
                 })
             }
             if (roleDescription) {
                 setFilteredRoles(prev => {
-                    return prev.filter(role => role?.description?.includes(roleDescription.trim()))
+                    return prev.filter(role => role?.description && searchRelatives(role?.description, roleDescription))
                 })
             }
         }else {

@@ -25,9 +25,10 @@ import {
     cilTrash,
     cilMagnifyingGlass,
     cilReload,
-    cilPlus
+    cilPlus,
+    cilLoopCircular
   } from '@coreui/icons'
-import { createUser, deleteUser, /*getAllDomains*/ getAllRoles, getAllUsers, getPermissionsOfDomain, getUserById, updateUser } from "src/services/authentication-services"
+import { createUser, deleteUser, getAllUsers, getPermissionsOfDomain, getUserById, updateUser } from "src/services/authentication-services"
 import { setAuthApiHeader } from "src/services/global-axios"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
@@ -35,7 +36,7 @@ import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
-import { checkCurrentRoleOfUser, checkCurrentUser } from "src/tools"
+import { checkCurrentUser, searchRelatives } from "src/tools"
 
 const UserManagement = () => {
 
@@ -135,18 +136,17 @@ const UserManagement = () => {
             setFilteredUsers(listUsers)
             if (username) {
                 setFilteredUsers(prev => {
-                    return prev.filter(user => user?.username?.includes(username.trim()))
+                    return prev.filter(user => user?.username && searchRelatives(user?.username, username))
                 })
             }
             if (email) {
                 setFilteredUsers(prev => {
-                    return prev.filter(user => user?.email?.includes(email.trim()))
+                    return prev.filter(user => user?.email && searchRelatives(user?.email, email))
                 })
             }
             if (fullName) {
-                console.log();
                 setFilteredUsers(prev => {
-                    return prev.filter(user => user?.fullName?.includes(fullName.trim()))
+                    return prev.filter(user => user?.fullName && searchRelatives(user?.fullName, fullName))
                 })
             }
         }else {
@@ -422,7 +422,7 @@ const UserManagement = () => {
         updateFullname: '',
         updateEmail: '',
         // updateDomainId: '',
-        updateRoleId: ''
+        updateRoleId: '' 
     }
     const [updateState, setUpdateState] = useState(updateData)
     const { updateId, updateUsername, updatePassword, updateFullname, updateEmail, /*updateDomainId*/ updateRoleId } = updateState
@@ -468,6 +468,10 @@ const UserManagement = () => {
     // }
     const openUpdateModal = (userId) => {
         getUserDataById(userId)
+        setUpdateVisible(true)
+    }
+    const openUpdatePasswordModal = (userId) => {
+        getUserById(userId)
         setUpdateVisible(true)
     }
     const handleSetUpdateUsername = (value) => {
@@ -517,6 +521,7 @@ const UserManagement = () => {
             //     role: updateRoleId
             // }
             let user = {}
+            // if we have already complete the password field.
             if (updatePassword){
                 user = {
                     username: updateUsername,

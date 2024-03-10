@@ -103,7 +103,7 @@ const AppHeader = () => {
                 type="button"
                 onClick={() => setColorMode('light')}
               >
-                <CIcon className="me-2" icon={cilSun} size="lg" /> Light
+                <CIcon className="me-2" icon={cilSun} size="lg" /> Sáng
               </CDropdownItem>
               <CDropdownItem
                 active={colorMode === 'dark'}
@@ -112,7 +112,7 @@ const AppHeader = () => {
                 type="button"
                 onClick={() => setColorMode('dark')}
               >
-                <CIcon className="me-2" icon={cilMoon} size="lg" /> Dark
+                <CIcon className="me-2" icon={cilMoon} size="lg" /> Tối
               </CDropdownItem>
               {/* <CDropdownItem
                 active={colorMode === 'auto'}

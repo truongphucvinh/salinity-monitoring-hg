@@ -35,7 +35,7 @@ import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import { createRiver,  deleteRiver,  getAllRivers,  getRiverById,  updateRiver } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
-import { splitCoordinates } from "src/tools"
+import { removeVietnameseAccents, searchRelatives, splitCoordinates } from "src/tools"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 
@@ -101,12 +101,13 @@ const RiverManagement = () => {
             setFilteredRivers(listRivers)
             if (riverName) {
                 setFilteredRivers(prev => {
-                    return prev.filter(river => river?.riverName?.includes(riverName.trim()))
+                    // return prev.filter(river => river?.riverName?.includes(riverName.trim()))
+                    return prev.filter(river => river?.riverName && searchRelatives(river?.riverName, riverName))
                 })
             }
             if (riverLocation) {
                 setFilteredRivers(prev => {
-                    return prev.filter(river => river?.riverLocation?.includes(riverLocation.trim()))
+                    return prev.filter(river => river?.riverLocation && searchRelatives(river?.riverLocation, riverLocation))
                 })
             }
         }else {
