@@ -57,6 +57,10 @@ function zones(colors) {
   }]
 }
 
+const getTime = (date) => {
+  return new Date(date).getTime();
+}
+
 const colors = [
   ['#7cb5ec', '#FFA262', '#7cb5ec'],
   ['#7cb5ec', '#8bbc21', '#7cb5ec']
@@ -71,6 +75,7 @@ const colors = [
     Legend
   );
   
+
 const StationDetail = () => {
     const { id } = useParams()
 
@@ -92,6 +97,7 @@ const StationDetail = () => {
     const [latestValueSensorList, setLatestValueSensorList] = useState([]);
 
     //option chart <<
+
     const [optionsss, setOptionsss] = useState(
       {
         chart: {
@@ -122,7 +128,7 @@ const StationDetail = () => {
         }]
       }
     )
-    //option charr >>
+
 
 
     //test <<
@@ -157,6 +163,7 @@ const StationDetail = () => {
       }
     )
     //test >>
+
 
     useEffect(() => {
 
@@ -305,7 +312,6 @@ const StationDetail = () => {
       }
     } 
 
-    //change: sensor device
     const handleChangeSelectingSensor = (index, sensorId) => {  // change tab
       setActiveKey(index);
       setSelectingSensor(sensorId);

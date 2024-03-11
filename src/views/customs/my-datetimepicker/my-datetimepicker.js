@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import clsx from "clsx"
 import styles from "./mydatetimepicker.module.css"
 
-const CustomDateTimePicker = ({placeholder, classes, value, setValue}) => {
+const CustomDateTimePicker = ({placeholder, classes, value, setValue, isRequired = true}) => {
     const [type, setType] = useState('text')
     const dateTimePickerClasses = clsx(
         'form-control',
@@ -26,16 +26,27 @@ const CustomDateTimePicker = ({placeholder, classes, value, setValue}) => {
 
     return (
         <>
-            <input 
-                className={dateTimePickerClasses}
-                type={type}
-                placeholder={placeholder}
-                value={type === 'text' ? '' : value}
-                onBlur={handleOnBlur}
-                onFocus={handleOnFocus}
-                onChange={(e) => setValue(e.target.value)}
-                required
-            />
+            {
+                isRequired ? <input 
+                    className={dateTimePickerClasses}
+                    type={type}
+                    placeholder={placeholder}
+                    value={type === 'text' ? '' : value}
+                    onBlur={handleOnBlur}
+                    onFocus={handleOnFocus}
+                    onChange={(e) => setValue(e.target.value)}
+                    required
+                />  :  <input 
+                    className={dateTimePickerClasses}
+                    type={type}
+                    placeholder={placeholder}
+                    value={type === 'text' ? '' : value}
+                    onBlur={handleOnBlur}
+                    onFocus={handleOnFocus}
+                    onChange={(e) => setValue(e.target.value)}
+                />
+            }
+
         </>
     )
 }

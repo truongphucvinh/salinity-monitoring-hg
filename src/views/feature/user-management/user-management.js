@@ -25,15 +25,18 @@ import {
     cilTrash,
     cilMagnifyingGlass,
     cilReload,
-    cilPlus
+    cilPlus,
+    cilLoopCircular
   } from '@coreui/icons'
-import { createUser, deleteUser, /*getAllDomains*/ getAllRoles, getAllUsers, getUserById, updateUser } from "src/services/authentication-services"
+import { createUser, deleteUser, getAllUsers, getPermissionsOfDomain, getUserById, updateUser } from "src/services/authentication-services"
 import { setAuthApiHeader } from "src/services/global-axios"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
-import CustomAdminChecker from "src/views/customs/my-adminchecker"
+import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
+import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
+import { checkCurrentUser, searchRelatives } from "src/tools"
 
 const UserManagement = () => {
 
@@ -42,15 +45,25 @@ const UserManagement = () => {
     // const [listDomains, setListDomains] = useState([])
     const [listRoles, setListRoles] = useState([])
     const secretKey = process.env.AUTH_TOKEN || 'oda_dev'
-    const defaultDomainId = process.env.HG_DOMAIN_ID || '6585900cf7ed98f198697653'
-    const defaultAdminId = process.env.ADMIN_ROLE_ID || '6588e34a6f4d6dd9d37c8a01'
-    const defaultClientId = process.env.CLIENT_ROLE_ID || '6588e2806f4d6dd9d37c89bd'
-    
+    const defaultDomainId = process.env.HG_DOMAIN_ID || '65b0cbba526ef32c8be05f1d'
+    const defaultAuthorizationCode = process.env.HG_MODULE_USER_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_user_management"
+    // Checking feature's module
+    const defaultModuleAddFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_user_management_add_user"
+    const defaultModuleUpdateFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_user_management_update_user"
+    const defaultModuleDeleteFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_user_management_delete_user"
+    const [haveAdding, setHaveAdding] = useState(false)
+    const [haveUpdating, setHaveUpdating] = useState(false)
+    const [haveDeleting, setHaveDeleting] = useState(false)
     // Call inital APIs
     // Filtering all users of our project
     const onFilterUsers = (listUsers, domainId) => {
         return listUsers.filter(user => {
             return user?.permission?.domain === domainId
+        })
+    }
+    const convertResultToRoleList = (results) => {
+        return results?.length !== 0 && results?.map(item => {
+            return item?.role
         })
     }
     const rebaseAllData = () => {
@@ -78,12 +91,13 @@ const UserManagement = () => {
             //     // Do nothing
             // })
 
-            getAllRoles()
-            .then((res) => {
-                const roles = res?.data?.data?.result
+            getPermissionsOfDomain(defaultDomainId)
+            .then(res => {
+                const permissions = res?.data?.data?.result
+                const roles = convertResultToRoleList(permissions)
                 setListRoles(roles)
             })
-            .catch((err) => {
+            .catch(err => {
                 // Do nothing
             })
         }
@@ -122,18 +136,17 @@ const UserManagement = () => {
             setFilteredUsers(listUsers)
             if (username) {
                 setFilteredUsers(prev => {
-                    return prev.filter(user => user?.username?.includes(username.trim()))
+                    return prev.filter(user => user?.username && searchRelatives(user?.username, username))
                 })
             }
             if (email) {
                 setFilteredUsers(prev => {
-                    return prev.filter(user => user?.email?.includes(email.trim()))
+                    return prev.filter(user => user?.email && searchRelatives(user?.email, email))
                 })
             }
             if (fullName) {
-                console.log();
                 setFilteredUsers(prev => {
-                    return prev.filter(user => user?.fullName?.includes(fullName.trim()))
+                    return prev.filter(user => user?.fullName && searchRelatives(user?.fullName, fullName))
                 })
             }
         }else {
@@ -171,8 +184,8 @@ const UserManagement = () => {
                                     <CTableDataCell>{user?.email}</CTableDataCell>
                                     <CTableDataCell>{user?.fullName}</CTableDataCell>
                                     <CTableDataCell>
-                                        <CIcon icon={cilPencil} onClick={() => openUpdateModal(user?._id)} className="text-success mx-1" role="button"/>
-                                        <CIcon icon={cilTrash} onClick={() => openDeleteModal(user?._id)}  className="text-danger" role="button"/>
+                                        {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(user?._id)} className="text-success mx-1" role="button"/>}
+                                        {haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(user?._id)}  className="text-danger" role="button"/>}
                                     </CTableDataCell>
                                 </CTableRow>    
                             )
@@ -384,9 +397,7 @@ const UserManagement = () => {
                     >
                         <option selected="" value="" >Vai trò</option>
                         {
-                            listRoles.filter(role => {
-                                return role?._id === defaultAdminId || role?._id === defaultClientId
-                            }).map((role) => {
+                            listRoles && Array.isArray(listRoles) && listRoles.map((role) => {
                                 return  <option key={role?._id} value={role?._id}>{role?.name}</option>
                             })
                         }
@@ -411,7 +422,7 @@ const UserManagement = () => {
         updateFullname: '',
         updateEmail: '',
         // updateDomainId: '',
-        updateRoleId: ''
+        updateRoleId: '' 
     }
     const [updateState, setUpdateState] = useState(updateData)
     const { updateId, updateUsername, updatePassword, updateFullname, updateEmail, /*updateDomainId*/ updateRoleId } = updateState
@@ -457,6 +468,10 @@ const UserManagement = () => {
     // }
     const openUpdateModal = (userId) => {
         getUserDataById(userId)
+        setUpdateVisible(true)
+    }
+    const openUpdatePasswordModal = (userId) => {
+        getUserById(userId)
         setUpdateVisible(true)
     }
     const handleSetUpdateUsername = (value) => {
@@ -505,13 +520,25 @@ const UserManagement = () => {
             //     domain: updateDomainId,
             //     role: updateRoleId
             // }
-            const user = {
-                username: updateUsername,
-                fullName: updateFullname,
-                password: CryptoJS.AES.encrypt(updatePassword || '', secretKey).toString(),
-                email: updateEmail,
-                domain: defaultDomainId,
-                role: updateRoleId
+            let user = {}
+            // if we have already complete the password field.
+            if (updatePassword){
+                user = {
+                    username: updateUsername,
+                    fullName: updateFullname,
+                    password: CryptoJS.AES.encrypt(updatePassword || '', secretKey).toString(),
+                    email: updateEmail,
+                    domain: defaultDomainId,
+                    role: updateRoleId
+                }
+            }else {
+                user = {
+                    username: updateUsername,
+                    fullName: updateFullname,
+                    email: updateEmail,
+                    domain: defaultDomainId,
+                    role: updateRoleId
+                }
             }
             updateUser(user, updateId)
             .then(res => {
@@ -624,26 +651,26 @@ const UserManagement = () => {
                                 </CFormSelect>
                             </CCol>
                         </CRow> */}
-                        <CRow>
-                            <CCol lg={12}>
-                                <CFormSelect 
-                                    aria-label="Default select example" 
-                                    className="mt-4"
-                                    onChange={(e) => handleSetUpdateRoleId(e.target.value)} 
-                                    value={updateRoleId}
-                                    feedbackInvalid="Chưa chọn vai trò!"
-                                >
-                                    <option selected="" value="" >Vai trò</option>
-                                    {
-                                        listRoles.filter(role => {
-                                            return role?._id === defaultAdminId || role?._id === defaultClientId
-                                        }).map((role) => {
-                                            return  <option key={role?._id} value={role?._id}>{role?.name}</option>
-                                        })
-                                    }
-                                </CFormSelect>
-                            </CCol>
-                        </CRow>
+                        {
+                            !checkCurrentUser(updateId) && <CRow>
+                                <CCol lg={12}>
+                                    <CFormSelect 
+                                        aria-label="Default select example" 
+                                        className="mt-4"
+                                        onChange={(e) => handleSetUpdateRoleId(e.target.value)} 
+                                        value={updateRoleId}
+                                        feedbackInvalid="Chưa chọn vai trò!"
+                                    >
+                                        <option selected="" value="" >Vai trò</option>
+                                        {
+                                            listRoles && Array.isArray(listRoles) && listRoles.map((role) => {
+                                                return  <option key={role?._id} value={role?._id}>{role?.name}</option>
+                                            })
+                                        }
+                                    </CFormSelect>
+                                </CCol>
+                            </CRow>
+                        }
                         <CRow>
                             <CCol lg={12} className="d-flex justify-content-end">
                                 <CButton type="submit" className="mt-4" color="primary">Hoàn tất</CButton>
@@ -722,14 +749,17 @@ const UserManagement = () => {
 
     return (
         <CRow>
-        <CustomAdminChecker />
         <CCol xs>
+        <CustomAuthorizationChecker isRedirect={true} code={defaultAuthorizationCode} />
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleAddFeature} setExternalState={setHaveAdding}/>
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateFeature} setExternalState={setHaveUpdating}/>
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleDeleteFeature} setExternalState={setHaveDeleting}/>
           <CCard className="mb-4">
             <CToaster ref={toaster} push={toast} placement="top-end" />
             <CCardHeader>Danh sách người dùng</CCardHeader>
             <CCardBody>
                 <CustomModal visible={addVisible} title={'Thêm người dùng'} body={addForm(addLoaded)} setVisible={(value) => setAddVisible(value)}/>
-                <CustomModal visible={updateVisible} title={'Cập nhật người dùng'} body={updateForm(updateUsername)} setVisible={(value) => setUpdateVisible(value)}/>
+                <CustomModal visible={updateVisible} title={'Cập nhật người dùng'} body={updateForm(updateId)} setVisible={(value) => setUpdateVisible(value)}/>
                 <CustomModal visible={deleteVisible} title={'Xóa người người dùng'} body={deleteForm(deleteId)} setVisible={(value) => setDeleteVisible(value)}/>
                 <CForm onSubmit={onFilter}>
                     <CRow>
@@ -773,7 +803,7 @@ const UserManagement = () => {
               <br />
               <CRow>
                 <CCol xs={12}>
-                    <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>
+                    {haveAdding && <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>}
                 </CCol>
               </CRow>
               <br />
