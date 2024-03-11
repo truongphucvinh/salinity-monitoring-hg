@@ -10,6 +10,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import { CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react';
 
 import Switch from '@mui/material/Switch';
 
@@ -113,7 +114,12 @@ const StationList = () => {
   //select chip sensor list
   const [sensorList, setSensorList] = useState([])
   const [selectedSensorList, setSelectedSensorList] = useState([]);
-  const [selectedSensorListBackup, setSelectedSensorListBackup] = useState([]);
+
+  //available station
+  const [availableStationList, setAvailableStationList] = useState(); //including stations are gotten by Ryan api
+
+  //model view station detail
+  const [visibleViewStationDetail, setVisibleViewStationDetail] = useState(false)
 
   const handleChangeSensorsSelection = (event) => {
     setSelectedSensor(event);
@@ -183,6 +189,14 @@ const StationList = () => {
   //useEffect
   useEffect(() => {
     setStationListLoading (true);
+
+    //Rynan station list
+    stationService.getStationListByRyan()
+      .then((res) => {
+        console.log("rynan station list: ", res.data);
+        setAvailableStationList(res.data);
+      })
+
     stationService.getStationList()
       .then((res) => {
         setStationList(res);
@@ -372,11 +386,59 @@ const StationList = () => {
               <CCard>
                 <CCardHeader>Danh sách trạm cảm biến</CCardHeader>
                 <CCardBody>
-                  <CButton 
-                    type="button" 
-                    color="primary"
-                    onClick={handleOpenCreateStationModal}
-                  >Thêm</CButton>
+
+                  {/* station list in available << */}
+                  <h6>Trạm sẵn có</h6>
+                  <CTable bordered align="middle" className="mb-0 border" hover responsive style={{'margin-top' : "10px"}}>
+                    <CTableHead className="text-nowrap">
+                      <CTableRow>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Tên trạm</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Mô tả</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Liên kết đập</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Trạng thái</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Thao tác</CTableHeaderCell>
+                      </CTableRow>
+                    </CTableHead>
+                    <CTableBody>
+                      {
+                        availableStationList?.length !== 0 ? availableStationList?.map((station, index) => {
+                          return <>
+                            <CTableRow onClick={() => setStationIsSelected(station)}>
+                              <CTableDataCell>{ index+1 }</CTableDataCell>
+                              <CTableDataCell style={{'cursor': 'pointer'}} onClick={() => handelDirectToDetail(station?.so_serial)}>{ station.ten_thiet_bi }</CTableDataCell>
+                              <CTableDataCell>{ station.ghi_chu }</CTableDataCell>
+                              <CTableDataCell>{ station.ghi_chu }</CTableDataCell>
+                              <CTableDataCell style={{display: "flex", alignItem: 'center'}}>
+                                <div className={station.trang_thai ? "station-status station-status--active" : "station-status station-status--inactive"}></div>
+                                {
+                                  station.trang_thai ? <span>Đang hoạt động</span> : <span>Trạm đang khóa</span>
+                                }
+                              </CTableDataCell>
+                              <CTableDataCell>
+                                <CIcon icon={cilTouchApp} onClick={() => {setVisibleViewStationDetail(true)}} className="text-primary mx-1" role="button"/>
+                              </CTableDataCell>
+                            </CTableRow>
+                          </>
+                        })
+                        :
+                        <CTableRow>
+                          <CTableDataCell colSpan={6}><p className="text-center">{'Không có dữ liệu'}</p></CTableDataCell>
+                        </CTableRow>
+                      }
+                    </CTableBody>
+                  </CTable>
+                  {/* station list in available >> */}
+
+                  <hr />
+                  <div className="defined-station-table-heading">
+                    <h6>Trạm tự định nghĩa</h6>
+                    <CButton 
+                      type="button" 
+                      color="primary"
+                      onClick={handleOpenCreateStationModal}
+                    >Thêm</CButton>
+                  </div>
                   <CTable bordered align="middle" className="mb-0 border" hover responsive style={{'margin-top' : "20px"}}>
                     <CTableHead className="text-nowrap">
                       <CTableRow>
@@ -385,7 +447,7 @@ const StationList = () => {
                         <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Mô tả</CTableHeaderCell>
                         <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Liên kết đập</CTableHeaderCell>
                         <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Trạng thái</CTableHeaderCell>
-                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Thao tác</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Thao tác</CTableHeaderCell>
                       </CTableRow>
                     </CTableHead>
                     <CTableBody>
@@ -661,6 +723,49 @@ const StationList = () => {
               </Box>
             </Fade>
           </Modal>
+
+          {/* view station detail */}
+          <CModal
+            alignment="center"
+            visible={visibleViewStationDetail}
+            onClose={() => setVisibleViewStationDetail(false)}
+            aria-labelledby="VerticallyCenteredExample"
+          >
+            <div className="view-station-detail">
+              <div className="view-station-detail__header">
+                Thông tin trạm
+              </div>
+              <div className="view-station-detail__body">
+                <table>
+                  <tr>
+                    <td className='key'>Tên trạm</td>
+                    <td className='value'>Trạm Vị Thanh</td>
+                  </tr>
+                  <tr>
+                    <td className='key'>Mô tả</td>
+                    <td className='value'>Trạm Vị Thanh</td>
+                  </tr>
+                  <tr>
+                    <td className='key'>Địa chỉ</td>
+                    <td className='value'>Trạm Vị Thanh</td>
+                  </tr>
+                  <tr>
+                    <td className='key'>Tọa độ</td>
+                    <td className='value'>Trạm Vị Thanh</td>
+                  </tr>
+                  <tr>
+                    <td className='key'>Cảm biến</td>
+                    <td className='value'>Trạm Vị Thanh<br/>Trạm Vị Thanh</td>
+                  </tr>
+                </table>
+              </div>
+              <div className="view-station-detail__footer">
+                <div className="view-station-detail__footer__close-btn" onClick={() =>  setVisibleViewStationDetail(false)}>
+                  Đóng
+                </div>
+              </div>
+            </div>
+          </CModal>
 
           {/* confirm delete station */}
           <CModal

@@ -65,46 +65,6 @@ const colors = [
   ['#7cb5ec', '#FFA262', '#7cb5ec'],
   ['#7cb5ec', '#8bbc21', '#7cb5ec']
 ]
-
-const optionss = {
-  chart: {
-    type: 'line',
-    height: 550, // Set the desired height here
-  },
-  plotOptions: {
-    series: {
-        color: '#1a2848'
-    }
-  },
-  tooltip: {
-    formatter: function() {
-        return 'Thời gian: <b>' + new Date(this.x).toLocaleString() + '</b>' + '<br/>Giá trị: <b>' +  this.y + '</b>';
-    }
-  },
-
-  series: [{
-    data: [{x: 1640269800000, y: 435, color:'#1a2848'}, {x: 1640615400000, y: 437, color:'#1a2848'}, {x: 1640701800000, y: 455, color:'#1a2848'}, {x: 1640788200000, y: 475, color:'#1a2848'}, {x: 1640874600000, y: 555, color:'#1a2848'},{x: 1640961000000, y: 435, color:'#1a2848'}],
-    zoneAxis: 'x',
-    marker: {
-			symbol: "circle",
-			radius: 3,
-      enabled: true
-		},
-    // zones: [{value: 3}, {value: 5, color: 'red'}]
-    zones: zones(colors[0])
-  }]
-}
-
-// (() => {
-//   let i = 0
-
-//   setInterval(() => {
-//     optionss.series[0].update({
-//       zones: zones(colors[++i % 2])
-//     })
-//   }, 2000)
-// })()
-  
   ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -115,18 +75,6 @@ const optionss = {
     Legend
   );
   
-  export const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        // position: 'top' as const
-      },
-      title: {
-        display: false,
-        text: 'Chart.js Line Chart',
-      },
-    },
-  };
 
 const StationDetail = () => {
     const { id } = useParams()
@@ -138,11 +86,6 @@ const StationDetail = () => {
 
     const [thing, setThing] = useState();
 
-    // const handleChangeSensor = (event) => {
-    //   setSelectedSensor(handelChangSelectedSensor(event.target.value))
-    //   setSelectedSensorId(event.target.value);
-    // } 
-
     //tab
     const [activeKey, setActiveKey] = useState(0);
     const [selectingSensor, setSelectingSensor] = useState();  //luu tru id sensor dang duoc chon hay dang xem
@@ -153,7 +96,8 @@ const StationDetail = () => {
 
     const [latestValueSensorList, setLatestValueSensorList] = useState([]);
 
-    //option chart
+    //option chart <<
+
     const [optionsss, setOptionsss] = useState(
       {
         chart: {
@@ -186,12 +130,97 @@ const StationDetail = () => {
     )
 
 
-    //test
-    console.log("date: ", new Date(1640615400000).toLocaleString());
-    console.log("time ", new Date("12/27/2023").getTime())
+
+    //test <<
+    const [dataStation, setDataStation] = useState(
+      {
+        chart: {
+          type: 'line',
+          height: 550, // Set the desired height here
+        },
+        plotOptions: {
+          series: {
+              color: '#1a2848'
+          }
+        },
+        tooltip: {
+          formatter: function() {
+              return 'Thời gian: <b>' + new Date(this.x).toLocaleString() + '</b>' + '<br/>Giá trị: <b>' +  this.y + '</b>';
+          }
+        },
+      
+        series: [{
+          data: [],
+          zoneAxis: 'x',
+          marker: {
+            symbol: "circle",
+            radius: 3,
+            enabled: true
+          },
+          // zones: [{value: 3}, {value: 5, color: 'red'}]
+          // zones: zones(colors[0])
+        }]
+      }
+    )
+    //test >>
+
 
     useEffect(() => {
-      console.log("id thing: ", id);
+
+      //get data station <<
+      observation.getDataStation("L2177R1M001F001", "2024/01/10", "20245/01/18", 1, 1000)
+        .then((res) => {
+          console.log("get data station of ryan: ", res);
+          // var d = new Date(res.data[0]?.resultTime.substring(0, res[0]?.resultTime.length-5));
+          // console.log("d: ", d.getTime());
+          var pointArray = [];
+          res?.data.map((multi) => {
+            var point = {
+              x: new Date(multi.ngay_gui.substring(0, multi.ngay_gui.length-5)).getTime(),
+              y: Number(multi.do_man),
+              color: '#1a2848'
+            }
+            pointArray.push(point);
+          })
+          // setSelectingMultiDTSValue(res);
+          return pointArray;
+        })
+        .then((res) => {
+          console.log("ryan dataa: ", res);
+          setDataStation(
+            {
+              chart: {
+                type: 'line',
+                height: 550, // Set the desired height here
+              },
+              plotOptions: {
+                series: {
+                    color: '#1a2848'
+                }
+              },
+              tooltip: {
+                formatter: function() {
+                    return 'Thời gian: <b>' + new Date(this.x).toLocaleString() + '</b>' + '<br/>Giá trị: <b>' +  this.y + '</b>';
+                }
+              },
+            
+              series: [{
+                data: res,
+                zoneAxis: 'x',
+                marker: {
+                  symbol: "circle",
+                  radius: 2,
+                  enabled: true
+                },
+                // zones: [{value: 3}, {value: 5, color: 'red'}]
+                // zones: zones(colors[0])
+              }]
+            }
+          )
+          console.log("ryan: ", dataStation);
+        })
+      //get data station >>
+
       //get sensor list in specific thing/station
       thingService.getThingById(id)
         .then((res) => {
@@ -216,9 +245,13 @@ const StationDetail = () => {
         })
     }, [])
 
+
+    //get all value by data stream id <<
     useEffect(() => {
+      console.log("selecting: ", selectingMultiDTS)
       observation.getAllValueByDataStreamId(selectingMultiDTS)
         .then((res) => {
+          console.log("abc: ", res);
           var d = new Date(res[0]?.resultTime.substring(0, res[0]?.resultTime.length-5));
           console.log("d: ", d.getTime());
           var pointArray = [];
@@ -230,6 +263,7 @@ const StationDetail = () => {
             }
             pointArray.push(point);
           })
+          console.log("selecting multidata value: ", res);
           setSelectingMultiDTSValue(res);
           return pointArray;
         })
@@ -268,7 +302,9 @@ const StationDetail = () => {
           console.log("optionsss: ", optionsss);
         })
     }, [selectingMultiDTS])
+    //get all value by data stream id >>
 
+    //change view: chart/table
     const handelChangeShowMode = (modeStr) => {
       setShowMode(modeStr);
       if(modeStr==='table') {
@@ -360,7 +396,7 @@ const StationDetail = () => {
                                     <HighchartsReact
                                       highcharts={Highcharts}
                                       constructorType={'stockChart'}
-                                      options={optionsss}
+                                      options={dataStation}
                                     />
                                   </CTabPane>
                                 </>
