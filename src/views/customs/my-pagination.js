@@ -33,7 +33,7 @@ const CustomPagination = ({ listItems, showData, isLoaded }) => {
     }, [listItems, active])
     return (
         <>
-            { showData(listItems.slice((active - 1) * itemsPerPage, active * itemsPerPage), (active - 1) * itemsPerPage, isLoaded) }
+            {showData(listItems.slice((active - 1) * itemsPerPage, active * itemsPerPage), (active - 1) * itemsPerPage, isLoaded) }
             <br />
             {
                 listItems?.length > itemsPerPage ? <CPagination aria-label="Page navigation example">
