@@ -85,6 +85,7 @@ export const AppSidebarNav = ({ items }) => {
       })
     }
   }
+  
   useEffect(() => {
     if (Array.isArray(listModules) && listModules?.length === 0) {
       // Just call api for the first time
@@ -94,6 +95,9 @@ export const AppSidebarNav = ({ items }) => {
 
   return (
     <React.Fragment>
+      {
+        items && navItem(items[0], 0) // Home page
+      }
       {filteredItems &&
         filteredItems.map((item, index) => (item.items ? navGroup(item, index) : navItem(item, index)))}
     </React.Fragment>

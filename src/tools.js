@@ -39,14 +39,37 @@ export const damStatusConverter = (dam) => {
         return {
             icon: cilLockUnlocked,
             class: "success",
-            status: "Đang mở"
+            status: "MỞ"
         }
     }
     return {
         icon: cilLockLocked,
         class: "secondary",
-        status: "Đang đóng"
+        status: "ĐÓNG"
     }
+}
+
+export const damStatusConverterV2 = (damStatusName) => {
+    if (damStatusName === "OPEN") {
+        return {
+            icon: cilLockUnlocked,
+            class: "success",
+            status: "MỞ"
+        }
+    }
+    return {
+        icon: cilLockLocked,
+        class: "secondary",
+        status: "ĐÓNG"
+    }
+}
+
+export const getDamScheduleBeginAt = (damSchedule) => {
+    return `${damSchedule?.damScheduleBeginAt[3]}:${damSchedule?.damScheduleBeginAt[4] ? damSchedule?.damScheduleBeginAt[4] : '00'}:${damSchedule?.damScheduleBeginAt[5] ? damSchedule?.damScheduleBeginAt[5] : '00'} ${damSchedule?.damScheduleBeginAt[2]}/${damSchedule?.damScheduleBeginAt[1]}/${damSchedule?.damScheduleBeginAt[0]}`
+}
+
+export const getDamScheduleEndAt = (damSchedule) => {
+    return `${damSchedule?.damScheduleEndAt[3]}:${damSchedule?.damScheduleEndAt[4] ? damSchedule?.damScheduleEndAt[4] : '00'}:${damSchedule?.damScheduleEndAt[5] ? damSchedule?.damScheduleEndAt[5] : '00'} ${damSchedule?.damScheduleEndAt[2]}/${damSchedule?.damScheduleEndAt[1]}/${damSchedule?.damScheduleEndAt[0]}`
 }
 
 export const getLoggedUserRole = () => {

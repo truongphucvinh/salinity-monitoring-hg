@@ -33,7 +33,7 @@ import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import { createDamSchedule,  defaultDamStatusId, deleteDamSchedule,  getAllDamSchedules,  getDamScheduleId,  updateDamSchedule } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
 import CustomDateTimePickerV2 from "src/views/customs/my-datetimepicker/my-datetimepicker-time"
-import { formatDate } from "src/tools"
+import { formatDate, getDamScheduleBeginAt, getDamScheduleEndAt } from "src/tools"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 
 const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
@@ -159,8 +159,8 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
                   <CTableRow>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Diễn giải</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Ngày mở</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Ngày đóng</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Ngày bắt đầu</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Ngày kết thúc</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Thao tác</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
@@ -171,8 +171,8 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
                                 <CTableRow key={damSchedule?.damScheduleId}>
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
                                     <CTableDataCell>{damSchedule?.damScheduleDescription}</CTableDataCell>
-                                    <CTableDataCell>{`${damSchedule?.damScheduleBeginAt[0]}-${damSchedule?.damScheduleBeginAt[1]}-${damSchedule?.damScheduleBeginAt[2]} lúc ${damSchedule?.damScheduleBeginAt[3]}:${damSchedule?.damScheduleBeginAt[4]}:${damSchedule?.damScheduleBeginAt[5] ? damSchedule?.damScheduleBeginAt[5] : '00'}`}</CTableDataCell>
-                                    <CTableDataCell>{`${damSchedule?.damScheduleEndAt[0]}-${damSchedule?.damScheduleEndAt[1]}-${damSchedule?.damScheduleEndAt[2]} lúc ${damSchedule?.damScheduleEndAt[3]}:${damSchedule?.damScheduleEndAt[4]}:${damSchedule?.damScheduleEndAt[5] ? damSchedule?.damScheduleEndAt[5] : '00'}`}</CTableDataCell>
+                                    <CTableDataCell>{getDamScheduleBeginAt(damSchedule)}</CTableDataCell>
+                                    <CTableDataCell>{getDamScheduleEndAt(damSchedule)}</CTableDataCell>
                                     {
                                         damSchedule?.damScheduleIsLock ? <CTableDataCell>
                                             Đã vô hiệu    
