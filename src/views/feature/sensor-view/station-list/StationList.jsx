@@ -357,7 +357,7 @@ const StationList = () => {
   const handelViewRynanStation = (serialNo) => {
     rynanStationList.map((station) => {
       if(station.so_serial == serialNo) {
-        observation.getDataStation("L2177R1M001F001", "2024/01/10", "20245/01/18", 1, 1000)
+        observation.getDataStation(serialNo, "", "", 1, 1000) 
           .then((res) => {
             var sensorList = [];
             for(const sensor in res.data[0]) {
