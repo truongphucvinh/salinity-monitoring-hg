@@ -374,9 +374,13 @@ const StationList = () => {
   }
 
   const navigate = useNavigate()
-  const handelDirectToDetail = (thingId) => {
-    localStorage.setItem("thingInfo", JSON.stringify({id: thingId}));
-    navigate(`station-detail/${thingId}`);
+  const handelDirectToDetailRynan = (serial) => {
+    // localStorage.setItem("thingInfo", JSON.stringify({id: serial}));
+    navigate(`station-detail-ry/${serial}`);
+  }
+
+  const handelDirectToDetailSE = (thingId) => {
+    navigate(`station-detail-se/${thingId}`);
   }
 
     return (
@@ -406,7 +410,7 @@ const StationList = () => {
                           return <>
                             <CTableRow onClick={() => setStationIsSelected(station)}>
                               <CTableDataCell>{ index+1 }</CTableDataCell>
-                              <CTableDataCell style={{'cursor': 'pointer'}} onClick={() => handelDirectToDetail(station?.so_serial)}>{ station.ten_thiet_bi }</CTableDataCell>
+                              <CTableDataCell style={{'cursor': 'pointer'}} onClick={() => handelDirectToDetailRynan(station?.so_serial)}>{ station.ten_thiet_bi }</CTableDataCell>
                               <CTableDataCell>{ station.ghi_chu }</CTableDataCell>
                               <CTableDataCell>{ station.ghi_chu }</CTableDataCell>
                               <CTableDataCell style={{display: "flex", alignItem: 'center'}}>
@@ -456,7 +460,7 @@ const StationList = () => {
                           return <>
                             <CTableRow onClick={() => setStationIsSelected(station)}>
                               <CTableDataCell>{ index+1 }</CTableDataCell>
-                              <CTableDataCell style={{'cursor': 'pointer'}} onClick={() => handelDirectToDetail(station?.thingId)}>{ station.station.name }</CTableDataCell>
+                              <CTableDataCell style={{'cursor': 'pointer'}} onClick={() => handelDirectToDetailSE(station?.thingId)}>{ station.station.name }</CTableDataCell>
                               <CTableDataCell>{ station.station.name }</CTableDataCell>
                               <CTableDataCell>{ station.station.name }</CTableDataCell>
                               <CTableDataCell style={{display: "flex", alignItem: 'center'}}>
@@ -531,7 +535,7 @@ const StationList = () => {
                                   </IconButton>
                               </Tooltip>
                           </div>
-                          <div className="station__list__item__action__detail-btn" onClick={() => {handelDirectToDetail(station?.thingId)}}>
+                          <div className="station__list__item__action__detail-btn" onClick={() => {handelDirectToDetailSE(station?.thingId)}}>
                               Chi tiết
                           </div>
                       </div>
