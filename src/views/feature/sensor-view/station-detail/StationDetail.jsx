@@ -58,6 +58,10 @@ function zones(colors) {
   }]
 }
 
+const getTime = (date) => {
+  return new Date(date).getTime();
+}
+
 const colors = [
   ['#7cb5ec', '#FFA262', '#7cb5ec'],
   ['#7cb5ec', '#8bbc21', '#7cb5ec']
@@ -72,6 +76,7 @@ const colors = [
     Legend
   );
   
+
 const StationDetail = () => {
     const { id } = useParams();
     //tab
@@ -127,6 +132,7 @@ const StationDetail = () => {
           setIsLoadingSensorList(false);
         })
     }, [])
+
 
     useEffect(() => {
       setIsLoadingSensorList(true);

@@ -17,7 +17,8 @@ import {
     CToaster,
     CSpinner,
     CFormTextarea,
-    CFormSelect
+    CFormSelect,
+    CInputGroup
   } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -26,9 +27,9 @@ import {
     cilMagnifyingGlass,
     cilReload,
     cilPlus,
-    cilTouchApp
+    cilTouchApp,
+    cilLocationPin
   } from '@coreui/icons'
-import { setAuthApiHeader } from "src/services/global-axios"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
@@ -37,10 +38,19 @@ import { createDam, deleteDam, getAllDamTypes, getAllDams, getAllRivers, getDamB
 import CustomSpinner from "src/views/customs/my-spinner"
 import CustomDateTimePicker from "src/views/customs/my-datetimepicker/my-datetimepicker"
 import { useNavigate } from "react-router-dom"
-import { damStatusConverter } from "src/tools"
+import { addZeroToDate, damStatusConverter, searchRelatives, splitCoordinates } from "src/tools"
+import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
+import { red } from "@mui/material/colors"
+import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 
 const DamManagement = () => {
-
+    const defaultAuthorizationCode = process.env.HG_MODULE_DAM_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management"
+    const defaultModuleAddFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management_add_dam"
+    const defaultModuleUpdateFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management_update_dam"
+    const defaultModuleDeleteFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management_delete_dam"
+    const [haveAdding, setHaveAdding] = useState(false)
+    const [haveUpdating, setHaveUpdating] = useState(false)
+    const [haveDeleting, setHaveDeleting] = useState(false)
     // Dam Type Management
     const [listDams, setListDams] = useState([])
     const [listDamTypes, setListDamTypes] = useState([])
@@ -124,12 +134,12 @@ const DamManagement = () => {
             setFilteredDams(listDams)
             if (damName) {
                 setFilteredDams(prev => {
-                    return prev.filter(dam => dam?.damName?.includes(damName.trim()))
+                    return prev.filter(dam => dam?.damName && searchRelatives(dam?.damName, damName))
                 })
             }
             if (damRiverName) {
                 setFilteredDams(prev => {
-                    return prev.filter(dam => dam?.damRiver?.riverName.includes(damRiverName.trim()))
+                    return prev.filter(dam => dam?.damRiver?.riverName && searchRelatives(dam?.damRiver?.riverName, damRiverName))
                 })
             }
             if (damSize) {
@@ -183,11 +193,11 @@ const DamManagement = () => {
                                     <CTableDataCell>{dam?.damName}</CTableDataCell>
                                     <CTableDataCell>{dam?.damRiver?.riverName}</CTableDataCell>
                                     <CTableDataCell>{`${dam?.damCapacity} x ${dam?.damHeight} (mét)`}</CTableDataCell>
-                                    <CTableDataCell><CIcon icon={damStatusConverter(dam)?.icon} className="me-2"/>{damStatusConverter(dam)?.status}</CTableDataCell>
+                                    <CTableDataCell className={`text-${damStatusConverter(dam)?.class}`}><CIcon icon={damStatusConverter(dam)?.icon} className="me-2"/>{damStatusConverter(dam)?.status}</CTableDataCell>
                                     <CTableDataCell>
                                         <CIcon icon={cilTouchApp} onClick={() => openDamDetail(dam?.damId)} className="text-primary mx-1" role="button"/>
-                                        <CIcon icon={cilPencil} onClick={() => openUpdateModal(dam?.damId)} className="text-success mx-1" role="button"/>
-                                        <CIcon icon={cilTrash} onClick={() => openDeleteModal(dam?.damId)}  className="text-danger" role="button"/>
+                                        {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(dam?.damId)} className="text-success mx-1" role="button"/>}
+                                        {haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(dam?.damId)}  className="text-danger" role="button"/>}
                                     </CTableDataCell>
                                 </CTableRow>    
                             )
@@ -242,14 +252,10 @@ const DamManagement = () => {
             return { ...prev, addDamCapacity: value }
         })
     }
-    const handleSetAddDamLatitude = (value) => {
+    const handleSetLatLngAutomatically = (value) => {
+        const coordinates = splitCoordinates(value)
         setAddState(prev => {
-            return { ...prev, addDamLatitude: value }
-        })
-    }
-    const handleSetAddDamLongtitude = (value) => {
-        setAddState(prev => {
-            return { ...prev, addDamLongtitude: value }
+            return { ...prev, addDamLongtitude: coordinates?.lng, addDamLatitude: coordinates?.lat }
         })
     }
     const handleSetAddDamTypeId = (value) => {
@@ -274,7 +280,7 @@ const DamManagement = () => {
                 damConstructedAt: addDamConstructedAt,
                 damHeight: addDamHeight,
                 damCapacity: addDamCapacity,
-                damLongtitude: addDamLongtitude,
+                damLongitude: addDamLongtitude,
                 damLatitude: addDamLatitude,
                 damDescription: addDamDescription ? addDamDescription.trim() : addDamDescription,
                 damRiverId: addDamRiverId,
@@ -376,14 +382,35 @@ const DamManagement = () => {
                         </CCol>
                     </CRow>
                     <CRow>
+                        <CCol xs={12} lg={12}>
+                            <CInputGroup className="mt-4">
+                                <CFormInput 
+                                    type="text"
+                                    placeholder="Tọa độ"
+                                    feedbackInvalid="Không bỏ trống và phải là một cặp số gồm vĩ độ và kinh độ"
+                                    onChange={(e) => handleSetLatLngAutomatically(e.target.value)}
+                                    aria-describedby="exampleFormControlInputHelpInline"
+                                    required
+                                    id="button-addon2"
+                                />
+                                <CButton type="button" className="text-white" color="primary" id="button-addon2">
+                                    <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">
+                                        <CIcon icon={cilLocationPin} style={{color: "white", width: "18px",  height: "18px"}}/>
+                                    </a>
+                                </CButton>
+                            </CInputGroup>
+                        </CCol>
+                    </CRow>
+                    <CRow>
                         <CCol xs={12} lg={6}>
                             <CFormInput
                                 className="mt-4"
                                 type="number"
-                                placeholder="Kinh độ"
+                                placeholder="Vĩ độ"
+                                readOnly
                                 feedbackInvalid="Không bỏ trống và phải là số lớn hơn 0"
-                                onChange={(e) => handleSetAddDamLongtitude(e.target.value)}
-                                value={addDamLongtitude}
+                                // onChange={(e) => handleSetAddDamLatitude(e.target.value)}
+                                value={addDamLatitude}
                                 aria-describedby="exampleFormControlInputHelpInline"
                                 required
                             />
@@ -392,10 +419,11 @@ const DamManagement = () => {
                             <CFormInput
                                 className="mt-4"
                                 type="number"
-                                placeholder="Vĩ độ"
+                                placeholder="Kinh độ"
+                                readOnly
                                 feedbackInvalid="Không bỏ trống và phải là số lớn hơn 0"
-                                onChange={(e) => handleSetAddDamLatitude(e.target.value)}
-                                value={addDamLatitude}
+                                // onChange={(e) => handleSetAddDamLongtitude(e.target.value)}
+                                value={addDamLongtitude}
                                 aria-describedby="exampleFormControlInputHelpInline"
                                 required
                             />
@@ -464,7 +492,8 @@ const DamManagement = () => {
         updateDamRiverId: ""
     }
     const [updateState, setUpdateState] = useState(updateData)
-    const { updateId,
+    const { 
+        updateId,
         updateDamName,
         updateDamConstructedAt,
         updateDamDescription,
@@ -482,7 +511,10 @@ const DamManagement = () => {
             .then(res => {
                 const dam = res?.data
                 if (dam) {
-                    const constructedAt = `${dam?.damConstructedAt[0]}-${dam?.damConstructedAt[1]}-${dam?.damConstructedAt[2]}`
+                    let year = dam?.damConstructedAt[2].toString()
+                    let month = dam?.damConstructedAt[1].toString()
+                    let day = dam?.damConstructedAt[0].toString()
+                    const constructedAt = addZeroToDate(year, month, day)
                     const updateDamFetchData = {
                         updateId: dam?.damId,
                         updateDamName: dam?.damName,
@@ -490,7 +522,7 @@ const DamManagement = () => {
                         updateDamDescription: dam?.damDescription,
                         updateDamHeight: dam?.damHeight,
                         updateDamCapacity: dam?.damCapacity,
-                        updateDamLongtitude: dam?.damLongtitude,
+                        updateDamLongtitude: dam?.damLongitude,
                         updateDamLatitude: dam?.damLatitude,
                         updateDamTypeId: dam?.damType?.damTypeId,
                         updateDamRiverId: dam?.damRiver?.riverId 
@@ -542,14 +574,10 @@ const DamManagement = () => {
             return { ...prev, updateDamCapacity: value }
         })
     }
-    const handleSetUpdateDamLatitude = (value) => {
+    const handleSetUpdateLatLngAutomatically = (value) => {
+        const coordinates = splitCoordinates(value)
         setUpdateState(prev => {
-            return { ...prev, updateDamLatitude: value }
-        })
-    }
-    const handleSetUpdateDamLongtitude = (value) => {
-        setUpdateState(prev => {
-            return { ...prev, updateDamLongtitude: value }
+            return { ...prev, updateDamLatitude:  coordinates?.lat, updateDamLongtitude: coordinates?.lng }
         })
     }
     const handleSetUpdateDamTypeId = (value) => {
@@ -576,7 +604,7 @@ const DamManagement = () => {
                 damDescription: updateDamDescription ? updateDamDescription.trim() : updateDamDescription,
                 damHeight: updateDamHeight,
                 damCapacity: updateDamCapacity,
-                damLongtitude: updateDamLongtitude,
+                damLongitude: updateDamLongtitude,
                 damLatitude: updateDamLatitude,
                 damTypeId: updateDamTypeId,
                 damRiverId: updateDamRiverId 
@@ -630,6 +658,7 @@ const DamManagement = () => {
                                     classes='mt-4' 
                                     value={updateDamConstructedAt}
                                     setValue={handleSetUpdateDamConstructedAt}
+                                    isRequired={false}
                                 />
                             </CCol>
                         </CRow>
@@ -673,14 +702,33 @@ const DamManagement = () => {
                             </CCol>
                         </CRow>
                         <CRow>
+                            <CCol xs={12} lg={12}>
+                                <CInputGroup className="mt-4">
+                                    <CFormInput 
+                                        type="text"
+                                        placeholder="Tọa độ"
+                                        feedbackInvalid="Không bỏ trống và phải là một cặp số gồm vĩ độ và kinh độ"
+                                        onChange={(e) => handleSetUpdateLatLngAutomatically(e.target.value)}
+                                        aria-describedby="exampleFormControlInputHelpInline"
+                                        id="button-addon2"
+                                    />
+                                    <CButton type="button" className="text-white" color="primary" id="button-addon2">
+                                        <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">
+                                            <CIcon icon={cilLocationPin} style={{color: "white", width: "18px",  height: "18px"}}/>
+                                        </a>
+                                    </CButton>
+                                </CInputGroup>
+                            </CCol>
+                        </CRow>
+                        <CRow>
                             <CCol xs={12} lg={6}>
                                 <CFormInput
                                     className="mt-4"
                                     type="number"
-                                    placeholder="Kinh độ"
+                                    placeholder="Vĩ độ"
+                                    readOnly
                                     feedbackInvalid="Là một số"
-                                    onChange={(e) => handleSetUpdateDamLongtitude(e.target.value)}
-                                    value={updateDamLongtitude}
+                                    value={updateDamLatitude}
                                     aria-describedby="exampleFormControlInputHelpInline"
                                 />
                             </CCol>
@@ -688,10 +736,10 @@ const DamManagement = () => {
                                 <CFormInput
                                     className="mt-4"
                                     type="number"
-                                    placeholder="Vĩ độ"
+                                    placeholder="Kinh độ"
+                                    readOnly
                                     feedbackInvalid="Là một số"
-                                    onChange={(e) => handleSetUpdateDamLatitude(e.target.value)}
-                                    value={updateDamLatitude}
+                                    value={updateDamLongtitude}
                                     aria-describedby="exampleFormControlInputHelpInline"
                                 />
                             </CCol>
@@ -802,15 +850,20 @@ const DamManagement = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addVisible, updateVisible])
 
+    
     return (
         <CRow>
+        <CustomAuthorizationChecker isRedirect={true} code={defaultAuthorizationCode} />
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleAddFeature} setExternalState={setHaveAdding}/>
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateFeature} setExternalState={setHaveUpdating}/>
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleDeleteFeature} setExternalState={setHaveDeleting}/>
         <CCol xs>
           <CCard className="mb-4">
             <CToaster ref={toaster} push={toast} placement="top-end" />
             <CCardHeader>Danh sách đập</CCardHeader>
             <CCardBody>
                 <CustomModal visible={addVisible} title={'Thêm đập'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
-                <CustomModal visible={updateVisible} title={'Cập nhật đập'} body={updateForm(updateDamName)} setVisible={(value) => setUpdateVisible(value)}/>
+                <CustomModal visible={updateVisible} title={'Cập nhật đập'} body={updateForm(updateId)} setVisible={(value) => setUpdateVisible(value)}/>
                 <CustomModal visible={deleteVisible} title={'Xóa người đập'} body={deleteForm(deleteIdDamId)} setVisible={(value) => setDeleteVisible(value)}/>
                 <CForm onSubmit={onFilter}>
                     <CRow>
@@ -857,7 +910,7 @@ const DamManagement = () => {
               <br />
               <CRow>
                 <CCol xs={12}>
-                    <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>
+                    {haveAdding && <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>}
                 </CCol>
               </CRow>
               <br />

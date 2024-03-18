@@ -12,6 +12,7 @@ const CustomModal = ({title, body, visible, setVisible}) => {
     return (
         <>
             <CModal
+                backdrop="static"
                 visible={visible}
                 onClose={() => setVisible(false)}
                 aria-labelledby="LiveDemoExampleLabel"

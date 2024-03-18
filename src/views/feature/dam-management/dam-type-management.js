@@ -26,16 +26,26 @@ import {
     cilReload,
     cilPlus
   } from '@coreui/icons'
-import { setAuthApiHeader } from "src/services/global-axios"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import { createDamType, deleteDamType, getAllDamTypes, getDamTypeById, updateDamType } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
+import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
+import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
+import { searchRelatives } from "src/tools"
 
 const DamTypeManagement = () => {
 
+    const defaultAuthorizationCode = process.env.HG_MODULE_DAM_TYPE_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_type_management"
+    // Checking feature's module
+    const defaultModuleAddFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_type_management_add_dam_type"
+    const defaultModuleUpdateFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_type_management_update_dam_type"
+    const defaultModuleDeleteFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_type_management_delete_dam_type"
+    const [haveAdding, setHaveAdding] = useState(false)
+    const [haveUpdating, setHaveUpdating] = useState(false)
+    const [haveDeleting, setHaveDeleting] = useState(false)
     // Dam Type Management
     const [listDamTypes, setListDamTypes] = useState([])
     const [isLoadedDamTypes, setIsLoadedDamTypes] = useState(false)
@@ -88,12 +98,12 @@ const DamTypeManagement = () => {
             setFilteredDamTypes(listDamTypes)
             if (damTypeName) {
                 setFilteredDamTypes(prev => {
-                    return prev.filter(damType => damType?.damTypeName?.includes(damTypeName.trim()))
+                    return prev.filter(damType => damType?.damTypeName && searchRelatives(damType?.damTypeName, damTypeName))
                 })
             }
             if (damTypeDescription) {
                 setFilteredDamTypes(prev => {
-                    return prev.filter(damType => damType?.damTypeDescription?.includes(damTypeDescription.trim()))
+                    return prev.filter(damType => damType?.damTypeDescription && searchRelatives(damType?.damTypeDescription, damTypeDescription))
                 })
             }
         }else {
@@ -132,8 +142,8 @@ const DamTypeManagement = () => {
                                     <CTableDataCell>{damType?.damTypeName}</CTableDataCell>
                                     <CTableDataCell>{damType?.damTypeDescription}</CTableDataCell>
                                     <CTableDataCell>
-                                        <CIcon icon={cilPencil} onClick={() => openUpdateModal(damType?.damTypeId)} className="text-success mx-1" role="button"/>
-                                        <CIcon icon={cilTrash} onClick={() => openDeleteModal(damType?.damTypeId)}  className="text-danger" role="button"/>
+                                        {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(damType?.damTypeId)} className="text-success mx-1" role="button"/>}
+                                        {haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(damType?.damTypeId)}  className="text-danger" role="button"/>}
                                     </CTableDataCell>
                                 </CTableRow>    
                             )
@@ -245,7 +255,6 @@ const DamTypeManagement = () => {
                     </CRow>
                 </CForm> 
         </>
-
 
     }
  
@@ -446,9 +455,12 @@ const DamTypeManagement = () => {
         setUpdateState(updateData)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addVisible, updateVisible])
-
     return (
         <CRow>
+        <CustomAuthorizationChecker isRedirect={true} code={defaultAuthorizationCode}/>
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleAddFeature} setExternalState={setHaveAdding}/>
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateFeature} setExternalState={setHaveUpdating}/>
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleDeleteFeature} setExternalState={setHaveDeleting}/>
         <CCol xs>
           <CCard className="mb-4">
             <CToaster ref={toaster} push={toast} placement="top-end" />
@@ -490,7 +502,7 @@ const DamTypeManagement = () => {
               <br />
               <CRow>
                 <CCol xs={12}>
-                    <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>
+                    {haveAdding && <CButton type="button" color="primary" onClick={() => setAddVisible(true)}>Thêm <CIcon icon={cilPlus}/></CButton>}
                 </CCol>
               </CRow>
               <br />

@@ -20,7 +20,7 @@ export const createDamStatus = (damStatus) => damApi.post('/dam-statuses', damSt
 export const updateDamStatus = (damStatus) => damApi.patch('/dam-statuses', damStatus)
 export const deleteDamStatus = (damStatusId) => damApi.delete(`/dam-statuses/${damStatusId}`)
 
-export const getAllDamSchedules = (damId) => damApi.get(`/dam-schedules?damId=${damId}&damStatusId=${defaultDamStatusId}`)
+export const getAllDamSchedules = (damId) => damApi.get(`/dam-schedules?damId=${damId}`)
 export const getDamScheduleId = (damScheduleId) => damApi.get(`/dam-schedules/${damScheduleId}`)
 export const createDamSchedule = (damSchedule) => damApi.post('/dam-schedules', damSchedule)
 export const updateDamSchedule = (damSchedule) => damApi.patch('/dam-schedules', damSchedule)
