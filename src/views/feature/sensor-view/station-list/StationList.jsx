@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect } from 'react'
+import { useState, useEffect} from 'react'
 import * as React from 'react';
 import './StationList.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,7 +10,6 @@ import MenuItem from '@mui/material/MenuItem';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import { CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react';
 
 import Switch from '@mui/material/Switch';
 
@@ -28,6 +27,7 @@ import multiDataStreamSerivce from 'src/services/multi-data-stream';
 import stationService from 'src/services/station';
 import thingService from 'src/services/thing';
 import sensorService from 'src/services/sensor'
+import observation from "src/services/observation";
 
 //bootstrap
 import { Spinner } from 'react-bootstrap';
@@ -116,10 +116,10 @@ const StationList = () => {
   const [selectedSensorList, setSelectedSensorList] = useState([]);
 
   //available station
-  const [availableStationList, setAvailableStationList] = useState(); //including stations are gotten by Ryan api
+  const [rynanStationList, setRynanStationList] = useState(); //including stations are gotten by Ryan api
 
   //model view station detail
-  const [visibleViewStationDetail, setVisibleViewStationDetail] = useState(false)
+  const [visibleRynanStationDetail, setVisibleRynanStationDetail] = useState(false)
 
   const handleChangeSensorsSelection = (event) => {
     setSelectedSensor(event);
@@ -127,7 +127,6 @@ const StationList = () => {
       ...prev,
       sensors: event
     }))
-    console.log("selected sensor: ", newStation);
   };
 
   const handleChangeDamSelection = (event) => {
@@ -169,9 +168,6 @@ const StationList = () => {
     stationService.deleteStation(station?.station?.id)
       .then((res) => {
         thingService.deleteThing(station?.thingId)
-        .then((resThing) => {
-          console.log("resthing: ", resThing);
-        })
         .then(() => {
           setDeletionConfirm(false);
           setStationListChange(!stationListChange);
@@ -182,10 +178,6 @@ const StationList = () => {
 
   const [isModification, setIsModification] = useState(false); //true: modify, false: create
 
-  useLayoutEffect(() => {
-
-  })
-
   //useEffect
   useEffect(() => {
     setStationListLoading (true);
@@ -193,20 +185,18 @@ const StationList = () => {
     //Rynan station list
     stationService.getStationListByRyan()
       .then((res) => {
-        console.log("rynan station list: ", res.data);
-        setAvailableStationList(res.data);
+        setRynanStationList(res.data);
       })
 
     stationService.getStationList()
       .then((res) => {
         setStationList(res);
-        console.log("station list: ", res)
       })
       .then(() => {
         setStationListLoading(false);
       })
       .catch((error) => {
-        console.log("error: ", error);
+        console.log(error);
       })
   }, [stationListChange])
 
@@ -221,7 +211,6 @@ const StationList = () => {
             label: sensor.name
           }
           sensorListVL.push(sensorVL);
-          console.log("sensorListVL: ", sensorListVL);
           setSensorList(sensorListVL);
         })
       })
@@ -240,16 +229,13 @@ const StationList = () => {
       ...prev,
       [e.target.name]: e.target.value
     }))
-    console.log(newStation);
   }
 
   const handelSubmitStationForm = (e) => { //for creation and modification
     e.preventDefault();
     if(isModification) {
-      console.log("modify");
       handelModifyStation();
     } else {
-      console.log("create");
       handelCreateStation();
     }
   }
@@ -267,24 +253,19 @@ const StationList = () => {
       status: true
     }
 
-    console.log("new station formating", newStationFormating);
-
     thingService.createThing(newThing)
       .then((res) => {
         //create station
         stationService.createStation(res.data.id, newStationFormating)
           .then((resStation) => {
-          
           //link sensor here
             var dataStreamInfo = {
               name: newStation.name,
               description: newStation.description
             }
-            console.log("selected sensor list in: ", selectedSensorList);
             selectedSensor.map((sensor) => {
               multiDataStreamSerivce.createDataStream(res.data.id, sensor.value, dataStreamInfo)
                 .then((resMultiDTS) => {
-                  console.log("resMultiDTS: ", resMultiDTS);
                 })
             })
         })
@@ -294,11 +275,11 @@ const StationList = () => {
           setStationListChange(!stationListChange);
         })
         .catch((error) => {
-          console.log("station error: ", error);
+          console.log(error);
         })
       })
       .catch((error) => {
-        console.log("thing error: ", error);
+        console.log(error);
       })
   }
 
@@ -336,7 +317,6 @@ const StationList = () => {
     var selectedSensorId = await Promise.all(selectedSensor.map((sensor) => {
       return sensor.value;
     }))
-    console.log("change: ", selectedSensorId);
     //cap nhap lien ket sensor
     //neu khong co trong backup => them
     var thingId = stationIsSelected.thingId;
@@ -373,10 +353,54 @@ const StationList = () => {
     }
   }
 
+  const [rynanStationIsSeeing, setRynanStationIsSeeing] = useState();
+  const handelViewRynanStation = (serialNo) => {
+    rynanStationList.map((station) => {
+      if(station.so_serial == serialNo) {
+        observation.getDataStation("L2177R1M001F001", "2024/01/10", "20245/01/18", 1, 1000)
+          .then((res) => {
+            var sensorList = [];
+            for(const sensor in res.data[0]) {
+              if(sensor !== "trang_thai" && !isNaN(res.data[0][sensor]) && res.data[0][sensor] !== null) {
+                sensorList.push(sensor);
+                station.sensor_list = sensorList;
+              }
+            }
+          })
+          .then(() => {
+            setRynanStationIsSeeing(station);
+            setVisibleRynanStationDetail(true);
+          })
+      }
+    })
+  }
+
   const navigate = useNavigate()
   const handelDirectToDetail = (thingId) => {
     localStorage.setItem("thingInfo", JSON.stringify({id: thingId}));
     navigate(`station-detail/${thingId}`);
+  }
+
+  const generateSensorName = (rawName) => {
+    var generatedName = '';
+    switch(rawName) {
+      case 'do_pH':
+        generatedName = "Độ pH";
+        break;
+      case 'muc_nuoc':
+        generatedName = "Mực nước";
+        break;
+      case 'nhiet_do':
+        generatedName = "Nhiệt độ";
+        break;
+      case 'do_man':
+        generatedName = "Độ mặn";
+        break;
+      default:
+        generatedName = rawName;
+        break;    
+    }
+    return generatedName;
   }
 
     return (
@@ -392,23 +416,23 @@ const StationList = () => {
                   <CTable bordered align="middle" className="mb-0 border" hover responsive style={{'margin-top' : "10px"}}>
                     <CTableHead className="text-nowrap">
                       <CTableRow>
-                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>STT</CTableHeaderCell>
                         <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Tên trạm</CTableHeaderCell>
-                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Mô tả</CTableHeaderCell>
-                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Liên kết đập</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '40%'}}>Mô tả</CTableHeaderCell>
+                        {/* <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Liên kết đập</CTableHeaderCell> */}
                         <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Trạng thái</CTableHeaderCell>
                         <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Thao tác</CTableHeaderCell>
                       </CTableRow>
                     </CTableHead>
                     <CTableBody>
                       {
-                        availableStationList?.length !== 0 ? availableStationList?.map((station, index) => {
+                        rynanStationList?.length !== 0 ? rynanStationList?.map((station, index) => {
                           return <>
                             <CTableRow onClick={() => setStationIsSelected(station)}>
                               <CTableDataCell>{ index+1 }</CTableDataCell>
                               <CTableDataCell style={{'cursor': 'pointer'}} onClick={() => handelDirectToDetail(station?.so_serial)}>{ station.ten_thiet_bi }</CTableDataCell>
                               <CTableDataCell>{ station.ghi_chu }</CTableDataCell>
-                              <CTableDataCell>{ station.ghi_chu }</CTableDataCell>
+                              {/* <CTableDataCell>{ station.ghi_chu }</CTableDataCell> */}
                               <CTableDataCell style={{display: "flex", alignItem: 'center'}}>
                                 <div className={station.trang_thai ? "station-status station-status--active" : "station-status station-status--inactive"}></div>
                                 {
@@ -416,7 +440,7 @@ const StationList = () => {
                                 }
                               </CTableDataCell>
                               <CTableDataCell>
-                                <CIcon icon={cilTouchApp} onClick={() => {setVisibleViewStationDetail(true)}} className="text-primary mx-1" role="button"/>
+                                <CIcon icon={cilTouchApp} onClick={() => {handelViewRynanStation(station.so_serial)}} className="text-primary mx-1" role="button"/>
                               </CTableDataCell>
                             </CTableRow>
                           </>
@@ -442,7 +466,7 @@ const StationList = () => {
                   <CTable bordered align="middle" className="mb-0 border" hover responsive style={{'margin-top' : "20px"}}>
                     <CTableHead className="text-nowrap">
                       <CTableRow>
-                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>STT</CTableHeaderCell>
                         <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Tên trạm</CTableHeaderCell>
                         <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Mô tả</CTableHeaderCell>
                         <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Liên kết đập</CTableHeaderCell>
@@ -727,8 +751,8 @@ const StationList = () => {
           {/* view station detail */}
           <CModal
             alignment="center"
-            visible={visibleViewStationDetail}
-            onClose={() => setVisibleViewStationDetail(false)}
+            visible={visibleRynanStationDetail}
+            onClose={() => setVisibleRynanStationDetail(false)}
             aria-labelledby="VerticallyCenteredExample"
           >
             <div className="view-station-detail">
@@ -739,28 +763,55 @@ const StationList = () => {
                 <table>
                   <tr>
                     <td className='key'>Tên trạm</td>
-                    <td className='value'>Trạm Vị Thanh</td>
+                    <td className='value'>{ rynanStationIsSeeing?.ghi_chu }</td>
+                  </tr>
+                  <tr>
+                    <td className='key'>Trạng thái</td>
+                    <td className='value' style={{display: "flex", alignItem: 'center'}}>
+                        <div style={{marginLeft: 0}}
+                          className={rynanStationIsSeeing?.trang_thai ? "station-status station-status--active" : "station-status station-status--inactive"}></div>
+                        {
+                          rynanStationIsSeeing?.trang_thai ? <span>Đang hoạt động</span> : <span>Trạm đang khóa</span>
+                        }
+                    </td>
                   </tr>
                   <tr>
                     <td className='key'>Mô tả</td>
-                    <td className='value'>Trạm Vị Thanh</td>
+                    <td className='value'>{ rynanStationIsSeeing?.ghi_chu }</td>
                   </tr>
                   <tr>
                     <td className='key'>Địa chỉ</td>
-                    <td className='value'>Trạm Vị Thanh</td>
+                    <td className='value'>{ rynanStationIsSeeing?.khu_vuc_lap_dat }</td>
                   </tr>
                   <tr>
                     <td className='key'>Tọa độ</td>
-                    <td className='value'>Trạm Vị Thanh</td>
+                    <td className='value' >
+                      <span>Kinh độ: { rynanStationIsSeeing?.kinh_do }</span><br/>
+                      <span>Vĩ độ: { rynanStationIsSeeing?.vi_do }</span>
+                    </td>
                   </tr>
                   <tr>
                     <td className='key'>Cảm biến</td>
-                    <td className='value'>Trạm Vị Thanh<br/>Trạm Vị Thanh</td>
+                    <td className='value'>
+                      {
+                        rynanStationIsSeeing?.sensor_list?.map((sensor, index) => {
+                          return <>
+                            <span key={index}>{ sensor }</span>
+                            {
+                              rynanStationIsSeeing?.sensor_list?.length-1 !== index ? 
+                              <span>, </span>
+                              :
+                              <span></span>
+                            }
+                          </>
+                        })
+                      }
+                    </td>
                   </tr>
                 </table>
               </div>
               <div className="view-station-detail__footer">
-                <div className="view-station-detail__footer__close-btn" onClick={() =>  setVisibleViewStationDetail(false)}>
+                <div className="view-station-detail__footer__close-btn" onClick={() =>  setVisibleRynanStationDetail(false)}>
                   Đóng
                 </div>
               </div>

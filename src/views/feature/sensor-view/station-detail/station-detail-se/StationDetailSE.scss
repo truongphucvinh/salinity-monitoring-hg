@@ -1,4 +1,4 @@
-@import '../../../../scss/custom';
+@import '../../../../../scss/custom';
 
 .station-detail {
     &__heading {
@@ -313,9 +313,24 @@
                     padding: 10px;
                 }
             }
+            .station-value {
+                .type {
+                    width: 30%;
+                }
+                .time {
+                    width: 30%;
+                    text-align: left;
+                }
+                .unit, .index {
+                    text-align: center;
+                }
+                .index {
+                    font-weight: bold;
+                }
+            }
             .sensor-value-div {
-                max-height: 520px !important;
-                overflow-y: auto !important;
+                max-height: 520px;
+                overflow: auto;
                 box-shadow: 0 0 8px 0.5px rgba(128, 128, 128, 0.308);
             }
             .sensor-value__specific-sensor {
@@ -325,30 +340,12 @@
                 .index {
                     width: 50%;
                     text-align: center;
+                    font-weight: bold;
                 }
             }
             &__general-index {
                 &__header {
                     height: 42px;
-                    font-weight: bold;
-                }
-                &__table {
-                    .station-value {
-                        .type {
-                            width: 30%;
-                        }
-                        .time {
-                            width: 40%;
-                            text-align: left;
-                        }
-                        .unit, .index {
-                            text-align: center;
-                        }
-                        .index {
-                            width: 30%;
-                            font-weight: bold;
-                        }
-                    }
                 }
             }
         }
@@ -356,9 +353,8 @@
 }
 
 .spinner-border {
+    height: 15px;
+    width: 15px;
+    margin-left: 20px;
     border-width: thin;
-    position: relative;
-    height: 16px;
-    width: 16px;
-    margin-left: 10px;
 }
