@@ -1,10 +1,11 @@
 import { cilLocationPin, cilMagnifyingGlass, cilReload } from "@coreui/icons"
 import CIcon from "@coreui/icons-react"
-import { CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from "@coreui/react"
+import { CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow, CSpinner, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from "@coreui/react"
 import React, { useEffect, useState } from "react"
-import { getAllDamScheduleBySelectedDate } from "src/services/dam-services"
+import { getAllDamScheduleBySelectedDate, getAllDamSchedules } from "src/services/dam-services"
 import { damStatusConverter, damStatusConverterV2, getDamScheduleBeginAt, getDamScheduleEndAt, searchRelatives } from "src/tools"
 import CustomDateTimePicker from "src/views/customs/my-datetimepicker/my-datetimepicker"
+import CustomModal from "src/views/customs/my-modal"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomSpinner from "src/views/customs/my-spinner"
 
@@ -76,6 +77,86 @@ const HomePage = () => {
     const onReset = () => {
         handleFilteredListDams(listDams)
     }
+    const [damVisible, setDamVisible] = useState(false)
+    const [openedDam, setOpenedDam] = useState(null)
+    const [openedDamSchedules, setOpenedDamSchedules] = useState([])
+    const [isLoadedOpenedDamSchedules, setIsLoadedOpenedDamSchedules] = useState(false)
+    const getAllDamSchedulesByDamId = (damId) => {
+        getAllDamSchedules(damId)
+        .then((res) => {
+            if (res?.data) {
+                setOpenedDamSchedules(res?.data)
+            }
+        })
+        .catch((err) => {
+            // Do nothing
+        })
+    }
+    const openDamModal = (dam) => {
+        setOpenedDam(dam)
+        getAllDamSchedulesByDamId(dam?.damId)
+        setDamVisible(true)
+    }
+    const damScheduleInfo = (damSchedules) => {
+        return (<>
+            <CTable>
+                <CTableHead>
+                    <CTableRow>
+                        <CTableHeaderCell>Lịch mở cống / đập</CTableHeaderCell>
+                    </CTableRow>
+                </CTableHead>
+                <CTableBody>
+                    {
+                        damSchedules?.length > 0 ? damSchedules?.filter((damSchedule) => {
+                            return damSchedule?.damScheduleIsLock === false
+                        }).map((damSchedule, index) => {
+                            return <CTableRow key={index}>
+                                <CTableDataCell>
+                                    Từ
+                                    <strong className="text-success">
+                                        {' '}{getDamScheduleBeginAt(damSchedule)}
+                                    </strong> đến 
+                                    <strong className="text-success">
+                                        {' '}{getDamScheduleEndAt(damSchedule)}
+                                    </strong>
+                                </CTableDataCell>
+                            </CTableRow>
+                        }) : <CTableRow>
+                            <CTableDataCell>Không có</CTableDataCell>
+                        </CTableRow>
+                    }
+                </CTableBody>
+            </CTable>
+        </>)
+    }
+    const damInfo = () => {
+        return (
+            <>{
+                openedDam ?<> <CTable>
+                    <CTableBody>
+                        <CTableRow>
+                            <CTableHeaderCell>Tên cống / đập</CTableHeaderCell>
+                            <CTableDataCell>{openedDam?.damName}</CTableDataCell>
+                        </CTableRow>
+                        <CTableRow>
+                            <CTableHeaderCell>Kích thước</CTableHeaderCell>
+                            <CTableDataCell>{openedDam?.damHeight} (m) x {openedDam?.damCapacity} (m)</CTableDataCell>
+                        </CTableRow>
+                        <CTableRow>
+                            <CTableHeaderCell>Mô tả</CTableHeaderCell>
+                            <CTableDataCell>{openedDam?.damDescription}</CTableDataCell>
+                        </CTableRow>
+                    </CTableBody>
+                </CTable> 
+                <CustomPagination 
+                    listItems={openedDamSchedules}
+                    showData={damScheduleInfo}
+                    isLoaded={isLoadedOpenedDamSchedules}
+                />
+                </>: <CSpinner/>
+            }</>
+        )
+    }
     useEffect(() => {
         rebaseAllData()
     }, [pickedDate]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -135,7 +216,11 @@ const HomePage = () => {
                             return (
                                 <CTableRow key={dam?.damId}>
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
-                                    <CTableDataCell>{dam?.damName}</CTableDataCell>
+                                    <CTableDataCell>
+                                        <a className="link-opacity-100" role="button" onClick={() => openDamModal(dam)}>
+                                            {dam?.damName}
+                                        </a>
+                                    </CTableDataCell>
                                     <CTableDataCell className={`text-${damStatusConverterV2(dam?.damCurrentStatus)?.class}`}><CIcon icon={damStatusConverterV2(dam?.damCurrentStatus)?.icon} className="me-2"/>{damStatusConverterV2(dam?.damCurrentStatus)?.status}</CTableDataCell>
                                     <CTableDataCell>
                                         {
@@ -146,6 +231,9 @@ const HomePage = () => {
                                                     </div>
                                                 )
                                             }) 
+                                        }
+                                        {
+                                            dam?.damSchedulesAtThisDate?.length === 0 ? "Không có" : ""
                                         }
                                     </CTableDataCell>
                                     <CTableDataCell>
@@ -175,16 +263,9 @@ const HomePage = () => {
                         Lịch mở cống / đập
                     </CCardHeader>
                     <CCardBody>
+                        <CustomModal visible={damVisible} title={'Thông tin cống / đập'} body={damInfo()} setVisible={(value) => setDamVisible(value)}/>
                         { searchComponent() }
                         <br/>
-                        {
-                            // Viết API 
-                            // Ráp Pagination vô
-                            // Làm hàm search theo ngày
-                            // Mới vô là ngày hôm nay --> rebase
-                            // Chọn ngày riêng với tìm tên
-                            // 
-                        }
                         <CustomPagination
                             listItems={filteredListDams}
                             showData={showFilteredTable} 
