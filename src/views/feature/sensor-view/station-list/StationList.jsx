@@ -44,6 +44,7 @@ import {
 //modal
 import { CModal} from '@coreui/react';
 import { useNavigate } from 'react-router-dom';
+import CustomIntroduction from 'src/views/customs/my-introduction';
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
 
 const animatedComponents = makeAnimated();
@@ -405,6 +406,10 @@ const StationList = () => {
 
     return (
         <>
+          <CustomIntroduction 
+            title={'QUẢN LÝ TRẠM CẢM BIẾN'}
+            content={'Hỗ trợ quản lý thông tin các trạm cảm biến tại các vị trí trực thuộc tỉnh Hậu Giang'}
+          />
           <CRow>
             <CCol>
               <CCard>

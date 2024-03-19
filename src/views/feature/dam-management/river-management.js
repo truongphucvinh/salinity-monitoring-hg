@@ -38,6 +38,8 @@ import CustomSpinner from "src/views/customs/my-spinner"
 import { removeVietnameseAccents, searchRelatives, splitCoordinates } from "src/tools"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
+import CustomAuthChecker from "src/views/customs/my-authchecker"
+import CustomIntroduction from "src/views/customs/my-introduction"
 
 const RiverManagement = () => {
 
@@ -588,7 +590,13 @@ const RiverManagement = () => {
     }, [addVisible, updateVisible])
 
     return (
+        <>
+        <CustomIntroduction 
+            title={'QUẢN LÝ SÔNG / KÊNH / RẠCH'}
+            content={'Hỗ trợ quản lý thông tin về hệ thống sông / kênh / rạch trên địa bàn tỉnh Hậu Giang'}
+        />
         <CRow>
+        <CustomAuthChecker />
         <CCol xs>
           <CCard className="mb-4">
             <CustomAuthorizationChecker isRedirect={true} code={defaultAuthorizationCode}/>
@@ -643,6 +651,7 @@ const RiverManagement = () => {
           </CCard>
         </CCol>
       </CRow>
+      </>
     )
 }
 

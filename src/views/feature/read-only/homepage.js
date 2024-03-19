@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react"
 import { getAllDamScheduleBySelectedDate, getAllDamSchedules } from "src/services/dam-services"
 import { damStatusConverter, damStatusConverterV2, getDamScheduleBeginAt, getDamScheduleEndAt, searchRelatives } from "src/tools"
 import CustomDateTimePicker from "src/views/customs/my-datetimepicker/my-datetimepicker"
+import CustomIntroduction from "src/views/customs/my-introduction"
 import CustomModal from "src/views/customs/my-modal"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomSpinner from "src/views/customs/my-spinner"
@@ -136,7 +137,7 @@ const HomePage = () => {
                     <CTableBody>
                         <CTableRow>
                             <CTableHeaderCell>Tên cống / đập</CTableHeaderCell>
-                            <CTableDataCell>{openedDam?.damName}</CTableDataCell>
+                            <CTableDataCell>{openedDam?.damName}, {openedDam?.damRiverName}</CTableDataCell>
                         </CTableRow>
                         <CTableRow>
                             <CTableHeaderCell>Kích thước</CTableHeaderCell>
@@ -204,10 +205,10 @@ const HomePage = () => {
                 <CTableHead className="text-nowrap">
                   <CTableRow>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Tên đập</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Tên đập</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Trạng thái</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '40%'}}>Thời gian</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Vị trí</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '45%'}}>Thời gian</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Vị trí</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -218,7 +219,7 @@ const HomePage = () => {
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
                                     <CTableDataCell>
                                         <a className="link-opacity-100" role="button" onClick={() => openDamModal(dam)}>
-                                            {dam?.damName}
+                                            {dam?.damName}, {dam?.damRiverName}
                                         </a>
                                     </CTableDataCell>
                                     <CTableDataCell className={`text-${damStatusConverterV2(dam?.damCurrentStatus)?.class}`}><CIcon icon={damStatusConverterV2(dam?.damCurrentStatus)?.icon} className="me-2"/>{damStatusConverterV2(dam?.damCurrentStatus)?.status}</CTableDataCell>
@@ -256,6 +257,11 @@ const HomePage = () => {
     }
     
     return (
+        <>
+        <CustomIntroduction 
+            title={'HỆ THỐNG GIÁM SÁT ĐỘ MẶN VÀ LỊCH ĐÓNG MỞ CỐNG / ĐẬP'}
+            content={'Hệ thống hỗ trợ quản lý các thông tin về lịch đóng / mở của hệ thống cống / đập và cảm biến trên địa bàn tỉnh Hậu Giang'}
+        />
         <CRow>
             <CCol xs>
                 <CCard className="mb-4">
@@ -275,6 +281,7 @@ const HomePage = () => {
                 </CCard>
             </CCol>
         </CRow>
+        </>
     )
 }
 

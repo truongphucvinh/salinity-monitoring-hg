@@ -27,7 +27,7 @@ const AppContent = () => {
           })}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
-        <CustomAuthChecker />
+        {/* <CustomAuthChecker /> */}
       </Suspense>
     </CContainer>
   )

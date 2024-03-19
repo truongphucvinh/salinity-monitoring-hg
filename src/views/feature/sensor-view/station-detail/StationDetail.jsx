@@ -37,6 +37,7 @@ import observation from "src/services/observation";
 import station from "src/services/station";
 
 import { useParams } from "react-router-dom";
+import CustomIntroduction from "src/views/customs/my-introduction";
 
 function zones(colors) {
   return [{
@@ -237,6 +238,10 @@ const StationDetail = () => {
     }
 
     return (<>
+      <CustomIntroduction 
+        title={'THÔNG TIN TRẠM CHI TIẾT'}
+        content={'Hỗ trợ theo dõi thông tin chi tiết của trạm cảm biến'}
+      />
       <CRow className="station-detail2">
         <CCol xs>
           <CCard className="mb-4">

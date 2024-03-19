@@ -42,6 +42,8 @@ import { addZeroToDate, damStatusConverter, searchRelatives, splitCoordinates } 
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import { red } from "@mui/material/colors"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
+import CustomAuthChecker from "src/views/customs/my-authchecker"
+import CustomIntroduction from "src/views/customs/my-introduction"
 
 const DamManagement = () => {
     const defaultAuthorizationCode = process.env.HG_MODULE_DAM_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management"
@@ -851,8 +853,15 @@ const DamManagement = () => {
     }, [addVisible, updateVisible])
 
     
-    return (
-        <CRow>
+    return (<>
+        <CustomIntroduction 
+            title={'QUẢN LÝ CỐNG / ĐẬP'}
+            content={'Hỗ trợ quản lý các thông tin chung về hệ thống cống / đập trực thuộc tỉnh Hậu Giang'}
+        />
+            <CRow>
+        {/* Checking the authentication here */}
+        <CustomAuthChecker />
+        {/* Checking the authorization here */}
         <CustomAuthorizationChecker isRedirect={true} code={defaultAuthorizationCode} />
         <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleAddFeature} setExternalState={setHaveAdding}/>
         <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateFeature} setExternalState={setHaveUpdating}/>
@@ -919,6 +928,8 @@ const DamManagement = () => {
           </CCard>
         </CCol>
       </CRow>
+    </>
+
     )
 }
 

@@ -41,6 +41,8 @@ import { createPermission, createRole, deletePermission, deleteRole, getAllModul
 import { checkCurrentRoleOfUser, getLoggedUserInformation, searchRelatives } from "src/tools"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
+import CustomAuthChecker from "src/views/customs/my-authchecker"
+import CustomIntroduction from "src/views/customs/my-introduction"
 
 const RoleManagement = () => {
 
@@ -753,7 +755,13 @@ const RoleManagement = () => {
 
  
     return (
+        <>
+        <CustomIntroduction 
+            title={'QUẢN LÝ VAI TRÒ CỦA NGƯỜI DÙNG'}
+            content={'Hỗ trợ quản lý thông tin về vai trò và quyền hạn của người dung bên trong hệ thống'}
+        />
         <CRow>
+        <CustomAuthChecker />
         <CCol xs>
         <CustomAuthorizationChecker isRedirect={true} code={defaultAuthorizationCode} />
         <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleAddFeature} setExternalState={setHaveAdding}/>
@@ -810,6 +818,7 @@ const RoleManagement = () => {
           </CCard>
         </CCol>
       </CRow>
+      </>
     )
 }
 

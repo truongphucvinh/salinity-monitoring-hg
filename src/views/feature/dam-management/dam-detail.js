@@ -18,6 +18,7 @@ import DamScheduleManagement from "./dam-schedule-management"
 import { addZeroToDate, damStatusConverter, splitCoordinates } from "src/tools"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomEmbeddedMap from "src/views/customs/my-embedded-map"
+import CustomIntroduction from "src/views/customs/my-introduction"
 
 const DamDetail = () => {
     // Got the id of URL
@@ -80,6 +81,10 @@ const DamDetail = () => {
 
     return (
         <>
+            <CustomIntroduction 
+                title={'THÔNG TIN CỐNG / ĐẬP CHI TIẾT'}
+                content={'Hỗ trợ theo dõi và thao tác các thông tin cống / đập chi tiết'}
+            />
             {
                 isLoaded && isLoadedDamSchedules ?
                 <CRow>
