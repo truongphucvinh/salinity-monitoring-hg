@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react"
 import { getAllDamScheduleBySelectedDate, getAllDamSchedules } from "src/services/dam-services"
 import { damStatusConverter, damStatusConverterV2, getDamScheduleBeginAt, getDamScheduleEndAt, searchRelatives } from "src/tools"
 import CustomDateTimePicker from "src/views/customs/my-datetimepicker/my-datetimepicker"
+import CustomIntroduction from "src/views/customs/my-introduction"
 import CustomModal from "src/views/customs/my-modal"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomSpinner from "src/views/customs/my-spinner"
@@ -256,6 +257,11 @@ const HomePage = () => {
     }
     
     return (
+        <>
+        <CustomIntroduction 
+            title={'HỆ THỐNG GIÁM SÁT ĐỘ MẶN VÀ LỊCH ĐÓNG MỞ CỐNG / ĐẬP'}
+            content={'Hệ thống hỗ trợ quản lý các thông tin về lịch đóng / mở của hệ thống cống / đập và cảm biến trên địa bàn tỉnh Hậu Giang'}
+        />
         <CRow>
             <CCol xs>
                 <CCard className="mb-4">
@@ -275,6 +281,7 @@ const HomePage = () => {
                 </CCard>
             </CCol>
         </CRow>
+        </>
     )
 }
 

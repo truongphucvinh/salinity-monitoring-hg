@@ -36,6 +36,7 @@ import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecke
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 import { searchRelatives } from "src/tools"
 import CustomAuthChecker from "src/views/customs/my-authchecker"
+import CustomIntroduction from "src/views/customs/my-introduction"
 
 const DamTypeManagement = () => {
 
@@ -457,6 +458,11 @@ const DamTypeManagement = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addVisible, updateVisible])
     return (
+        <>
+        <CustomIntroduction 
+            title={'QUẢN LÝ LOẠI CỐNG / ĐẬP'}
+            content={'Hỗ trợ quản lý thông tin về các loại hình cống / đập đang được sử dụng tại tỉnh Hậu Giang'}
+        />
         <CRow>
         <CustomAuthChecker />
         <CustomAuthorizationChecker isRedirect={true} code={defaultAuthorizationCode}/>
@@ -513,6 +519,7 @@ const DamTypeManagement = () => {
           </CCard>
         </CCol>
       </CRow>
+      </>
     )
 }
 
