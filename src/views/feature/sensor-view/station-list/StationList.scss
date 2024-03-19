@@ -120,24 +120,6 @@
     &__form {
         padding: 20px;
         padding-top: 10px;
-        // label {
-        //     display: block;
-        // }
-        // input, select, Select {
-        //     width: 100%;
-        //     margin-top: 7px;
-        //     height: 40px;
-        //     border: none;
-        //     border-bottom: 1px solid rgba(0, 0, 0, 0.5);
-        //     padding: 0 10px;
-        //     transition: all 0.3s ease;
-        //     &:focus {
-        //         padding: 0 15px;
-        //         outline: none;
-        //         @extend %shadow;
-        //         transition: all 0.3s ease;
-        //     }
-        // }
         .css-b62m3t-container {
             margin-top: 10px;
         }
@@ -190,24 +172,6 @@
 .css-ppxnyn-MuiFormControl-root {
     margin: 0 !important;
 }
-
-// .css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input .css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input .css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
-//     margin: 0;
-//     border: none !important;
-// }
-
-// #demo-multiple-name {
-//     border: none !important;
-//     outline: none !important;
-// }
-
-// .css-9ddj71-MuiInputBase-root-MuiOutlinedInput-root {
-//     border: none !important;
-//     outline: none !important;
-//     &:focus {
-//         outline: none !important;
-//     }
-// }
 
 //spinner 
 .spinner-border {
@@ -299,7 +263,7 @@
 }
 
 // view station detail
-.view-station-detail {
+.view-station-detail { //rynan
     padding: 20px;
     &__header {
         font-weight: bold;

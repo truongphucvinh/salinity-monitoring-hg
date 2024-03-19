@@ -50,7 +50,6 @@ export default {
     getStationListByRyan: async function() { // inclding stations are gotten by Ryan api
         try {
             const responseLogin = await this.login();
-            console.log("response login: ", responseLogin);
             const response = await axios.get("https://document.rynangate.com/api/v1/get-list-stations",
                 {
                     headers: {

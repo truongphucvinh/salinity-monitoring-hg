@@ -1,22 +1,16 @@
-import React, { useEffect, useRef } from "react"
+import React, { useEffect } from "react"
 import './StationDetail.scss'
 
-import dayjs from 'dayjs';
-import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
-
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendar } from "@fortawesome/free-regular-svg-icons";
-import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { faChartLine } from "@fortawesome/free-solid-svg-icons";
 import { faTableCells } from "@fortawesome/free-solid-svg-icons";
+import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
+
+import { useNavigate } from "react-router-dom";
 
 //modal 
-import { CModal, CNav, CNavItem, CNavLink, CTabContent, CButton } from '@coreui/react';
+import { CNav, CNavItem, CNavLink, CTabContent } from '@coreui/react';
 
 //chart
 import { CCard, CCardBody, CCol, CCardHeader, CRow, CTabPane } from '@coreui/react'
@@ -39,8 +33,8 @@ import Highcharts from 'highcharts/highstock'
 import HighchartsReact from 'highcharts-react-official'
 
 //service
-import thingService from 'src/services/thing';
 import observation from "src/services/observation";
+import station from "src/services/station";
 
 import { useParams } from "react-router-dom";
 
@@ -77,61 +71,17 @@ const colors = [
   
 
 const StationDetail = () => {
-    const { id } = useParams()
-
-    const [showMode, setShowMode] = useState('chart'); //table
-
-    //sensor list
-    const [sensorList, setSensorList] = useState([])
-
-    const [thing, setThing] = useState();
-
+    const { id } = useParams();
     //tab
     const [activeKey, setActiveKey] = useState(0);
-    const [selectingSensor, setSelectingSensor] = useState();  //luu tru id sensor dang duoc chon hay dang xem
-    const [selectingMultiDTS, setSelectingMultiDTS] = useState(); //id multidatastream
-    const [selectingMultiDTSValue, setSelectingMultiDTSValue] = useState(); //manng gia trị sensor/multidatastreamid hien tai
 
-    const [multiDTSStation, setMultiDTSStation] = useState();
-
-    const [latestValueSensorList, setLatestValueSensorList] = useState([]);
-
-    //option chart <<
-
-    const [optionsss, setOptionsss] = useState(
-      {
-        chart: {
-          type: 'line',
-          height: 550, // Set the desired height here
-        },
-        plotOptions: {
-          series: {
-              color: '#1a2848'
-          }
-        },
-        tooltip: {
-          formatter: function() {
-              return 'Thời gian: <b>' + new Date(this.x).toLocaleString() + '</b>' + '<br/>Giá trị: <b>' +  this.y + '</b>';
-          }
-        },
-      
-        series: [{
-          data: [],
-          zoneAxis: 'x',
-          marker: {
-            symbol: "circle",
-            radius: 3,
-            enabled: true
-          },
-          // zones: [{value: 3}, {value: 5, color: 'red'}]
-          zones: zones(colors[0])
-        }]
-      }
-    )
-
-
-
-    //test <<
+    const [sensorListRynan, setSensorListRynan] = useState([]);
+    const [selectingSensorRynan, setSelectingSensorRynan] = useState(""); //sensor name
+    const [viewMode, setViewMode] = useState("chart"); //mode name: table, chart, etc
+    const [latestSensorValue, setLatestSensorValue] = useState([]); //latest value of sensors array
+    const [sensorValueList, setSensorValueList] = useState([]); //all value for all sensor
+    const [isLoadingSensorList, setIsLoadingSensorList] = useState(false);
+    const [stationInfo, setStationInfo] = useState();
     const [dataStation, setDataStation] = useState(
       {
         chart: {
@@ -162,31 +112,60 @@ const StationDetail = () => {
         }]
       }
     )
-    //test >>
 
+    //lay thong tin tram
+    useEffect(() => {
+      setIsLoadingSensorList(true);
+      station.getStationListByRyan()
+        .then((res) => {
+          res.data.map((station) => {
+            if(id==station.so_serial) {
+              setStationInfo(station);
+            }
+          })
+          setIsLoadingSensorList(false);
+        })
+    }, [])
 
     useEffect(() => {
-
-      //get data station <<
-      observation.getDataStation("L2177R1M001F001", "2024/01/10", "20245/01/18", 1, 1000)
+      setIsLoadingSensorList(true);
+      observation.getDataStation(id, "", "", 1, 1000)
         .then((res) => {
-          console.log("get data station of ryan: ", res);
-          // var d = new Date(res.data[0]?.resultTime.substring(0, res[0]?.resultTime.length-5));
-          // console.log("d: ", d.getTime());
+          setSensorValueList(res.data);
+          //station list
+          var sensorList = [];
+          var ltsValue = [];
+          for(const sensor in res.data[0]) {
+            if(sensor !== "trang_thai" && !isNaN(res.data[0][sensor]) && res.data[0][sensor] !== null) {
+              sensorList.push(sensor);
+              setSensorListRynan(sensorList);
+
+              //set latest value for all sensor
+              let ltsValue1Sensor = {sensorName: '', sensorValue: 0, time: ''};
+              ltsValue1Sensor.sensorName = sensor;
+              ltsValue1Sensor.sensorValue = res.data[res.data.length-1][sensor];
+              ltsValue1Sensor.time = new Date(res.data[res.data.length-1].ngay_gui).toLocaleString();
+              ltsValue.push(ltsValue1Sensor);
+              setLatestSensorValue(ltsValue);
+            }
+          }
+          //options array
           var pointArray = [];
           res?.data.map((multi) => {
             var point = {
               x: new Date(multi.ngay_gui.substring(0, multi.ngay_gui.length-5)).getTime(),
-              y: Number(multi.do_man),
+              y: Number(selectingSensorRynan == "" ? multi[sensorList[0]] : multi[selectingSensorRynan]),
               color: '#1a2848'
             }
             pointArray.push(point);
+            if(selectingSensorRynan=="") {
+              setSelectingSensorRynan(sensorList[0]);
+            }
           })
           // setSelectingMultiDTSValue(res);
           return pointArray;
         })
         .then((res) => {
-          console.log("ryan dataa: ", res);
           setDataStation(
             {
               chart: {
@@ -217,171 +196,103 @@ const StationDetail = () => {
               }]
             }
           )
-          console.log("ryan: ", dataStation);
+          setIsLoadingSensorList(false);
         })
-      //get data station >>
+        console.log("dataStation ", dataStation);
+    }, [selectingSensorRynan])
 
-      //get sensor list in specific thing/station
-      thingService.getThingById(id)
-        .then((res) => {
-          setThing(res);
-          console.log("thing info: ", res);
-          setMultiDTSStation(res?.multiDataStreamDTOs);
-          setSelectingMultiDTS(res?.multiDataStreamDTOs[1]?.multiDataStreamId)
-          //loc danh sach station
-          console.log("selecting sensor id: ", res?.multiDataStreamDTOs[0]?.sensor?.sensorId);
-          setSelectingSensor(res?.multiDataStreamDTOs[0]?.sensor?.sensorId);
-          var sensorLists = []; 
-          res?.multiDataStreamDTOs.map((multiDTS) => {
-            sensorLists.push(multiDTS.sensor);
-            setSensorList(sensorLists);
-            console.log("sensor list: ", sensorLists);
-          })
-          console.log("res thing info: ", res);
-          return sensorLists;
-        })
-        .then((res) => {
-          setSelectingSensor(res[0]?.sensorId);
-        })
-    }, [])
-
-
-    //get all value by data stream id <<
-    useEffect(() => {
-      console.log("selecting: ", selectingMultiDTS)
-      observation.getAllValueByDataStreamId(selectingMultiDTS)
-        .then((res) => {
-          console.log("abc: ", res);
-          var d = new Date(res[0]?.resultTime.substring(0, res[0]?.resultTime.length-5));
-          console.log("d: ", d.getTime());
-          var pointArray = [];
-          res.map((multi) => {
-            var point = {
-              x: new Date(multi.resultTime.substring(0, multi.resultTime.length-5)).getTime(),
-              y: Number(multi.result),
-              color: '#1a2848'
-            }
-            pointArray.push(point);
-          })
-          console.log("selecting multidata value: ", res);
-          setSelectingMultiDTSValue(res);
-          return pointArray;
-        })
-        .then((res) => {
-          console.log("dataa: ", res);
-          setOptionsss(
-            {
-              chart: {
-                type: 'line',
-                height: 550, // Set the desired height here
-              },
-              plotOptions: {
-                series: {
-                    color: '#1a2848'
-                }
-              },
-              tooltip: {
-                formatter: function() {
-                    return 'Thời gian: <b>' + new Date(this.x).toLocaleString() + '</b>' + '<br/>Giá trị: <b>' +  this.y + '</b>';
-                }
-              },
-            
-              series: [{
-                data: res,
-                zoneAxis: 'x',
-                marker: {
-                  symbol: "circle",
-                  radius: 3,
-                  enabled: true
-                },
-                // zones: [{value: 3}, {value: 5, color: 'red'}]
-                // zones: zones(colors[0])
-              }]
-            }
-          )
-          console.log("optionsss: ", optionsss);
-        })
-    }, [selectingMultiDTS])
-    //get all value by data stream id >>
-
-    //change view: chart/table
-    const handelChangeShowMode = (modeStr) => {
-      setShowMode(modeStr);
-      if(modeStr==='table') {
-        handleGetLatestValueAllSensor();
-      }
-    } 
-
-    const handleChangeSelectingSensor = (index, sensorId) => {  // change tab
+    const handleChangeSensorViewRynan = (sensorName, index) => {
       setActiveKey(index);
-      setSelectingSensor(sensorId);
-      setSelectingMultiDTS(handleFindMultiDTSIdBySensorId(sensorId));
-      console.log("data: ", optionsss.series.data);
+      setSelectingSensorRynan(sensorName);
+    }
+    const handleChangeViewModeRynan = (modeName) => {
+      setViewMode(modeName);
+    }
+    //Rynan >>
+    const navigate = useNavigate()
+    const backToStationList = () => {
+      navigate("/station-list"); 
     }
 
-    const handleFindMultiDTSIdBySensorId = (sensorId) => { //ham tim multi datastreamid dua vao sensor id
-      for(let i=0; i<multiDTSStation?.length; i++) {
-        if(sensorId===multiDTSStation[i].sensor.sensorId) {
-          console.log("multiId: ", multiDTSStation[i].multiDataStreamId);
-          return multiDTSStation[i].multiDataStreamId;
-        }
+    const generateSensorName = (rawName) => {
+      var generatedName = '';
+      switch(rawName) {
+        case 'do_pH':
+          generatedName = "Độ pH";
+          break;
+        case 'muc_nuoc':
+          generatedName = "Mực nước";
+          break;
+        case 'nhiet_do':
+          generatedName = "Nhiệt độ";
+          break;
+        case 'do_man':
+          generatedName = "Độ mặn";
+          break;
+        default:
+          generatedName = rawName;
+          break;    
       }
-    }
-
-    const handleGetLatestValueAllSensor = () => {
-      var latestValueSL=[];
-      sensorList.map((sensor) => {
-        observation.getLatestValueByDataStreamId(sensor.sensorId)
-          .then((res) => {
-            // setLatestValueSensorList(...latestValueSensorList, res);
-            latestValueSL.push(res);
-            setLatestValueSensorList(latestValueSL);
-          })
-      })
+      return generatedName;
     }
 
     return (<>
-        <CRow className="station-detail2">
+      <CRow className="station-detail2">
         <CCol xs>
           <CCard className="mb-4">
-            <CCardHeader className="station-detail2__header">Danh sách trạm cảm biến/{thing?.nameThing}</CCardHeader>
+            <CCardHeader className="station-detail2__header">
+              <span style={{marginRight: '10px', cursor: 'pointer'}} 
+                onClick={() => {backToStationList()}}
+              > 
+                  <FontAwesomeIcon icon={faChevronLeft}/>
+                </span>
+              { stationInfo?.ten_thiet_bi }
+            {
+              isLoadingSensorList &&
+              <div className="spinner-border" role="status">
+                <span className="sr-only">Loading...</span>
+              </div>
+            }
+            </CCardHeader>
             <CCardBody className="station-detail2__body">
               <CRow>
                 <CCol xs={12}>
                   <CRow>
                     <CCol xs={12} className="station-detail2__body__formating">
                       <div 
-                        className={showMode=='table'? "station-detail2__body__formating__item station-detail2__body__formating__item--active" : "station-detail2__body__formating__item"} 
-                        onClick={() => handelChangeShowMode('table')}
+                        className={viewMode=='table'? "station-detail2__body__formating__item station-detail2__body__formating__item--active" : "station-detail2__body__formating__item"} 
+                        onClick={() => {handleChangeViewModeRynan('table')}}
                       >
                         <FontAwesomeIcon icon={faTableCells}/>
                       </div>
                       <div 
-                        className={showMode=='chart'? "station-detail2__body__formating__item station-detail2__body__formating__item--active" : "station-detail2__body__formating__item"} 
-                        onClick={() => handelChangeShowMode('chart')}
+                        className={viewMode=='chart'? "station-detail2__body__formating__item station-detail2__body__formating__item--active" : "station-detail2__body__formating__item"} 
+                        onClick={() => {handleChangeViewModeRynan('chart')}}
                       >
                         <FontAwesomeIcon icon={faChartLine}/>
                       </div>
                     </CCol>
                   </CRow>
+
+                  {/* chart */}
                   {
-                    showMode=='chart' && <div>
+                    viewMode=='chart' && <div>
                       <CRow>
                         <CCol>
                           <CNav variant="tabs" role="tablist">
                             {
-                              sensorList.map((sensor, index) => {
+                              sensorListRynan.map((sensor, index) => {
                                 return <>
-                                  <CNavItem role="presentation">
+                                  <CNavItem role="presentation" key={index}>
                                     <CNavLink
                                       active={activeKey === index}
                                       component="button"
                                       role="tab"
                                       aria-controls="home-tab-pane"
                                       aria-selected={activeKey === index}
-                                      onClick={() => handleChangeSelectingSensor(index, sensor.sensorId)}
+                                      onClick={() => {handleChangeSensorViewRynan(sensor, index)}}
                                     >
-                                      { sensor.sensorName }
+                                      { sensor }
                                     </CNavLink>
                                   </CNavItem>
                                 </>
@@ -390,7 +301,7 @@ const StationDetail = () => {
                           </CNav>
                           <CTabContent>
                             {
-                              sensorList.map((sensor, index) => {
+                              sensorListRynan.map((sensor, index) => {
                                 return <>
                                   <CTabPane role="tabpanel" aria-labelledby="profile-tab-pane" visible={activeKey === index}>
                                     <HighchartsReact
@@ -407,40 +318,46 @@ const StationDetail = () => {
                       </CRow>
                     </div>
                   }
+
+                  {/* table */}
                   {
-                    showMode=='table' && <div>
+                    viewMode=='table' && <div>
                       <CRow className="station-detail2__body__table">
                         <CCol xs={6} className="station-detail2__body__table__general-index">
                           <div className="station-detail2__body__table__general-index__header">
-                            Chỉ số chung
+                            Chỉ số gần nhất
                           </div>
                           <div className="station-detail2__body__table__general-index__table">
                             <table className="station-value">
+                                <thead>
                                   <tr>
-                                    <th className="time">Thời gian</th>
-                                    <th className="type">Cảm biến</th>
-                                    <th className="index">Giá trị</th>
-                                    <th className="unit">Đơn vị</th>
-                                  </tr>
+                                      <th className="time">Thời gian</th>
+                                      <th className="type">Cảm biến</th>
+                                      <th className="index">Giá trị</th>
+                                      {/* <th className="unit">Đơn vị</th> */}
+                                    </tr>
+                                </thead>
+                                <tbody>
                                   {
-                                    sensorList.map((sensor, index) => {
+                                    latestSensorValue.map((sensor, index) => {
                                       return <>
                                         <tr>
-                                          <td className="time">08:00 27/12/2023</td>
+                                          <td className="time">{ sensor.time }</td>
                                           <td>{ sensor.sensorName }</td>
-                                          <td className="index">{ 9.6+index }</td>
-                                          <td className="unit">ppt</td>
+                                          <td className="index">{ sensor.sensorValue }</td>
+                                          {/* <td className="unit">ppt</td> */}
                                         </tr>
                                       </>
                                     })
                                   }
+                                </tbody>
                             </table>
                           </div>
                         </CCol>
                         <CCol xs={6}>
                           <CNav variant="tabs" role="tablist">
                             {
-                              sensorList.map((sensor, index) => {
+                              sensorListRynan.map((sensor, index) => {
                                 return <>
                                   <CNavItem role="presentation">
                                     <CNavLink
@@ -449,9 +366,9 @@ const StationDetail = () => {
                                       role="tab"
                                       aria-controls="home-tab-pane"
                                       aria-selected={activeKey === index}
-                                      onClick={() => handleChangeSelectingSensor(index, sensor.sensorId)}
+                                      onClick={() => {handleChangeSensorViewRynan(sensor, index)}}
                                     >
-                                      { sensor.sensorName }
+                                      { sensor }
                                     </CNavLink>
                                   </CNavItem>
                                 </>
@@ -460,44 +377,32 @@ const StationDetail = () => {
                           </CNav>
                           <CTabContent>
                             {
-                              sensorList.map((sensor, index) => {
+                              sensorListRynan.map((sensor, index) => {
                                 return <>
                                   <CTabPane role="tabpanel" aria-labelledby="profile-tab-pane" visible={activeKey === index}>
                                     <table className="sensor-value__specific-sensor">
-                                      <tr>
-                                          <th className="time">Thời gian</th>
-                                          <th className="index">Giá trị</th>
-                                          <th></th>
-                                      </tr>
-                                      {
-                                        selectingMultiDTSValue.map((multiData, index) => {
-                                          return  <tr key={'multi'+index}>
-                                                    <td>{ multiData.resultTime }</td>
-                                                    <td className="index">{ multiData.result}</td>
-                                                  </tr>
-                                        })
-                                      }
-                                      {/* <tr>
-                                          <td>06:00 27/12/2023</td>
-                                          <td className="index">25</td>
-                                      </tr>
-                                      <tr>
-                                          <td>06:30 27/12/2023</td>
-                                          <td className="index">25.5</td>
-                                      </tr>
-                                      <tr>
-                                          <td>07:00 27/12/2023</td>
-                                          <td className="index">26</td>
-                                      </tr>
-                                      <tr>
-                                          <td>07:30 27/12/2023</td>
-                                          <td className="index">26</td>
-                                      </tr>
-                                      <tr>
-                                          <td>08:00 27/12/2023</td>
-                                          <td className="index">28</td>
-                                      </tr> */}
+                                      <thead>
+                                        <tr>
+                                            <th className="time">Thời gian</th>
+                                            <th className="index">Giá trị</th>
+                                            <th></th>
+                                        </tr>
+                                      </thead>
                                     </table>
+                                    <div className="sensor-value-div">
+                                      <table className="sensor-value__specific-sensor">
+                                        <tbody>
+                                          {
+                                            sensorValueList.map((certainTime, index) => {
+                                              return  <tr key={index}>
+                                                        <td className="time">{ new Date(certainTime.ngay_gui).toLocaleString() }</td>
+                                                        <td className="index">{ certainTime[selectingSensorRynan] }</td>
+                                                      </tr>
+                                            })
+                                          }
+                                        </tbody>
+                                      </table>
+                                    </div>
                                   </CTabPane>
                                 </>
                               })

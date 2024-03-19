@@ -17,6 +17,7 @@ import {
   cilStar,
   cilStream,
   cilTask,
+  cilEqualizer
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -66,7 +67,7 @@ const _nav = [
     component:  CNavItem,
     name: 'Quản lý trạm',
     to: '/station-list',
-    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilEqualizer} customClassName="nav-icon" />,
     code: 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_sensor_station_management'
   }
 ]
