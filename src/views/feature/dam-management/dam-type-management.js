@@ -35,6 +35,7 @@ import CustomSpinner from "src/views/customs/my-spinner"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 import { searchRelatives } from "src/tools"
+import CustomAuthChecker from "src/views/customs/my-authchecker"
 
 const DamTypeManagement = () => {
 
@@ -457,6 +458,7 @@ const DamTypeManagement = () => {
     }, [addVisible, updateVisible])
     return (
         <CRow>
+        <CustomAuthChecker />
         <CustomAuthorizationChecker isRedirect={true} code={defaultAuthorizationCode}/>
         <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleAddFeature} setExternalState={setHaveAdding}/>
         <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateFeature} setExternalState={setHaveUpdating}/>

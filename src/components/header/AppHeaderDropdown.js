@@ -343,7 +343,9 @@ const AppHeaderDropdown = () => {
               Đăng xuất
             </CDropdownItem>
           </CDropdownMenu>
-          </CDropdown> : ''
+          </CDropdown> : <CButton>
+            <a className='' href='#/login'>Đăng nhập</a>
+          </CButton>
       }
     </>
 

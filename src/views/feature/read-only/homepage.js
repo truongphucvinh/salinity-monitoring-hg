@@ -136,7 +136,7 @@ const HomePage = () => {
                     <CTableBody>
                         <CTableRow>
                             <CTableHeaderCell>Tên cống / đập</CTableHeaderCell>
-                            <CTableDataCell>{openedDam?.damName}</CTableDataCell>
+                            <CTableDataCell>{openedDam?.damName}, {openedDam?.damRiverName}</CTableDataCell>
                         </CTableRow>
                         <CTableRow>
                             <CTableHeaderCell>Kích thước</CTableHeaderCell>
@@ -204,10 +204,10 @@ const HomePage = () => {
                 <CTableHead className="text-nowrap">
                   <CTableRow>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Tên đập</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Tên đập</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Trạng thái</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '40%'}}>Thời gian</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Vị trí</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '45%'}}>Thời gian</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Vị trí</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -218,7 +218,7 @@ const HomePage = () => {
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
                                     <CTableDataCell>
                                         <a className="link-opacity-100" role="button" onClick={() => openDamModal(dam)}>
-                                            {dam?.damName}
+                                            {dam?.damName}, {dam?.damRiverName}
                                         </a>
                                     </CTableDataCell>
                                     <CTableDataCell className={`text-${damStatusConverterV2(dam?.damCurrentStatus)?.class}`}><CIcon icon={damStatusConverterV2(dam?.damCurrentStatus)?.icon} className="me-2"/>{damStatusConverterV2(dam?.damCurrentStatus)?.status}</CTableDataCell>

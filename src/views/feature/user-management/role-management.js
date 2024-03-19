@@ -41,6 +41,7 @@ import { createPermission, createRole, deletePermission, deleteRole, getAllModul
 import { checkCurrentRoleOfUser, getLoggedUserInformation, searchRelatives } from "src/tools"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
+import CustomAuthChecker from "src/views/customs/my-authchecker"
 
 const RoleManagement = () => {
 
@@ -754,6 +755,7 @@ const RoleManagement = () => {
  
     return (
         <CRow>
+        <CustomAuthChecker />
         <CCol xs>
         <CustomAuthorizationChecker isRedirect={true} code={defaultAuthorizationCode} />
         <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleAddFeature} setExternalState={setHaveAdding}/>

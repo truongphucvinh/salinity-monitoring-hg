@@ -37,6 +37,7 @@ import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 import { checkCurrentUser, searchRelatives } from "src/tools"
+import CustomAuthChecker from "src/views/customs/my-authchecker"
 
 const UserManagement = () => {
 
@@ -749,6 +750,7 @@ const UserManagement = () => {
 
     return (
         <CRow>
+            <CustomAuthChecker />
         <CCol xs>
         <CustomAuthorizationChecker isRedirect={true} code={defaultAuthorizationCode} />
         <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleAddFeature} setExternalState={setHaveAdding}/>

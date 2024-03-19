@@ -38,6 +38,7 @@ import CustomSpinner from "src/views/customs/my-spinner"
 import { removeVietnameseAccents, searchRelatives, splitCoordinates } from "src/tools"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
+import CustomAuthChecker from "src/views/customs/my-authchecker"
 
 const RiverManagement = () => {
 
@@ -589,6 +590,7 @@ const RiverManagement = () => {
 
     return (
         <CRow>
+        <CustomAuthChecker />
         <CCol xs>
           <CCard className="mb-4">
             <CustomAuthorizationChecker isRedirect={true} code={defaultAuthorizationCode}/>
