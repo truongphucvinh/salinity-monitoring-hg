@@ -10,6 +10,10 @@ import CustomModal from "src/views/customs/my-modal"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomSpinner from "src/views/customs/my-spinner"
 
+//service 
+import station from "src/services/station"
+import observation from "src/services/observation"
+
 const HomePage = () => {
 
     const damListData = {
@@ -255,6 +259,99 @@ const HomePage = () => {
             
         )
     }
+
+    // SENSOR STATION
+    const [rynanStationList, setRynanStationList] = useState([]);
+    useEffect(() => {
+        //get Rynan station list 
+        station.getStationListByRyan()
+            .then((res) => {
+                setRynanStationList(res.data);
+                res.data.map((station) => {
+                    observation.getDataStation(station?.so_serial, "", "", 1, 1000)
+                        .then((seperatedRes) => {
+                            var sensorList = [];
+                            for(const sensor in seperatedRes.data[0]) {
+                                if(sensor !== "trang_thai" && !isNaN(seperatedRes.data[0][sensor]) && seperatedRes.data[0][sensor] !== null) {
+                                    let sensorInfo = {
+                                        name: sensor, 
+                                        value: seperatedRes.data[seperatedRes.data.length-1][sensor],
+                                        time: new Date(seperatedRes.data[seperatedRes.data.length-1].ngay_gui).toLocaleString()
+                                    }
+                                    sensorList.push(sensorInfo);
+                                }
+                            }
+                            var x=seperatedRes;
+                            x.sensor = sensorList;
+                            return x;
+                        })
+                        .then((sensor) => {
+                            station.sensor = sensor;
+                            return station;
+                        })
+                        .then((station) => {
+                            setRynanStationList([station]);
+                            console.log("station: ", station);
+                        })
+                    
+                })
+            })
+    }, [])
+
+    const showSensorStationList = () => {
+        return <>
+            <CTable bordered align="middle" className="mb-0 border" hover responsive>
+                <CTableHead  className="text-nowrap">
+                    <CTableRow>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>STT</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Tên trạm</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Cảm biến</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Giá trị </CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Thời gian</CTableHeaderCell>
+                    </CTableRow>
+                </CTableHead>
+                <CTableBody>
+                    {
+                        rynanStationList.map((station, stationIndex) => {
+                            return station?.sensor?.sensor?.map((sensor, sensorIndex) => {
+                                if(sensorIndex==0) {
+                                    return <CTableRow key={sensorIndex}>
+                                        <CTableDataCell rowSpan={station?.sensor?.sensor?.length}>{ stationIndex+1 }</CTableDataCell>
+                                        <CTableDataCell rowSpan={station?.sensor?.sensor?.length}>{ station.ten_thiet_bi }</CTableDataCell>
+                                        <CTableDataCell>{ sensor.name }</CTableDataCell>
+                                        <CTableDataCell>{ sensor.value }</CTableDataCell>
+                                        <CTableDataCell>{ sensor.time }</CTableDataCell>
+                                    </CTableRow>
+                                } else {
+                                    return <CTableRow key={sensorIndex}>
+                                        <CTableDataCell>{ sensor.name }</CTableDataCell>
+                                        <CTableDataCell>{ sensor.value }</CTableDataCell>
+                                        <CTableDataCell>{ sensor.time }</CTableDataCell>
+                                    </CTableRow>
+                                }
+                            })
+                        })
+                    }
+                {/* {
+                        rynanStationList.map((station, index) => {
+                            return <CTableRow key={index}>
+                            <CTableDataCell rowSpan={2}>{index}</CTableDataCell>
+                            <CTableDataCell rowSpan={2}>Tên trạm</CTableDataCell>
+                            <CTableDataCell>12</CTableDataCell>
+                            <CTableDataCell>Giá trị </CTableDataCell>
+                            <CTableDataCell>Thời gian</CTableDataCell>
+                        </CTableRow>
+                        })
+                } */}
+                    {/* <CTableRow>
+                        <CTableDataCell>d</CTableDataCell>
+                        <CTableDataCell>12</CTableDataCell>
+                        <CTableDataCell>3</CTableDataCell>
+                    </CTableRow> */}
+                </CTableBody>
+            </CTable>
+        </>
+    }
     
     return (
         <>
@@ -277,6 +374,20 @@ const HomePage = () => {
                             showData={showFilteredTable} 
                             isLoaded={isLoadedListDams}
                         />
+                    </CCardBody>
+                </CCard>
+            </CCol>
+        </CRow>
+
+        {/* SENSOR STATION */}
+        <CRow>
+            <CCol xs>
+                <CCard className="mb-4">
+                    <CCardHeader>
+                        Thông tin trạm cảm biến
+                    </CCardHeader>
+                    <CCardBody>
+                        { showSensorStationList() }
                     </CCardBody>
                 </CCard>
             </CCol>
