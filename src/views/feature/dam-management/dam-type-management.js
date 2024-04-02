@@ -457,11 +457,11 @@ const DamTypeManagement = () => {
         setUpdateState(updateData)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addVisible, updateVisible])
+    const defaultPageCode = 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_dam_type_management'
     return (
         <>
         <CustomIntroduction 
-            title={'QUẢN LÝ LOẠI CỐNG / ĐẬP'}
-            content={'Hỗ trợ quản lý thông tin về các loại hình cống / đập đang được sử dụng tại tỉnh Hậu Giang'}
+            pageCode={defaultPageCode}
         />
         <CRow>
         <CustomAuthChecker />

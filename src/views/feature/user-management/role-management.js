@@ -753,12 +753,11 @@ const RoleManagement = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addVisible, updateVisible])
 
- 
+    const defaultPageCode = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_role_management"
     return (
         <>
         <CustomIntroduction 
-            title={'QUẢN LÝ VAI TRÒ CỦA NGƯỜI DÙNG'}
-            content={'Hỗ trợ quản lý thông tin về vai trò và quyền hạn của người dung bên trong hệ thống'}
+            pageCode={defaultPageCode}
         />
         <CRow>
         <CustomAuthChecker />

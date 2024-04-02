@@ -42,6 +42,7 @@ import CustomIntroduction from "src/views/customs/my-introduction"
 
 const UserManagement = () => {
 
+    const defaultPageCode="U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_user_management"
     // User Management Data
     const [listUsers, setListUsers] = useState([])
     // const [listDomains, setListDomains] = useState([])
@@ -752,8 +753,7 @@ const UserManagement = () => {
     return (
         <>
         <CustomIntroduction 
-            title={'QUẢN LÝ TÀI KHOẢN NGƯỜI DÙNG'}
-            content={'Hỗ trợ quản lý thông tin tài khoản người dùng, cung cấp tài khoản'}
+            pageCode={defaultPageCode}
         />
         <CRow>
             <CustomAuthChecker />
