@@ -852,11 +852,10 @@ const DamManagement = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addVisible, updateVisible])
 
-    
+    const defaultPageCode = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_dam_management"
     return (<>
         <CustomIntroduction 
-            title={'QUẢN LÝ CỐNG / ĐẬP'}
-            content={'Hỗ trợ quản lý các thông tin chung về hệ thống cống / đập trực thuộc tỉnh Hậu Giang'}
+            pageCode={defaultPageCode}
         />
             <CRow>
         {/* Checking the authentication here */}

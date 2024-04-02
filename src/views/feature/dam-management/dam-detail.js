@@ -78,12 +78,11 @@ const DamDetail = () => {
     // To desire if have a permission to view schedule
     const [isSchedule, setIsSchedule] = useState(true)
     const defaultAuthorizationCode = process.env.HG_MODULE_DAM_SCHEDULE_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_schedule_management"
-
+    const defaultPageCode="U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_dam_detail"
     return (
         <>
             <CustomIntroduction 
-                title={'THÔNG TIN CỐNG / ĐẬP CHI TIẾT'}
-                content={'Hỗ trợ theo dõi và thao tác các thông tin cống / đập chi tiết'}
+                pageCode={defaultPageCode}
             />
             {
                 isLoaded && isLoadedDamSchedules ?

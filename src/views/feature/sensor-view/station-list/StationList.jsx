@@ -403,12 +403,11 @@ const StationList = () => {
     }
     return generatedName;
   }
-
+    const defaultPageCode = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_station_management"
     return (
         <>
           <CustomIntroduction 
-            title={'QUẢN LÝ TRẠM CẢM BIẾN'}
-            content={'Hỗ trợ quản lý thông tin các trạm cảm biến tại các vị trí trực thuộc tỉnh Hậu Giang'}
+            pageCode={defaultPageCode}
           />
           <CRow>
             <CCol>

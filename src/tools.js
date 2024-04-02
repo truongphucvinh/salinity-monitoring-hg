@@ -1,5 +1,26 @@
 import { cilLockLocked, cilLockUnlocked } from "@coreui/icons";
 
+export const getSpecificGeneralInformation = (projectCode, pageCode, projects) => {
+    if (projects) {
+        let filteredProjects = projects?.filter(project => {
+            return project?.projectCode === projectCode
+        })
+        let specificProject = filteredProjects[0]
+        if (specificProject) {
+            return {
+                page: specificProject?.projectPages?.filter(page => {
+                    return page?.pageCode === pageCode
+                })[0],
+                status: true
+            }
+        }
+    }
+    return {
+        status: false,
+        page: null
+    }
+}
+
 export const searchRelatives = (sourceValue, searchValue) => {
     const processedSearch = removeVietnameseAccents(searchValue?.trim()).toLowerCase()
     const processedSource = removeVietnameseAccents(sourceValue?.trim()).toLowerCase()
