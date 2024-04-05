@@ -181,15 +181,18 @@ const UserManagement = () => {
                     {
                         filteredUsers?.length !== 0 ? filteredUsers.map((user, index) => {
                             return (
-                                <CTableRow key={user._id}>
+                                <CTableRow key={user?._id}>
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
                                     <CTableDataCell>{user?.username}</CTableDataCell>
                                     <CTableDataCell>{user?.email}</CTableDataCell>
                                     <CTableDataCell>{user?.fullName}</CTableDataCell>
-                                    <CTableDataCell>
-                                        {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(user?._id)} className="text-success mx-1" role="button"/>}
-                                        {haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(user?._id)}  className="text-danger" role="button"/>}
-                                    </CTableDataCell>
+                                    {
+                                        checkCurrentUser(user?._id) ? <CTableDataCell>Người dùng hiện tại</CTableDataCell> : <CTableDataCell>
+                                            {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(user?._id)} className="text-success mx-1" role="button"/>}
+                                            {haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(user?._id)}  className="text-danger" role="button"/>}
+                                        </CTableDataCell>
+                                    }
+
                                 </CTableRow>    
                             )
                         }) : <CTableRow>

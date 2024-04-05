@@ -124,9 +124,12 @@ const Login = () => {
                     </CInputGroup>
                     <CRow>
                       <CCol xs>
-                        <CButton color="primary"  className="px-4" type='submit'>
-                          Đăng nhập
-                        </CButton>
+                        <div className='d-flex justify-content-between align-items-end'>
+                          <CButton color="primary"  className="px-4" type='submit'>
+                            Đăng nhập
+                          </CButton>
+                          <a href="/" className=''>Quay lại trang chủ</a>
+                        </div>
                       </CCol>
                     </CRow>
                   </CForm>

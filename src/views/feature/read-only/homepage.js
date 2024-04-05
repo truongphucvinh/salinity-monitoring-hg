@@ -72,7 +72,8 @@ const HomePage = () => {
             // Do nothing
         })
     }
-    const onFilter = () => {
+    const onFilter = (e) => {
+        e.preventDefault()
         if (damName) {
             handleFilteredListDams(listDams?.filter(dam => dam?.damName && searchRelatives(dam?.damName, damName)))
         }else {
@@ -168,7 +169,7 @@ const HomePage = () => {
     
     const searchComponent = () => {
         return (
-            <CForm onSubmit={onFilter}>
+            <CForm onSubmit={e => onFilter(e)}>
                 <CRow>
                     <CCol md={12} lg={3}>
                         <CustomDateTimePicker 

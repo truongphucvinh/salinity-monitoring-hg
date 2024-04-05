@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import { CButton, CCol, CFooter, CForm, CFormInput, CRow, CSpinner } from '@coreui/react'
+import React, { useEffect, useRef, useState } from 'react'
+import { CButton, CCol, CFooter, CForm, CFormInput, CRow, CSpinner, CToaster } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPencil } from '@coreui/icons'
 import CustomAuthorizationCheckerChildren from 'src/views/customs/my-authorizationchecker-children'
 import { getAllProjects, updateProjectById } from 'src/services/general-services'
 import CustomModal from 'src/views/customs/my-modal'
+import { createFailIcon, createSuccessIcon } from 'src/views/customs/my-icon'
+import createToast from 'src/views/customs/my-toast'
 
 const AppFooter = () => {
   const defaultAuthorizationCode = process.env.HG_MODULE_GENERAL_INFORMATION_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_general_information_management"
@@ -47,9 +49,19 @@ const AppFooter = () => {
         .then(res => {
           setUpdateFooterVisible(false)
           getProjectInformation()
+          addToast(createToast({
+            title: 'Cập nhật thông tin',
+            content: 'Cập nhật thông tin thành công !',
+            icon: createSuccessIcon()
+          }))
         })
         .catch(err => {
           // Do nothing
+          addToast(createToast({
+            title: 'Cập nhật thông tin',
+            content: 'Cập nhật thông tin không thành công ! Vui lòng thử lại',
+            icon: createFailIcon()
+          }))
         })
       }
     }
@@ -156,8 +168,11 @@ const AppFooter = () => {
   useEffect(() => {
     getProjectInformation()
   }, [])
+  const [toast, addToast] = useState(0)
+  const toaster = useRef()
   return (
     <CFooter className="px-4">
+      <CToaster ref={toaster} push={toast} placement="top-end" />
       <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateFooter} setExternalState={setHavingUpdateFooter}/>
       <CustomModal visible={updateFooterVisible} title={'Cập nhật chân trang'} body={updateFooterForm(projectState)} setVisible={(value) => setUpdateFooterVisible(value)}/>
       <div>
