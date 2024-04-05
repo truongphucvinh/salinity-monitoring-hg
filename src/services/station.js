@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const BASE_URL = "http://103.221.220.183:8088/"
+const BASE_URL = "http://103.221.220.183:8026/"
 
 export default {
     getStationList: async function() {
         try {
-            const response = await axios.get(BASE_URL+'ctu/geo/things')
+            const response = await axios.get(BASE_URL+'things')
             return response.data;
         } catch(error) {
             throw error;
@@ -14,7 +14,7 @@ export default {
 
     createStation: async function(thingId, stationInfo) {
         try {
-            const response = await axios.post(BASE_URL+`ctu/geo/stations/thing/${thingId}`, stationInfo);
+            const response = await axios.post(BASE_URL+`stations/thing/${thingId}`, stationInfo);
             return response;
         } catch(error) {
             throw error;
@@ -23,7 +23,7 @@ export default {
 
     deleteStation: async function(stationId) {
         try {
-            const response = await axios.delete(BASE_URL+`ctu/geo/stations/${stationId}`);
+            const response = await axios.delete(BASE_URL+`stations/${stationId}`);
             return response;
         } catch(error) {
             throw error;

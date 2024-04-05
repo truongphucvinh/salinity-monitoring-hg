@@ -314,7 +314,7 @@
                 }
             }
             .sensor-value-div {
-                max-height: 520px !important;
+                max-height: 480px !important;
                 overflow-y: auto !important;
                 box-shadow: 0 0 8px 0.5px rgba(128, 128, 128, 0.308);
             }
@@ -351,6 +351,17 @@
                     }
                 }
             }
+            &__seperate-index__download-btn {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                justify-self: right;
+                position: absolute;
+                right: 0;
+                cursor: pointer;
+                margin-top: 20px;
+                margin-right: 10px;
+            }
         }
     }
 }
@@ -361,4 +372,85 @@
     height: 16px;
     width: 16px;
     margin-left: 10px;
+}
+
+.download-card {
+    box-shadow: 0 0 8px 0.5px rgba(128, 128, 128, 0.308);
+    padding: 20px;
+    margin-top: 20px;
+    width: 420px;
+    position: absolute;
+    z-index: 2;
+    background-color: white;
+    right: 12px;
+    top: 23px;
+    // display: none;
+    &__content {
+        &__time {
+            &__heading {
+                font-weight: bold;
+            }
+            &__input-group {
+                margin-top: 10px;
+                input {
+                    margin-left: 10px;
+                }
+                label + input {
+                    margin-right: 10px;
+                }
+            }
+        }
+        &__sensor-option {
+            margin-top: 20px;
+            &__heading {
+                font-weight: bold;
+            }
+            &__sensor-list {
+                margin-top: 10px;
+                &__item:first-child {
+                    margin-right: 20px;
+                }
+                &__item + &__item {
+                    margin-right: 20px;
+                }
+                &__item {
+                    // float: left;
+                    display: inline-block;
+                    label {
+                        margin-left: 8px;
+                    }
+                }
+            }
+        }
+    }
+    &__button {
+        clear: left;
+        margin-top: 20px;
+        display: flex;
+        justify-content: right;
+        &__download {
+            padding: 8px 18px;
+            background-color: green;
+            border-radius: 3px;
+            cursor: pointer;
+            color: white;
+        }
+    }
+}
+
+.download-btn {
+    position: absolute;
+    right: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 3px;
+    padding: 5px 20px;
+    background-color: rgb(233, 233, 233);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    &:hover {
+        background-color: rgb(228, 228, 228);
+        transition: all 0.3s ease;
+    }
 }

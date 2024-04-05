@@ -418,7 +418,7 @@ const StationList = () => {
 
                   {/* station list in available << */}
                   <h6>Trạm sẵn có</h6>
-                  <CTable bordered align="middle" className="mb-0 border" hover responsive style={{'margin-top' : "10px"}}>
+                  <CTable bordered align="middle" className="mb-0 border" hover responsive style={{'marginTop' : "10px"}}>
                     <CTableHead className="text-nowrap">
                       <CTableRow>
                         <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>STT</CTableHeaderCell>
@@ -433,7 +433,7 @@ const StationList = () => {
                       {
                         rynanStationList?.length !== 0 ? rynanStationList?.map((station, index) => {
                           return <>
-                            <CTableRow onClick={() => setStationIsSelected(station)}>
+                            <CTableRow onClick={() => setStationIsSelected(station)} key={index}>
                               <CTableDataCell>{ index+1 }</CTableDataCell>
                               <CTableDataCell style={{'cursor': 'pointer'}} onClick={() => handelDirectToDetail(station?.so_serial)}>{ station.ten_thiet_bi }</CTableDataCell>
                               <CTableDataCell>{ station.ghi_chu }</CTableDataCell>
@@ -468,7 +468,7 @@ const StationList = () => {
                       onClick={handleOpenCreateStationModal}
                     >Thêm</CButton>
                   </div>
-                  <CTable bordered align="middle" className="mb-0 border" hover responsive style={{'margin-top' : "20px"}}>
+                  <CTable bordered align="middle" className="mb-0 border" hover responsive style={{'marginTop' : "20px"}}>
                     <CTableHead className="text-nowrap">
                       <CTableRow>
                         <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>STT</CTableHeaderCell>
@@ -483,7 +483,7 @@ const StationList = () => {
                       {
                         stationList?.length !== 0 ? stationList.map((station, index) => {
                           return <>
-                            <CTableRow onClick={() => setStationIsSelected(station)}>
+                            <CTableRow onClick={() => setStationIsSelected(station)} key={index}>
                               <CTableDataCell>{ index+1 }</CTableDataCell>
                               <CTableDataCell style={{'cursor': 'pointer'}} onClick={() => handelDirectToDetail(station?.thingId)}>{ station.station.name }</CTableDataCell>
                               <CTableDataCell>{ station.station.name }</CTableDataCell>
@@ -801,7 +801,7 @@ const StationList = () => {
                       {
                         rynanStationIsSeeing?.sensor_list?.map((sensor, index) => {
                           return <>
-                            <span key={index}>{ sensor }</span>
+                            <span >{ sensor }</span>
                             {
                               rynanStationIsSeeing?.sensor_list?.length-1 !== index ? 
                               <span>, </span>

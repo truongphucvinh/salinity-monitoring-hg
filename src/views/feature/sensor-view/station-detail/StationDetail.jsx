@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChartLine } from "@fortawesome/free-solid-svg-icons";
 import { faTableCells } from "@fortawesome/free-solid-svg-icons";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
+import { faCircleDown } from "@fortawesome/free-solid-svg-icons";
 
 import { useNavigate } from "react-router-dom";
 
@@ -38,6 +39,10 @@ import station from "src/services/station";
 
 import { useParams } from "react-router-dom";
 import CustomIntroduction from "src/views/customs/my-introduction";
+
+// import XLSX from "xlsx";
+import { CSVLink } from "react-csv";
+import * as XLSX from 'xlsx/xlsx.mjs';
 
 function zones(colors) {
   return [{
@@ -76,9 +81,14 @@ const StationDetail = () => {
     //tab
     const [activeKey, setActiveKey] = useState(0);
 
+    //download card
+    const [dateRange, setDateRange] = useState({startDate: '', endDate: ''});
+    const [selectedDateRange, setSelectedDateRange] = useState({from: '', to: ''});
+    const [visibleDownloadCard, setVisibleDownloadCard] = useState(false);
+
     const [sensorListRynan, setSensorListRynan] = useState([]);
     const [selectingSensorRynan, setSelectingSensorRynan] = useState(""); //sensor name
-    const [viewMode, setViewMode] = useState("chart"); //mode name: table, chart, etc
+    const [viewMode, setViewMode] = useState("table"); //mode name: table, chart, etc
     const [latestSensorValue, setLatestSensorValue] = useState([]); //latest value of sensors array
     const [sensorValueList, setSensorValueList] = useState([]); //all value for all sensor
     const [isLoadingSensorList, setIsLoadingSensorList] = useState(false);
@@ -130,7 +140,7 @@ const StationDetail = () => {
 
     useEffect(() => {
       setIsLoadingSensorList(true);
-      observation.getDataStation(id, "", "", 1, 1000)
+      observation.getDataStation(id, "", "", 1, 1000) //1000?
         .then((res) => {
           setSensorValueList(res.data);
           //station list
@@ -152,7 +162,7 @@ const StationDetail = () => {
           }
           //options array
           var pointArray = [];
-          res?.data.map((multi) => {
+          res?.data.map((multi, index) => {
             var point = {
               x: new Date(multi.ngay_gui.substring(0, multi.ngay_gui.length-5)).getTime(),
               y: Number(selectingSensorRynan == "" ? multi[sensorList[0]] : multi[selectingSensorRynan]),
@@ -161,6 +171,22 @@ const StationDetail = () => {
             pointArray.push(point);
             if(selectingSensorRynan=="") {
               setSelectingSensorRynan(sensorList[0]);
+            }
+
+            //dateRage
+            var dateTime = new Date(point.x);
+            var date, month;
+            date = dateTime.getDate() < 10 ? "0"+Number(dateTime.getDate()) : dateTime.getDate();
+            month = dateTime.getMonth() < 9 ? "0"+Number(dateTime.getMonth()+1) : dateTime.getMonth()+1;
+            var dateString = dateTime.getFullYear() + "-" + month + "-" + date;
+            console.log("dateStr: ", dateString);
+            if(index===0) {
+              dateRange.startDate = dateString;
+              selectedDateRange.from = dateRange.startDate;
+            }
+            if(index===res?.data.length-1) {
+              dateRange.endDate = dateString;
+              selectedDateRange.to = dateRange.endDate;
             }
           })
           // setSelectingMultiDTSValue(res);
@@ -199,7 +225,6 @@ const StationDetail = () => {
           )
           setIsLoadingSensorList(false);
         })
-        console.log("dataStation ", dataStation);
     }, [selectingSensorRynan])
 
     const handleChangeSensorViewRynan = (sensorName, index) => {
@@ -235,6 +260,60 @@ const StationDetail = () => {
           break;    
       }
       return generatedName;
+    }
+
+    //export excel
+    const [selectedSensorForDownloading, setSelectedSensorForDownloading] = useState([]);
+    
+    const handleChangeSelectedSensorForDownloading = (e) => {
+      if (e.target.checked) {
+        setSelectedSensorForDownloading([...selectedSensorForDownloading, e.target.value]);
+      } else {
+        setSelectedSensorForDownloading(selectedSensorForDownloading.filter((item) => item !== e.target.value));
+      }
+      console.log("selected sensor list for download: ", selectedSensorForDownloading);
+      console.log("dateRange: ", dateRange);
+    }
+
+    const handleSelectedDateRange = (e) => {
+      console.log("date: ", e.target.name);
+      var fromTo = {from: selectedDateRange.from, to: selectedDateRange.to};
+      fromTo[e.target.name] = e.target.value;
+      setSelectedDateRange(fromTo);
+      console.log("selected date time: ", selectedDateRange);
+    }
+
+    const handleExportExcel = () => {
+      var excelSheet = [];
+      var colSheet = {};
+      colSheet.ngay_gui = '';
+
+      selectedSensorForDownloading.map((sensor) => {
+        colSheet[sensor] = '';
+      })
+
+      sensorValueList.map((item) => {
+        //chuyen ngay trong csdl ve dang chuan utc
+        var sendDate = new Date(item.ngay_gui.substring(0, 4), Number(item.ngay_gui.substring(5, 7))-1, item.ngay_gui.substring(8, 10), item.ngay_gui.substring(11, 13), item.ngay_gui.substring(14, 16), item.ngay_gui.substring(17, 19));
+        var from, to;
+        from = selectedDateRange.from;
+        to = selectedDateRange.to;
+        if((new Date(sendDate).getTime()) >= (new Date(from.substring(0, 4), Number(from.substring(5, 7))-1, from.substring(8, 10), 0, 0, 0, 0).getTime()) 
+          && (new Date(sendDate).getTime()) <= (new Date(to.substring(0, 4), Number(to.substring(5, 7) - 1), to.substring(8, 10), 23, 59, 59, 59).getTime()))  
+        {
+          for(const key in colSheet) {
+            colSheet[key] = item[key];
+          }
+          excelSheet.push({...colSheet});
+        }
+      })
+      console.log("colSheet: ", excelSheet);
+
+      console.log("Sensor value list: ", excelSheet);
+      var wb = XLSX.utils.book_new();
+      var ws = XLSX.utils.json_to_sheet(excelSheet);
+      XLSX.utils.book_append_sheet(wb, ws, "MySheet1");
+      XLSX.writeFile(wb, "MyExcel.xlsx");
     }
 
     return (<>
@@ -327,40 +406,9 @@ const StationDetail = () => {
                   {/* table */}
                   {
                     viewMode=='table' && <div>
-                      <CRow className="station-detail2__body__table">
-                        <CCol xs={6} className="station-detail2__body__table__general-index">
-                          <div className="station-detail2__body__table__general-index__header">
-                            Chỉ số gần nhất
-                          </div>
-                          <div className="station-detail2__body__table__general-index__table">
-                            <table className="station-value">
-                                <thead>
-                                  <tr>
-                                      <th className="time">Thời gian</th>
-                                      <th className="type">Cảm biến</th>
-                                      <th className="index">Giá trị</th>
-                                      {/* <th className="unit">Đơn vị</th> */}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                  {
-                                    latestSensorValue.map((sensor, index) => {
-                                      return <>
-                                        <tr>
-                                          <td className="time">{ sensor.time }</td>
-                                          <td>{ sensor.sensorName }</td>
-                                          <td className="index">{ sensor.sensorValue }</td>
-                                          {/* <td className="unit">ppt</td> */}
-                                        </tr>
-                                      </>
-                                    })
-                                  }
-                                </tbody>
-                            </table>
-                          </div>
-                        </CCol>
-                        <CCol xs={6}>
-                          <CNav variant="tabs" role="tablist">
+                      <CRow className="station-detail2__body__table" style={{position: 'relative'}}>
+                        <CCol xs={6} style={{position: 'relative'}}>
+                          <CNav variant="tabs" role="tablist" >
                             {
                               sensorListRynan.map((sensor, index) => {
                                 return <>
@@ -379,7 +427,75 @@ const StationDetail = () => {
                                 </>
                               })
                             }
+                            <div className="download-btn"
+                              onClick={() => {setVisibleDownloadCard(!visibleDownloadCard)}}
+                            >
+                              <FontAwesomeIcon icon={faCircleDown}/>
+                              &nbsp;
+                              Tải xuống
+                            </div>
                           </CNav>
+                          {/* <div className="station-detail2__body__table__seperate-index__download-btn"
+                              onClick={() => handleExportExcel()}
+                            >
+                              Tải xuống
+                          </div> */}
+                          {
+                            visibleDownloadCard && <>
+                              <div className="download-card">
+                                {/* <div className="download-card__heading">
+                                  Tải xuống
+                                </div> */}
+                                <div className="download-card__content">
+                                  <div className="download-card__content__time">
+                                      <div className="download-card__content__time__heading">
+                                        Thời gian
+                                      </div>
+                                      <div className="download-card__content__time__input-group">
+                                        <label htmlFor="">Từ</label>
+                                        <input type="date" 
+                                          value={selectedDateRange.from} 
+                                          min={dateRange.startDate} 
+                                          max={dateRange.endDate} 
+                                          name="from"
+                                          onChange={handleSelectedDateRange}
+                                        />
+                                        <label htmlFor="">Đến</label>
+                                        <input 
+                                          type="date" value={selectedDateRange.to} 
+                                          min={dateRange.startDate} 
+                                          max={dateRange.endDate} 
+                                          name="to"
+                                          onChange={handleSelectedDateRange}
+                                        />
+                                      </div>
+                                  </div>
+                                  <div className="download-card__content__sensor-option">
+                                    <div className="download-card__content__sensor-option__heading">
+                                      Cảm biến
+                                    </div>
+                                    <div className="download-card__content__sensor-option__sensor-list">
+                                      {
+                                        sensorListRynan.map((sensor, index) => {
+                                          return <span className="download-card__content__sensor-option__sensor-list__item" key={index}>
+                                            <input type="checkbox" name="sensor" value={sensor} id="" onChange={handleChangeSelectedSensorForDownloading}/>
+                                            <label htmlFor="">{sensor}</label>
+                                          </span>
+                                        })
+                                      }
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="download-card__button">
+                                  <div className="download-card__button__download"
+                                    onClick={() => handleExportExcel()}
+                                  >
+                                    Tải xuống
+                                  </div>
+                                </div>
+                              </div>
+                            </>
+                          }
                           <CTabContent>
                             {
                               sensorListRynan.map((sensor, index) => {
@@ -413,6 +529,38 @@ const StationDetail = () => {
                               })
                             }
                           </CTabContent>
+                        </CCol>
+                        <CCol xs={6} className="station-detail2__body__table__general-index">
+                          <div className="station-detail2__body__table__general-index__header">
+                            Chỉ số gần nhất
+                          </div>
+                          <div className="station-detail2__body__table__general-index__table">
+                            <table className="station-value">
+                                <thead>
+                                  <tr>
+                                      <th className="time">Thời gian</th>
+                                      <th className="type">Cảm biến</th>
+                                      <th className="index">Giá trị</th>
+                                      {/* <th className="unit">Đơn vị</th> */}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                  {
+                                    latestSensorValue.map((sensor, index) => {
+                                      return <>
+                                        <tr>
+                                          <td className="time">{ sensor.time }</td>
+                                          <td>{ sensor.sensorName }</td>
+                                          <td className="index">{ sensor.sensorValue }</td>
+                                          {/* <td className="unit">ppt</td> */}
+                                        </tr>
+                                      </>
+                                    })
+                                  }
+                                </tbody>
+                            </table>
+                          </div>
+                          
                         </CCol>
                       </CRow>  
                     </div>

@@ -291,7 +291,6 @@ const HomePage = () => {
                         })
                         .then((station) => {
                             setRynanStationList([station]);
-                            console.log("station: ", station);
                         })
                     
                 })
