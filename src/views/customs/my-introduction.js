@@ -1,11 +1,13 @@
 import { cilPencil } from "@coreui/icons"
 import CIcon from "@coreui/icons-react"
-import { CButton, CCol, CForm, CFormInput, CRow, CSpinner } from "@coreui/react"
-import React, { useEffect, useState } from "react"
+import { CButton, CCol, CForm, CFormInput, CRow, CSpinner, CToaster } from "@coreui/react"
+import React, { useEffect, useRef, useState } from "react"
 import CustomAuthorizationCheckerChildren from "./my-authorizationchecker-children"
 import { getAllProjects, updatePageById } from "src/services/general-services"
 import { getSpecificGeneralInformation } from "src/tools"
 import CustomModal from "./my-modal"
+import createToast from "./my-toast"
+import { createFailIcon, createSuccessIcon } from "./my-icon"
 
 const CustomIntroduction = ({title,content,pageCode}) => {
     const defaultProjectCode = process.env.HG_GENERAL_PROJECT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_project"
@@ -80,9 +82,19 @@ const CustomIntroduction = ({title,content,pageCode}) => {
                 .then(res => {
                     getProjectInformation(defaultProjectCode, pageCode)
                     setUpdateHeaderVisible(false)
+                    addToast(createToast({
+                        title: 'Cập nhật tiêu đề',
+                        content: 'Cập nhật tiêu đề thành công !',
+                        icon: createSuccessIcon()
+                    }))
                 })
                 .catch(err => {
                     // Do nothing
+                    addToast(createToast({
+                        title: 'Cập nhật tiêu đề',
+                        content: 'Cập nhật tiêu đề không thành công !',
+                        icon: createFailIcon()
+                    }))
                 })
             }
         }
@@ -137,8 +149,10 @@ const CustomIntroduction = ({title,content,pageCode}) => {
     useEffect(() => {
         getProjectInformation(defaultProjectCode, pageCode)
     }, [])
-
+    const [toast, addToast] = useState(0)
+    const toaster = useRef()
     return (<>
+        <CToaster ref={toaster} push={toast} placement="top-end" />
         <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateHeader} setExternalState={setHavingUpdateHeader}/>
         <CustomModal visible={updateHeaderVisible} title={'Cập nhật tiêu đề'} body={updateHeaderForm(page)} setVisible={(value) => setUpdateHeaderVisible(value)}/>
         <CRow>
