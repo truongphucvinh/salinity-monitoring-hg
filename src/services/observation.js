@@ -23,12 +23,11 @@ export default  {
     },
 
     //Rynan
-    getDataStation: async function(serialStation, startDate, endDate, page, limit) { //serialStation: L2177R1M001F001, startDate: 2024%2F01%2F10, endDate: 2024%2F01%2F18, limit: 1000
+    getDataStation: async function(serialStation, startDate, endDate, page, limit) {
         try {
-            startDate = startDate.replace("/", "%");
-            endDate = endDate.replace("/", "%");
             const responseLogin = await station.login();
-            const response = await axios.get(`https://document.rynangate.com/api/v1/get-data-stations?so_serial=${serialStation}&tu_ngay=2024%2F01%2F10&den_ngay=2024%2F01%2F18&limit=${limit}`,
+            console.log(`https://document.rynangate.com/api/v1/get-data-stations?so_serial=${serialStation}&tu_ngay=${startDate}&den_ngay=${endDate}&limit=${limit}`);
+            const response = await axios.get(`https://document.rynangate.com/api/v1/get-data-stations?so_serial=${serialStation}&tu_ngay=${startDate}&den_ngay=${endDate}&limit=${limit}`,
                 {
                     headers: {
                         "x-access-token" : responseLogin.token,
