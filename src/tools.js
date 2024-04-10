@@ -218,3 +218,7 @@ export const checkCurrentUser = (userId) => {
     const currentUserId = user?._id
     return currentUserId === userId
 }
+
+export const googleMapLink = (lat, lng) => {
+    return `https://www.google.com/maps/?q=${lat},${lng}`
+}

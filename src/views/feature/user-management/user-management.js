@@ -773,7 +773,7 @@ const UserManagement = () => {
             <CCardBody>
                 <CustomModal visible={addVisible} title={'Thêm người dùng'} body={addForm(addLoaded)} setVisible={(value) => setAddVisible(value)}/>
                 <CustomModal visible={updateVisible} title={'Cập nhật người dùng'} body={updateForm(updateId)} setVisible={(value) => setUpdateVisible(value)}/>
-                <CustomModal visible={deleteVisible} title={'Xóa người người dùng'} body={deleteForm(deleteId)} setVisible={(value) => setDeleteVisible(value)}/>
+                <CustomModal visible={deleteVisible} title={'Xóa người dùng'} body={deleteForm(deleteId)} setVisible={(value) => setDeleteVisible(value)}/>
                 <CForm onSubmit={onFilter}>
                     <CRow>
                         <CCol md={12} lg={3}>

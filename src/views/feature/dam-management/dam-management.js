@@ -38,7 +38,7 @@ import { createDam, deleteDam, getAllDamTypes, getAllDams, getAllRivers, getDamB
 import CustomSpinner from "src/views/customs/my-spinner"
 import CustomDateTimePicker from "src/views/customs/my-datetimepicker/my-datetimepicker"
 import { useNavigate } from "react-router-dom"
-import { addZeroToDate, damStatusConverter, searchRelatives, splitCoordinates } from "src/tools"
+import { addZeroToDate, damStatusConverter, googleMapLink, searchRelatives, splitCoordinates } from "src/tools"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import { red } from "@mui/material/colors"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
@@ -363,6 +363,7 @@ const DamManagement = () => {
                                 className="mt-4"
                                 type="number"
                                 placeholder="Chiều cao"
+                                min={0}
                                 feedbackInvalid="Không bỏ trống và phải là số lớn hơn 0"
                                 onChange={(e) => handleSetAddDamHeight(e.target.value)}
                                 value={addDamHeight}
@@ -375,6 +376,7 @@ const DamManagement = () => {
                                 className="mt-4"
                                 type="number"
                                 placeholder="Chiều rộng"
+                                min={0}
                                 feedbackInvalid="Không bỏ trống và phải là số lớn hơn 0"
                                 onChange={(e) => handleSetAddDamCapacity(e.target.value)}
                                 value={addDamCapacity}
@@ -395,11 +397,9 @@ const DamManagement = () => {
                                     required
                                     id="button-addon2"
                                 />
-                                <CButton type="button" className="text-white" color="primary" id="button-addon2">
-                                    <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">
-                                        <CIcon icon={cilLocationPin} style={{color: "white", width: "18px",  height: "18px"}}/>
-                                    </a>
-                                </CButton>
+                                <a href="https://www.google.com/maps" className="btn btn-primary text-white" target="_blank" rel="noopener noreferrer">
+                                    <CIcon icon={cilLocationPin} style={{color: "white", width: "18px",  height: "18px"}}/>
+                                </a>
                             </CInputGroup>
                         </CCol>
                     </CRow>
@@ -647,9 +647,10 @@ const DamManagement = () => {
                                 <CFormInput
                                     className="mt-4"
                                     type="text"
+                                    required
                                     placeholder="Tên đập"
                                     maxLength={50}
-                                    feedbackInvalid="It hơn 50 ký tự"
+                                    feedbackInvalid="Ít hơn 50 ký tự"
                                     onChange={(e) => handleSetUpdateDamName(e.target.value)}
                                     value={updateDamName}
                                     aria-describedby="exampleFormControlInputHelpInline"
@@ -684,6 +685,7 @@ const DamManagement = () => {
                                 <CFormInput
                                     className="mt-4"
                                     type="number"
+                                    min={0}
                                     placeholder="Chiều cao"
                                     feedbackInvalid="Lớn hơn 0"
                                     onChange={(e) => handleSetUpdateDamHeight(e.target.value)}
@@ -695,6 +697,7 @@ const DamManagement = () => {
                                 <CFormInput
                                     className="mt-4"
                                     type="number"
+                                    min={0}
                                     placeholder="Chiều rộng"
                                     feedbackInvalid="Lớn hơn 0"
                                     onChange={(e) => handleSetUpdateDamCapacity(e.target.value)}
@@ -714,12 +717,10 @@ const DamManagement = () => {
                                         aria-describedby="exampleFormControlInputHelpInline"
                                         id="button-addon2"
                                     />
-                                    <CButton type="button" className="text-white" color="primary" id="button-addon2">
-                                        <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">
-                                            <CIcon icon={cilLocationPin} style={{color: "white", width: "18px",  height: "18px"}}/>
-                                        </a>
-                                    </CButton>
-                                </CInputGroup>
+                                    <a href={googleMapLink(updateDamLatitude, updateDamLongtitude)} className="btn btn-primary" target="_blank" rel="noopener noreferrer">
+                                        <CIcon icon={cilLocationPin} style={{color: "white", width: "18px",  height: "18px"}}/>
+                                    </a>
+                                    </CInputGroup>
                             </CCol>
                         </CRow>
                         <CRow>

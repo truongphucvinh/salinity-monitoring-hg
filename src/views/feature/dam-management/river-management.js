@@ -35,7 +35,7 @@ import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import { createRiver,  deleteRiver,  getAllRivers,  getRiverById,  updateRiver } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
-import { removeVietnameseAccents, searchRelatives, splitCoordinates } from "src/tools"
+import { googleMapLink, removeVietnameseAccents, searchRelatives, splitCoordinates } from "src/tools"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthChecker from "src/views/customs/my-authchecker"
@@ -148,7 +148,7 @@ const RiverManagement = () => {
                                     <CTableDataCell>{river?.riverName}</CTableDataCell>
                                     <CTableDataCell>{river?.riverLocation}</CTableDataCell>
                                     <CTableDataCell>
-                                        <a href={`https://www.google.com/maps/?q=${river?.riverLatitude},${river?.riverLongitude}`} rel="noopener noreferrer" target="_blank">
+                                        <a href={googleMapLink(river?.riverLatitude, river?.riverLongitude)} rel="noopener noreferrer" target="_blank">
                                             <CIcon icon={cilLocationPin} className="text-danger mx-1" role="button"/>
                                         </a>
                                         {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(river?.riverId)} className="text-success mx-1" role="button"/>}
@@ -456,6 +456,7 @@ const RiverManagement = () => {
                                     className="mt-4"
                                     type="text"
                                     placeholder="Tên sông, kênh, rạch"
+                                    required
                                     onChange={(e) => handleSetUpdateRiverName(e.target.value)}
                                     value={updateRiverName}
                                     aria-describedby="exampleFormControlInputHelpInline"
@@ -486,14 +487,11 @@ const RiverManagement = () => {
                                         feedbackInvalid="Không bỏ trống và phải là một cặp số gồm vĩ độ và kinh độ"
                                         onChange={(e) => handleSetUpdateLatLngAutomatically(e.target.value)}
                                         aria-describedby="exampleFormControlInputHelpInline"
-                                        required
                                         id="button-addon2"
                                     />
-                                    <CButton type="button" className="text-white" color="primary" id="button-addon2">
-                                        <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">
-                                            <CIcon icon={cilLocationPin} style={{color: "white", width: "18px",  height: "18px"}}/>
-                                        </a>
-                                    </CButton>
+                                    <a href={googleMapLink(updateRiverLatitude, updateRiverLongitude)} className="btn btn-primary text-white" target="_blank" rel="noopener noreferrer">
+                                        <CIcon icon={cilLocationPin} style={{color: "white", width: "18px",  height: "18px"}}/>
+                                    </a>
                                 </CInputGroup>
                             </CCol>
                         </CRow>

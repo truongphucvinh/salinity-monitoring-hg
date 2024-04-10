@@ -367,6 +367,7 @@ const DamTypeManagement = () => {
                                     className="mt-4"
                                     type="text"
                                     placeholder="Tên loại đập"
+                                    required
                                     maxLength={50}
                                     feedbackInvalid="Ít hơn 50 ký tự"
                                     onChange={(e) => handleSetUpdateDamTypeName(e.target.value)}
