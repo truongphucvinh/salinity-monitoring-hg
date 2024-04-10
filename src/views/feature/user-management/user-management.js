@@ -43,6 +43,7 @@ import CustomIntroduction from "src/views/customs/my-introduction"
 const UserManagement = () => {
 
     const defaultPageCode="U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_user_management"
+    const defaultRoleAdminId="65b74ca2526ef32c8be0ca07"||process.env.HG_ROLE_ID_ADMIN_DEFAULT
     // User Management Data
     const [listUsers, setListUsers] = useState([])
     // const [listDomains, setListDomains] = useState([])
@@ -84,15 +85,6 @@ const UserManagement = () => {
             .catch(err => {
                 // Do nothing
             })
-            
-            // getAllDomains()
-            // .then(res => {
-            //     const domains = res?.data?.data?.result
-            //     setListDomains(domains)
-            // })
-            // .catch(err => {
-            //     // Do nothing
-            // })
 
             getPermissionsOfDomain(defaultDomainId)
             .then(res => {
@@ -188,7 +180,11 @@ const UserManagement = () => {
                                     <CTableDataCell>{user?.fullName}</CTableDataCell>
                                     {
                                         !checkUserCanNotChange(user?._id)?.status ? <CTableDataCell>
-                                            {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(user?._id)} className="text-success mx-1" role="button"/>}                                            
+                                            {
+                                                checkUserCanNotChange(user?._id)?.canEdit ? <>
+                                                    {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(user?._id)} className="text-success mx-1" role="button"/>}                                            
+                                                </> : <>{`${checkUserCanNotChange(user?._id)?.msg}`}</>
+                                            }
                                         </CTableDataCell> : <CTableDataCell>
                                             {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(user?._id)} className="text-success mx-1" role="button"/>}
                                             {haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(user?._id)}  className="text-danger" role="button"/>}
@@ -405,7 +401,9 @@ const UserManagement = () => {
                     >
                         <option selected="" value="" >Vai trò</option>
                         {
-                            listRoles && Array.isArray(listRoles) && listRoles.map((role) => {
+                            listRoles && Array.isArray(listRoles) && listRoles.filter((role) => {
+                                return role?._id !== defaultRoleAdminId
+                            }).map((role) => {
                                 return  <option key={role?._id} value={role?._id}>{role?.name}</option>
                             })
                         }
@@ -671,7 +669,9 @@ const UserManagement = () => {
                                     >
                                         <option selected="" value="" >Vai trò</option>
                                         {
-                                            listRoles && Array.isArray(listRoles) && listRoles.map((role) => {
+                                            listRoles && Array.isArray(listRoles) && listRoles.filter((role) => {
+                                                return role?._id !== defaultRoleAdminId
+                                            }).map((role) => {
                                                 return  <option key={role?._id} value={role?._id}>{role?.name}</option>
                                             })
                                         }

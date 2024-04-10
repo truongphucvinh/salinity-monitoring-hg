@@ -369,6 +369,7 @@ const DamManagement = () => {
                                 value={addDamHeight}
                                 aria-describedby="exampleFormControlInputHelpInline"
                                 required
+                                step={0.01}
                             />
                         </CCol>
                         <CCol xs={12} lg={6}>
@@ -382,6 +383,7 @@ const DamManagement = () => {
                                 value={addDamCapacity}
                                 aria-describedby="exampleFormControlInputHelpInline"
                                 required
+                                step={0.01}
                             />
                         </CCol>
                     </CRow>
