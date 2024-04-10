@@ -44,7 +44,7 @@ const AppSidebar = () => {
         <CSidebarBrand to="/">
           {/* <span className='d-flex align-items-center'><CIcon customClassName="sidebar-brand-full me-2" icon={cilAudio} height={32} />Giám sát độ mặn</span> */}
           {/* <CIcon customClassName="sidebar-brand-full me-2" icon={cilAudio} height={32} /> */}
-          <CIcon customClassName="sidebar-brand-narrow" icon={cilAudio} height={32} />
+          {/* <CIcon customClassName="sidebar-brand-narrow" icon={cilAudio} height={32} /> */}
         </CSidebarBrand>
         <CCloseButton
           className="d-lg-none"

@@ -21,6 +21,18 @@ export const getSpecificGeneralInformation = (projectCode, pageCode, projects) =
     }
 }
 
+export const onFilterUsers = (listUsers, domainId) => {
+    return listUsers.filter(user => {
+        return user?.permission?.domain === domainId
+    })
+}
+
+export const onFilterUsersByRole = (listUsers, roleId) => {
+    return listUsers.filter(user => {
+        return user?.permission?.role === roleId
+    })
+}
+
 export const searchRelatives = (sourceValue, searchValue) => {
     const processedSearch = removeVietnameseAccents(searchValue?.trim()).toLowerCase()
     const processedSource = removeVietnameseAccents(sourceValue?.trim()).toLowerCase()
@@ -154,8 +166,59 @@ export const checkCurrentRoleOfUser = (roleId) => {
     return roleId === currentRoleId
 }
 
+export const checkRoleCanNotChange = (roleId) => {
+    const user = getLoggedUserInformation()
+    const currentRoleId = user?.permission?.role 
+    const defaultRoleQuest = "661544f6b77939e48d030119" || process.env.HG_ROLE_ID_DEFAULT
+    const defaultRoleHighestUser = "65b74ca2526ef32c8be0ca07" || process.env.HG_ROLE_ID_ADMIN_DEFAULT
+    let res = {
+        status: true,
+        msg: "Có thể thao tác"
+    }
+    if (roleId === defaultRoleHighestUser) {
+        res["status"] = false
+        res["msg"] = "Vai trò cao nhất"
+        return res 
+    }
+    if (roleId === defaultRoleQuest) {
+        res["status"] = false
+        res["msg"] = "Vai trò mặc định"
+        return res
+    }
+    if (roleId === currentRoleId) {
+        res["status"] = false
+        res["msg"] = "Vai trò hiện tại"
+    }
+    return res
+}
+
+export const checkUserCanNotChange = (userId) => {
+    const user = getLoggedUserInformation()
+    const currentUserId = user?._id
+    const defaultAdminId = "660bb6c18ace51aaeccec0fb" || process.env.HG_USER_ID_ADMIN_DEFAULT
+    let res = {
+        status: true,
+        msg: "Có thể thao tác"
+    }
+    if (userId === defaultAdminId) {
+        res["status"] = false
+        res["msg"] = "Người dùng quản trị"
+        return res
+    }
+    if (userId === currentUserId) {
+        res["status"] = false
+        res["msg"] = "Người dùng hiện tại"
+        return res
+    }
+    return res
+}
+
 export const checkCurrentUser = (userId) => {
     const user = getLoggedUserInformation()
     const currentUserId = user?._id
     return currentUserId === userId
+}
+
+export const googleMapLink = (lat, lng) => {
+    return `https://www.google.com/maps/?q=${lat},${lng}`
 }

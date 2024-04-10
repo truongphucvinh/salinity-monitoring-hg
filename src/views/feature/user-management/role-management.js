@@ -37,8 +37,8 @@ import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import CustomSpinner from "src/views/customs/my-spinner"
-import { createPermission, createRole, deletePermission, deleteRole, getAllModules, getAllModulesOfPermission, getAllPermissions, getPermissionById, updatePermission, updateRole } from "src/services/authentication-services"
-import { checkCurrentRoleOfUser, getLoggedUserInformation, searchRelatives } from "src/tools"
+import { createPermission, createRole, deletePermission, deleteRole, getAllModules, getAllModulesOfPermission, getAllPermissions, getAllUsers, getPermissionById, updatePermission, updateRole, updateUser } from "src/services/authentication-services"
+import { checkCurrentRoleOfUser, checkRoleCanNotChange, getLoggedUserInformation, onFilterUsers, onFilterUsersByRole, searchRelatives } from "src/tools"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 import CustomAuthChecker from "src/views/customs/my-authchecker"
@@ -46,6 +46,8 @@ import CustomIntroduction from "src/views/customs/my-introduction"
 
 const RoleManagement = () => {
 
+    // Recovery role
+    const defaultRoleId = "661544f6b77939e48d030119" || process.env.HG_ROLE_ID_DEFAULT
     // Role Management
     const defaultDomainId = '65b0cbba526ef32c8be05f1d' || process.env.HG_DOMAIN_ID
     const defaultModuleCode = 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ' || process.env.HG_MODULE_CODE
@@ -196,13 +198,12 @@ const RoleManagement = () => {
                     {
                         filteredRoles?.length !== 0 ? filteredRoles.map((role, index) => {
                             return (
-                                
                                 <CTableRow key={role?._id}>
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
                                     <CTableDataCell>{role?.name}</CTableDataCell>
                                     <CTableDataCell>{role?.description}</CTableDataCell>
                                     {
-                                        checkCurrentRoleOfUser(role?._id) ? <CTableDataCell>Vai trò hiện tại</CTableDataCell> : <CTableDataCell>
+                                        !checkRoleCanNotChange(role?._id)?.status ? <CTableDataCell>{checkRoleCanNotChange(role?._id)?.msg}</CTableDataCell> : <CTableDataCell>
                                             {
                                                 haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(role?._id, role?.permission_id)} className="text-success mx-1" role="button"/>
                                             }
@@ -287,11 +288,47 @@ const RoleManagement = () => {
         }
         return permissionModules
     }
+
+    // complete temporary
+    const defaultDamManagementId = "65b0d54c526ef32c8be05fbb"
+    const defaultDamManagementViewId = "65b0d54c526ef32c8be05fbd"
+    const defaultDamScheduleId = "65b0d592526ef32c8be05fc1"
+    const completeDamSchedulePermission = (permissionModules) => {
+        let newModules = permissionModules?.modules
+        let isDamSchedule = false
+        let isDamManagement = false
+        newModules?.forEach(module => {
+            if (module?.parent === defaultDamScheduleId) {
+                isDamSchedule = true
+            }
+        })
+        newModules?.forEach(module => {
+            if (module?.parent === defaultDamManagementId) {
+                isDamManagement = true
+            }
+        })
+        if (isDamSchedule && !isDamManagement) {
+            const newItem = {
+                parent: defaultDamManagementId,
+                children: [
+                    defaultDamManagementViewId
+                ]
+            }
+            newModules.push(newItem)
+            return {
+                modules: newModules
+            }
+        }
+        return permissionModules
+    }
+
+
+
     const createNewRole = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             const role = {
@@ -312,10 +349,11 @@ const RoleManagement = () => {
                 createPermission(permission)
                 .then(res1 => {
                     const newPermission = res1?.data?.data
-                    const permissionModules = {
+                    let permissionModules = {
                         // To filter all parent without children modules
                         modules: addingViewModule(addModules.filter(module => Array.isArray(module?.children) && module?.children?.length !== 0))
                     }
+                    permissionModules = completeDamSchedulePermission(permissionModules)
                     console.log(permissionModules)
                     updatePermission(permissionModules, newPermission?._id)
                     .then(res2 => {
@@ -533,8 +571,8 @@ const RoleManagement = () => {
     const updateAPermission = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             const role = {
@@ -543,9 +581,10 @@ const RoleManagement = () => {
             }
             updateRole(role, updateRoleId)
             .then(res => {
-                const updatingPermission = {
+                let updatingPermission = {
                     modules: addingViewModule(addModules.filter(module => Array.isArray(module?.children) && module?.children?.length !== 0))
                 }
+                updatingPermission = completeDamSchedulePermission(updatingPermission)
                 updatePermission(updatingPermission, updatePermissionId)
                 .then(res1 => {
                     setUpdateVisible(false)
@@ -685,28 +724,61 @@ const RoleManagement = () => {
     const [deletePermissionState, setDeletePermission] = useState(deleteData)
     const {deleteRoleId, deletePermissionId} = deletePermissionState
     const [deleteVisible, setDeleteVisible] = useState(false)
+    const callApiToUpdateUsers = async(user, userId) => {
+        const res = await updateUser(user, userId)
+        console.log(res?.data?.data)
+        return res
+    }
+    
+    const updateAllUsersByRole = async (listUsers) => {
+        for (const user of listUsers) {
+            const userId = user?._id
+            const updateUserData = {
+                domain: defaultDomainId,
+                role: defaultRoleId
+            }
+            await callApiToUpdateUsers(updateUserData, userId)
+        }
+    }
+    const deletePermissionAndRole = async(permissionId, roleId) => {
+        await deletePermission(permissionId)
+        .then(res => {
+            deleteRole(roleId)
+            .then(res1 => {
+                setDeleteVisible(false)
+                rebaseAllData()
+                addToast(createToast({
+                    title: 'Xóa vai trò',
+                    content: 'Xóa vai trò thành công',
+                    icon: createSuccessIcon()
+                }))
+                setUpdateValidated(false)
+            })
+            .catch(err1 => {
+                addToast(createToast({
+                    title: 'Xóa vai trò',
+                    content: "Xóa vai trò không thành công",
+                    icon: createFailIcon()
+                }))
+            })
+        })
+        .catch(err => {
+            addToast(createToast({
+                title: 'Xóa vai trò',
+                content: "Xóa vai trò không thành công",
+                icon: createFailIcon()
+            }))
+        })
+    }
     const deleteARole = (roleId, permissionId) => {
         if (roleId && permissionId) {
-            deletePermission(permissionId)
-            .then(res => {
-                deleteRole(roleId)
-                .then(res1 => {
-                    setDeleteVisible(false)
-                    rebaseAllData()
-                    addToast(createToast({
-                        title: 'Xóa vai trò',
-                        content: 'Xóa vai trò thành công',
-                        icon: createSuccessIcon()
-                    }))
-                    setUpdateValidated(false)
-                })
-                .catch(err1 => {
-                    addToast(createToast({
-                        title: 'Xóa vai trò',
-                        content: "Xóa vai trò không thành công",
-                        icon: createFailIcon()
-                    }))
-                })
+            getAllUsers()
+            .then(async(res) => {
+                const users = res?.data?.data?.result
+                const filteredUsers = onFilterUsers(users, defaultDomainId)
+                const filteredUsersByRole = onFilterUsersByRole(filteredUsers, roleId)
+                await updateAllUsersByRole(filteredUsersByRole)
+                await deletePermissionAndRole(permissionId, roleId)
             })
             .catch(err => {
                 addToast(createToast({
@@ -715,6 +787,7 @@ const RoleManagement = () => {
                     icon: createFailIcon()
                 }))
             })
+            
         }
     }
     const deleteForm = (roleId, permissionId) => {

@@ -36,7 +36,7 @@ import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
-import { checkCurrentUser, searchRelatives } from "src/tools"
+import { checkCurrentUser, checkUserCanNotChange, searchRelatives } from "src/tools"
 import CustomAuthChecker from "src/views/customs/my-authchecker"
 import CustomIntroduction from "src/views/customs/my-introduction"
 
@@ -187,7 +187,9 @@ const UserManagement = () => {
                                     <CTableDataCell>{user?.email}</CTableDataCell>
                                     <CTableDataCell>{user?.fullName}</CTableDataCell>
                                     {
-                                        checkCurrentUser(user?._id) ? <CTableDataCell>Người dùng hiện tại</CTableDataCell> : <CTableDataCell>
+                                        !checkUserCanNotChange(user?._id)?.status ? <CTableDataCell>
+                                            {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(user?._id)} className="text-success mx-1" role="button"/>}                                            
+                                        </CTableDataCell> : <CTableDataCell>
                                             {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(user?._id)} className="text-success mx-1" role="button"/>}
                                             {haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(user?._id)}  className="text-danger" role="button"/>}
                                         </CTableDataCell>
@@ -254,8 +256,8 @@ const UserManagement = () => {
     const createNewUser = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             // This is backup for general domain and role selection also
@@ -513,8 +515,8 @@ const UserManagement = () => {
     const updateAUser = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             // This is backup for update user with the general domain selections
@@ -658,7 +660,7 @@ const UserManagement = () => {
                             </CCol>
                         </CRow> */}
                         {
-                            !checkCurrentUser(updateId) && <CRow>
+                            checkUserCanNotChange(updateId)?.status && <CRow>
                                 <CCol lg={12}>
                                     <CFormSelect 
                                         aria-label="Default select example" 
@@ -771,7 +773,7 @@ const UserManagement = () => {
             <CCardBody>
                 <CustomModal visible={addVisible} title={'Thêm người dùng'} body={addForm(addLoaded)} setVisible={(value) => setAddVisible(value)}/>
                 <CustomModal visible={updateVisible} title={'Cập nhật người dùng'} body={updateForm(updateId)} setVisible={(value) => setUpdateVisible(value)}/>
-                <CustomModal visible={deleteVisible} title={'Xóa người người dùng'} body={deleteForm(deleteId)} setVisible={(value) => setDeleteVisible(value)}/>
+                <CustomModal visible={deleteVisible} title={'Xóa người dùng'} body={deleteForm(deleteId)} setVisible={(value) => setDeleteVisible(value)}/>
                 <CForm onSubmit={onFilter}>
                     <CRow>
                         <CCol md={12} lg={3}>
