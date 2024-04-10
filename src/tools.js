@@ -21,6 +21,18 @@ export const getSpecificGeneralInformation = (projectCode, pageCode, projects) =
     }
 }
 
+export const onFilterUsers = (listUsers, domainId) => {
+    return listUsers.filter(user => {
+        return user?.permission?.domain === domainId
+    })
+}
+
+export const onFilterUsersByRole = (listUsers, roleId) => {
+    return listUsers.filter(user => {
+        return user?.permission?.role === roleId
+    })
+}
+
 export const searchRelatives = (sourceValue, searchValue) => {
     const processedSearch = removeVietnameseAccents(searchValue?.trim()).toLowerCase()
     const processedSource = removeVietnameseAccents(sourceValue?.trim()).toLowerCase()
