@@ -1,86 +1,4 @@
 @import '../../../../scss/custom';
-.station {
-    display: none;
-    &__heading {
-        display: flex;
-        justify-content: space-between;
-        &__title {
-            font: {
-                size: 20px;
-                weight: bold;
-            }
-        }
-        &__add-new-station-btn {
-            @include button(170px, 50px, $dark-blue);
-        }
-    }
-    &__list {
-        width: 100%;
-        margin-top: 25px;
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 10px;
-        &__item {
-            background-color: white;
-            padding: 20px;
-            min-width: 300px;
-            height: 150px;
-            position: relative;
-            border-radius: 3px;
-            display: inline-block;
-            &__name {
-                font: {
-                    size: 17px;
-                    weight: bold;
-                }
-            }
-            &__status {
-                display: flex;
-                align-items: center;
-                div {
-                    height: 10px;
-                    width: 10px;
-                    background-color: $green;
-                    border-radius: 50%;
-                    margin-left: 14px;
-                    margin-right: 5px;
-                    margin-top: 3px;
-                }
-            }
-            &__action {
-                display: flex;
-                position: absolute;
-                bottom: 20px;
-                right: 20px;
-                &__detail-btn, &__more-btn {
-                    cursor: pointer;
-                    text-align: center;
-                    border-radius: 2px;
-                }
-                &__detail-btn {
-                    transition: all 0.3s ease;
-                    padding: 0 10px;
-                    font-size: 13px;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    &:hover {
-                        background-color: rgba(0, 0, 0, 0.05);
-                        transition: all 0.3s ease;
-                    }
-                }
-                &__more-btn {
-                    margin-right: 10px;
-                }
-            }
-            transition: all 0.3s ease;
-            &:hover {
-                @extend %shadow;
-                transition: all 0.3s ease;
-            }
-        }
-    }
-}
 
 .update-station-status {
     width: 192px;
@@ -89,21 +7,20 @@
     align-items: center;
 }
 
-
-    .station-status {
-        height: 10px;
-        width: 10px;
-        border-radius: 50%;
-        margin-left: 5px;
-        margin-right: 10px;
-        margin-top: 8px;
-        &--active {
-            background-color: $green;
-        }
-        &--inactive {
-            background-color: $red;
-        }
+.station-status {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    margin-left: 5px;
+    margin-right: 10px;
+    margin-top: 8px;
+    &--active {
+        background-color: $green;
     }
+    &--inactive {
+        background-color: $red;
+    }
+}
 
 
 .station-creation {
@@ -307,4 +224,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.error {
+    text-align: center;
+    margin-top: 200px;
+    span {
+        color: blue;
+        cursor: pointer;
+    }
 }

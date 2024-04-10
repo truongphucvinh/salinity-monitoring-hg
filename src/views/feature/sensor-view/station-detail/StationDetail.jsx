@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
+import * as React from "react"
 import './StationDetail.scss'
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChartLine, faCircleDown, faTableCells, faChevronLeft, faSort} from "@fortawesome/free-solid-svg-icons";
+import { faChartLine, faCircleDown, faTableCells, faChevronLeft, faSort, faRotateRight} from "@fortawesome/free-solid-svg-icons";
 
 import { useNavigate } from "react-router-dom";
 import 'animate.css'
 
 //modal 
-import { CNav, CNavItem, CNavLink, CTabContent, CCard, CCardBody, CCol, CCardHeader, CRow, CTabPane } from '@coreui/react';
+import { CNav, CNavItem, CNavLink, CTabContent, CCard, CCardBody, CCol, CCardHeader, CRow, CTabPane, CListGroup } from '@coreui/react';
+import Tooltip from '@mui/material/Tooltip';
 
 //chart
 import {
@@ -18,7 +20,7 @@ import {
   PointElement,
   LineElement,
   Title,
-  Tooltip,
+  // Tooltip,
   Legend,
 } from 'chart.js';
 
@@ -40,9 +42,11 @@ ChartJS.register(
   PointElement,
   LineElement,
   Title,
-  Tooltip,
+  // Tooltip,
   Legend
 );
+
+
 
 // function zones(colors) {
 //   return [{
@@ -65,8 +69,30 @@ ChartJS.register(
 // Load Highcharts modules
 require("highcharts/modules/exporting")(Highcharts);
 
+Highcharts?.setOptions({
+  lang: {
+    loading: 'Đang tải...',
+    months: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+    weekdays: ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'],
+    shortMonths: ['T01', 'T02', 'T03', 'T04', 'T05', 'T06', 'T07', 'T08', 'T09', 'T10', 'T11', 'T12'],
+    downloadJPEG: "Tải xuống hình ảnh JPEG",
+    downloadPNG: "Tải xuống hình ảnh PNG",
+    downloadPDF: "Tải xuống PDF",
+    downloadSVG: "Tải xuống SVG",
+    viewFullscreen: "Xem toàn màn hình",
+    printChart: "In biểu đồ"
+  },
+  time: {
+    useUTC: false
+  },
+  rangeSelector: {
+    inputEnabled: true
+  }
+})
+
 const StationDetail = () => {
     const { id } = useParams();
+    const [error , setError] = useState(false);
 
     //tab
     const [activeKey, setActiveKey] = useState(0);
@@ -90,9 +116,10 @@ const StationDetail = () => {
     const [stationInfo, setStationInfo] = useState();
     const [dataStation, setDataStation] = useState({})
 
-    //test
-    var testDate = new Date(2024, 12, 12, 14, 59, 58);
-    console.log("testDate: ", testDate);
+    //auto reload 
+    // setInterval(() => {
+    //   setReload(!reload);
+    // }, 5000)
 
     //lay thong tin tram
     useEffect(() => {
@@ -106,7 +133,12 @@ const StationDetail = () => {
           })
           setIsLoadingSensorList(false);
         })
+        .catch((error) => {
+          setError(true);
+        })
     }, [])
+
+    const [reload, setReload] = useState(false);
 
     useEffect(() => {
       setIsLoadingSensorList(true);
@@ -202,7 +234,11 @@ const StationDetail = () => {
           )
           setIsLoadingSensorList(false);
         })
-    }, [selectingSensorRynan])
+        .catch((error) => {
+          setError(true);
+          // console.log("error: ", error);
+        })
+    }, [selectingSensorRynan, reload])
 
     const handleChangeSensorViewRynan = (sensorName, index) => {
       setActiveKey(index);
@@ -327,8 +363,10 @@ const StationDetail = () => {
       })
       var wb = XLSX.utils.book_new();
       var ws = XLSX.utils.json_to_sheet(excelSheet);
-      XLSX.utils.book_append_sheet(wb, ws, "MySheet1");
-      XLSX.writeFile(wb, "MyExcel.xlsx");
+      var currentDate = new Date();
+      var dateStr = `${currentDate.getFullYear()}/${addZero(currentDate.getMonth()+1)}/${addZero(currentDate.getDate())}`;
+      XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+      XLSX.writeFile(wb,  `${stationInfo.ten_thiet_bi}_${dateStr}.xlsx`);
 
       //unckeck ckeckbox
       let inputs = document.querySelectorAll('.ckeckbox-sensor-downloading');
@@ -354,58 +392,43 @@ const StationDetail = () => {
     const generateHeader = () => {
       return <>
         <CCardHeader className="station-detail2__header">
-          <span style={{marginRight: '10px', cursor: 'pointer'}} 
-            onClick={() => {backToStationList()}}
-          > 
+          <div className="station-detail2__header__station-name">
+            <span style={{marginRight: '10px', cursor: 'pointer'}} 
+              onClick={() => {backToStationList()}}
+            > 
               <FontAwesomeIcon icon={faChevronLeft}/>
             </span>
-          { stationInfo?.ten_thiet_bi }
-          {
-            isLoadingSensorList &&
-            <div className="spinner-border" role="status">
-              <span className="sr-only">Loading...</span>
+            { stationInfo?.ten_thiet_bi }
+            {
+              isLoadingSensorList &&
+              <div className="spinner-border" role="status">
+                <span className="sr-only">Loading...</span>
+              </div>
+            }
+          </div>
+          <Tooltip title="Cập nhật dữ liệu" placement="left" arrow>
+            <div className="station-detail2__header__reload" onClick={() => {setReload(!reload)}}>
+              <FontAwesomeIcon icon={faRotateRight}/>
             </div>
-          }
+          </Tooltip>
         </CCardHeader>
       </>
     }
 
-    Highcharts?.setOptions({
-      lang: {
-        loading: 'Đang tải...',
-        months: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
-        weekdays: ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'],
-        shortMonths: ['T01', 'T02', 'T03', 'T04', 'T05', 'T06', 'T07', 'T08', 'T09', 'T10', 'T11', 'T12'],
-        downloadJPEG: "Tải xuống hình ảnh JPEG",
-        downloadPNG: "Tải xuống hình ảnh PNG",
-        downloadPDF: "Tải xuống PDF",
-        downloadSVG: "Tải xuống SVG",
-        viewFullscreen: "Xem toàn màn hình",
-        printChart: "In biểu đồ"
-      },
-      time: {
-        useUTC: false
-      },
-      rangeSelector: {
-        inputEnabled: true
-      }
-    })
-
     const generateToolBar = () => {
       return <>
         <CRow>
-          <CCol xs={4}>
+          <CCol xs={5}>
             {
               viewMode === 'table' && 
               <div className="station-detail2__body__date-range-sort">
                 <label htmlFor="">Từ</label>
                 <input type="date" 
                   value={selectedDateRangeSort.from} 
-                  min={dateRange.startDate} 
-                  max={dateRange.endDate} 
+                  min={dateRange.startDate}
+                  max={dateRange.endDate}
                   name="from"
                   onChange={handleSelectedDateRangeSort}
-                  
                 />
                 <label htmlFor="">đến</label>
                 <input 
@@ -418,7 +441,7 @@ const StationDetail = () => {
               </div>
             }
           </CCol>
-          <CCol xs={8} className="station-detail2__body__formating">
+          <CCol xs={7} className="station-detail2__body__formating">
             {
               viewMode === 'table' && 
               <button className="download-btn"
@@ -429,18 +452,22 @@ const StationDetail = () => {
                 Tải xuống
               </button>
             }
-            <div 
-              className={viewMode === 'table' ? "station-detail2__body__formating__item station-detail2__body__formating__item--active" : "station-detail2__body__formating__item"} 
-              onClick={() => {handleChangeViewModeRynan('table')}}
-            >
-              <FontAwesomeIcon icon={faTableCells}/>
-            </div>
-            <div 
-              className={viewMode === 'chart'? "station-detail2__body__formating__item station-detail2__body__formating__item--active" : "station-detail2__body__formating__item"} 
-              onClick={() => {handleChangeViewModeRynan('chart')}}
-            >
-              <FontAwesomeIcon icon={faChartLine}/>
-            </div>
+            <Tooltip title="Bảng số liệu" arrow>
+              <div 
+                className={viewMode === 'table' ? "station-detail2__body__formating__item station-detail2__body__formating__item--active" : "station-detail2__body__formating__item"} 
+                onClick={() => {handleChangeViewModeRynan('table')}}
+              >
+                <FontAwesomeIcon icon={faTableCells}/>
+              </div>
+            </Tooltip>
+            <Tooltip title="Biểu đồ" arrow>
+              <div 
+                className={viewMode === 'chart'? "station-detail2__body__formating__item station-detail2__body__formating__item--active" : "station-detail2__body__formating__item"} 
+                onClick={() => {handleChangeViewModeRynan('chart')}}
+              >
+                <FontAwesomeIcon icon={faChartLine}/>
+              </div>
+            </Tooltip>
           </CCol>
         </CRow>
         {
@@ -479,7 +506,7 @@ const StationDetail = () => {
                       sensorListRynan.map((sensor, index) => {
                         return <span className="download-card__content__sensor-option__sensor-list__item" key={index}>
                           <input className="ckeckbox-sensor-downloading" type="checkbox" name="sensor" value={sensor} id="" onChange={handleChangeSelectedSensorForDownloading}/>
-                          <label htmlFor="">{sensor}</label>
+                          <label htmlFor="">{ generateSensorName(sensor) }</label>
                         </span>
                       })
                     }
@@ -487,6 +514,9 @@ const StationDetail = () => {
                 </div>
               </div>
               <div className="download-card__button">
+                <div className="download-card__button__close" onClick={() => setVisibleDownloadCard(false)}>
+                  Đóng
+                </div>
                 <button className="download-card__button__download"
                   disabled={selectedSensorForDownloading?.length===0}
                   onClick={() => handleExportExcel()}
@@ -520,7 +550,7 @@ const StationDetail = () => {
                             aria-selected={activeKey === index}
                             onClick={() => {handleChangeSensorViewRynan(sensor, index)}}
                           >
-                            { sensor }
+                            { generateSensorName(sensor) }
                           </CNavLink>
                         </CNavItem>
                       </>
@@ -570,7 +600,7 @@ const StationDetail = () => {
                               aria-selected={activeKey === index}
                               onClick={() => {handleChangeSensorViewRynan(sensor, index)}}
                             >
-                              { sensor }
+                              { generateSensorName(sensor) }
                             </CNavLink>
                           </CNavItem>
                         </>
@@ -586,11 +616,13 @@ const StationDetail = () => {
                               <thead>
                                 <tr>
                                     <th className="time">Thời gian
-                                      <span className="sort-button"
-                                        onClick={() => handleSort()}
-                                      >
-                                        <FontAwesomeIcon icon={faSort}/>
-                                      </span>
+                                      <Tooltip title="Sắp xếp theo thứ tự thời gian" placement="right" arrow>
+                                        <span className="sort-button"
+                                          onClick={() => handleSort()}
+                                        >
+                                          <FontAwesomeIcon icon={faSort}/>
+                                        </span>
+                                      </Tooltip>
                                     </th>
                                     <th className="index">Giá trị</th>
                                     <th></th>
@@ -662,29 +694,37 @@ const StationDetail = () => {
         title={'THÔNG TIN TRẠM CHI TIẾT'}
         content={'Hỗ trợ theo dõi thông tin chi tiết của trạm cảm biến'}
       />
-      <CRow className="station-detail2">
-        <CCol>
-          <CCard className="mb-4">
+      {
+        !error ?
+        <CRow className="station-detail2">
+          <CCol>
+            <CCard className="mb-4">
 
-            { generateHeader() }
+              { generateHeader() }
 
-            <CCardBody className="station-detail2__body">
-              <CRow>
-                <CCol xs={12}>
+              <CCardBody className="station-detail2__body">
+                <CRow>
+                  <CCol xs={12}>
 
-                  { generateToolBar() }
+                    { generateToolBar() }
 
-                  {/* chart */}
-                  { viewMode === 'chart' && generateChart() }
+                    {/* chart */}
+                    { viewMode === 'chart' && generateChart() }
 
-                  {/* table */}
-                  { viewMode === 'table' && generateTable() }
-                </CCol>
-              </CRow>
-            </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
+                    {/* table */}
+                    { viewMode === 'table' && generateTable() }
+                  </CCol>
+                </CRow>
+              </CCardBody>
+            </CCard>
+          </CCol>
+        </CRow>
+        :
+        <div className="error">
+          Lỗi kết nối. Vui lòng thử lại sau. &nbsp;
+          <span onClick={() => window.location.reload()}>Thử lại</span>
+        </div>
+      }
     </>)
 }
 
