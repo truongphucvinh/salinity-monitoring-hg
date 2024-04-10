@@ -273,8 +273,8 @@ const DamManagement = () => {
     const createNewDam = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             const dam = {
@@ -595,8 +595,8 @@ const DamManagement = () => {
     const updateADam = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             const dam = {

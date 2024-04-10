@@ -38,7 +38,7 @@ import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import CustomSpinner from "src/views/customs/my-spinner"
 import { createPermission, createRole, deletePermission, deleteRole, getAllModules, getAllModulesOfPermission, getAllPermissions, getAllUsers, getPermissionById, updatePermission, updateRole, updateUser } from "src/services/authentication-services"
-import { checkCurrentRoleOfUser, getLoggedUserInformation, onFilterUsers, onFilterUsersByRole, searchRelatives } from "src/tools"
+import { checkCurrentRoleOfUser, checkRoleCanNotChange, getLoggedUserInformation, onFilterUsers, onFilterUsersByRole, searchRelatives } from "src/tools"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 import CustomAuthChecker from "src/views/customs/my-authchecker"
@@ -203,7 +203,7 @@ const RoleManagement = () => {
                                     <CTableDataCell>{role?.name}</CTableDataCell>
                                     <CTableDataCell>{role?.description}</CTableDataCell>
                                     {
-                                        checkCurrentRoleOfUser(role?._id) ? <CTableDataCell>Vai trò hiện tại</CTableDataCell> : <CTableDataCell>
+                                        !checkRoleCanNotChange(role?._id)?.status ? <CTableDataCell>{checkRoleCanNotChange(role?._id)?.msg}</CTableDataCell> : <CTableDataCell>
                                             {
                                                 haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(role?._id, role?.permission_id)} className="text-success mx-1" role="button"/>
                                             }
@@ -288,11 +288,47 @@ const RoleManagement = () => {
         }
         return permissionModules
     }
+
+    // complete temporary
+    const defaultDamManagementId = "65b0d54c526ef32c8be05fbb"
+    const defaultDamManagementViewId = "65b0d54c526ef32c8be05fbd"
+    const defaultDamScheduleId = "65b0d592526ef32c8be05fc1"
+    const completeDamSchedulePermission = (permissionModules) => {
+        let newModules = permissionModules?.modules
+        let isDamSchedule = false
+        let isDamManagement = false
+        newModules?.forEach(module => {
+            if (module?.parent === defaultDamScheduleId) {
+                isDamSchedule = true
+            }
+        })
+        newModules?.forEach(module => {
+            if (module?.parent === defaultDamManagementId) {
+                isDamManagement = true
+            }
+        })
+        if (isDamSchedule && !isDamManagement) {
+            const newItem = {
+                parent: defaultDamManagementId,
+                children: [
+                    defaultDamManagementViewId
+                ]
+            }
+            newModules.push(newItem)
+            return {
+                modules: newModules
+            }
+        }
+        return permissionModules
+    }
+
+
+
     const createNewRole = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             const role = {
@@ -313,10 +349,11 @@ const RoleManagement = () => {
                 createPermission(permission)
                 .then(res1 => {
                     const newPermission = res1?.data?.data
-                    const permissionModules = {
+                    let permissionModules = {
                         // To filter all parent without children modules
                         modules: addingViewModule(addModules.filter(module => Array.isArray(module?.children) && module?.children?.length !== 0))
                     }
+                    permissionModules = completeDamSchedulePermission(permissionModules)
                     console.log(permissionModules)
                     updatePermission(permissionModules, newPermission?._id)
                     .then(res2 => {
@@ -534,8 +571,8 @@ const RoleManagement = () => {
     const updateAPermission = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             const role = {
@@ -544,9 +581,10 @@ const RoleManagement = () => {
             }
             updateRole(role, updateRoleId)
             .then(res => {
-                const updatingPermission = {
+                let updatingPermission = {
                     modules: addingViewModule(addModules.filter(module => Array.isArray(module?.children) && module?.children?.length !== 0))
                 }
+                updatingPermission = completeDamSchedulePermission(updatingPermission)
                 updatePermission(updatingPermission, updatePermissionId)
                 .then(res1 => {
                     setUpdateVisible(false)

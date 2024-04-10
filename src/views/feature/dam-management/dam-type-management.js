@@ -182,8 +182,8 @@ const DamTypeManagement = () => {
     const createNewDamType = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             const damType = {
@@ -321,8 +321,8 @@ const DamTypeManagement = () => {
     const updateADamType = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             const damType = {

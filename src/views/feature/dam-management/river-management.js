@@ -207,8 +207,8 @@ const RiverManagement = () => {
     const createNewRiverRecord = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             const river = {
@@ -408,8 +408,8 @@ const RiverManagement = () => {
     const updateARiver = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             const river = {

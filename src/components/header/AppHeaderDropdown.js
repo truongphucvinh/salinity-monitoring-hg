@@ -100,8 +100,8 @@ const AppHeaderDropdown = () => {
   }
   const confirmPassword = (e) => {
     const form = e.currentTarget
+    e.preventDefault()
     if (form.checkValidity() === false) {
-      e.preventDefault()
       e.stopPropagation()
     }else {
       const loggedData = {
@@ -136,8 +136,8 @@ const AppHeaderDropdown = () => {
   const secretKey = process.env.AUTH_TOKEN || 'oda_dev'
   const updatePassword = (e) => {
     const form = e.currentTarget
+    e.preventDefault()
     if (form.checkValidity() === false) {
-      e.preventDefault()
       e.stopPropagation()
     } else {
       if (updateConfirmPassword !== updateNewPassword) {

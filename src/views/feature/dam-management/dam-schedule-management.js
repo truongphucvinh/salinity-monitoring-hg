@@ -401,8 +401,8 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
     const updateADamSchedule = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             // Re-use the previous isLock status 
