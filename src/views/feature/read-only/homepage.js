@@ -261,6 +261,10 @@ const HomePage = () => {
         )
     }
 
+    const addZero = (no) => {
+        return no < 10 ? '0' + no : no;
+    }
+
     // SENSOR STATION
     const [rynanStationList, setRynanStationList] = useState([]);
     useEffect(() => {
@@ -269,15 +273,19 @@ const HomePage = () => {
             .then((res) => {
                 setRynanStationList(res.data);
                 res.data.map((station) => {
-                    observation.getDataStation(station?.so_serial, "", "", 1, 1000)
+                    var currentDate = new Date();
+                    var dateStr = `${currentDate.getFullYear()}/${addZero(currentDate.getMonth()+1)}/${addZero(currentDate.getDate())}`;
+                    observation.getDataStation(station?.so_serial, "2024/01/01", dateStr, 1, 100000000)
                         .then((seperatedRes) => {
                             var sensorList = [];
                             for(const sensor in seperatedRes.data[0]) {
                                 if(sensor !== "trang_thai" && !isNaN(seperatedRes.data[0][sensor]) && seperatedRes.data[0][sensor] !== null) {
+                                    var ltsTime = new Date(seperatedRes.data[seperatedRes.data.length-1].ngay_gui)
+                                    var dateStr = addZero(ltsTime.getHours()) + ":" + addZero(ltsTime.getMinutes()) + ":" + addZero(ltsTime.getSeconds()) + ", " + addZero(ltsTime.getDate()) + '/' + addZero(ltsTime.getMonth()+1) + "/" + ltsTime.getFullYear();
                                     let sensorInfo = {
                                         name: sensor, 
                                         value: seperatedRes.data[seperatedRes.data.length-1][sensor],
-                                        time: new Date(seperatedRes.data[seperatedRes.data.length-1].ngay_gui).toLocaleString()
+                                        time: dateStr
                                     }
                                     sensorList.push(sensorInfo);
                                 }
@@ -292,7 +300,6 @@ const HomePage = () => {
                         })
                         .then((station) => {
                             setRynanStationList([station]);
-                            console.log("station: ", station);
                         })
                     
                 })
