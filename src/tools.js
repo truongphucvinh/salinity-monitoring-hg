@@ -224,3 +224,9 @@ export const checkCurrentUser = (userId) => {
 export const googleMapLink = (lat, lng) => {
     return `https://www.google.com/maps/?q=${lat},${lng}`
 }
+
+export const checkInitElement = (code) => {
+    const defaultInitCode = process.env.HG_CODE || "init"
+    console.log(code);
+    return code === defaultInitCode
+}

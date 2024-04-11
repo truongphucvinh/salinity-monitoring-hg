@@ -34,7 +34,7 @@ import { createDamType, deleteDamType, getAllDamTypes, getDamTypeById, updateDam
 import CustomSpinner from "src/views/customs/my-spinner"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
-import { searchRelatives } from "src/tools"
+import { checkInitElement, searchRelatives } from "src/tools"
 import CustomAuthChecker from "src/views/customs/my-authchecker"
 import CustomIntroduction from "src/views/customs/my-introduction"
 
@@ -143,10 +143,12 @@ const DamTypeManagement = () => {
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
                                     <CTableDataCell>{damType?.damTypeName}</CTableDataCell>
                                     <CTableDataCell>{damType?.damTypeDescription}</CTableDataCell>
-                                    <CTableDataCell>
+                                    {
+                                        checkInitElement(damType?.damTypeCode) ? <CTableDataCell>Thông tin mặc định</CTableDataCell> : <CTableDataCell>
                                         {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(damType?.damTypeId)} className="text-success mx-1" role="button"/>}
                                         {haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(damType?.damTypeId)}  className="text-danger" role="button"/>}
-                                    </CTableDataCell>
+                                        </CTableDataCell>
+                                    }
                                 </CTableRow>    
                             )
                         }) : <CTableRow>
@@ -432,7 +434,10 @@ const DamTypeManagement = () => {
             <>
                 {   
                     damTypeId ? 
-                    <CForm onSubmit={() => deleteADamType(damTypeId)}>
+                    <CForm onSubmit={(e) => {
+                        e.preventDefault()
+                        deleteADamType(damTypeId)
+                    }}>
                         <CRow>
                             <CCol md={12}>
                                 <p>Bạn có chắc muốn xóa loại đập này ?</p>

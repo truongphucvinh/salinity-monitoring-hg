@@ -728,7 +728,10 @@ const UserManagement = () => {
             <>
                 {   
                     userId ? 
-                    <CForm onSubmit={() => deleteAUser(userId)}>
+                    <CForm onSubmit={(e) => {
+                        e.preventDefault()
+                        deleteAUser(userId)
+                    }}>
                         <CRow>
                             <CCol md={12}>
                                 <p>Bạn có chắc muốn xóa người dùng này ?</p>
