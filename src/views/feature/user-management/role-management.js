@@ -795,7 +795,10 @@ const RoleManagement = () => {
             <>
                 {   
                     permissionId && roleId ? 
-                    <CForm onSubmit={() => deleteARole(roleId, permissionId)}>
+                    <CForm onSubmit={(e) => {
+                        e.preventDefault()
+                        deleteARole(roleId, permissionId)
+                    }}>
                         <CRow>
                             <CCol md={12}>
                                 <p>Bạn có chắc muốn xóa vai trò này ?</p>

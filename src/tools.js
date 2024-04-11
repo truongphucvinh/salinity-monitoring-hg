@@ -198,10 +198,12 @@ export const checkUserCanNotChange = (userId) => {
     const defaultAdminId = "660bb6c18ace51aaeccec0fb" || process.env.HG_USER_ID_ADMIN_DEFAULT
     let res = {
         status: true,
+        canEdit: true,
         msg: "Có thể thao tác"
     }
     if (userId === defaultAdminId) {
         res["status"] = false
+        res["canEdit"] = false
         res["msg"] = "Người dùng quản trị"
         return res
     }
@@ -221,4 +223,10 @@ export const checkCurrentUser = (userId) => {
 
 export const googleMapLink = (lat, lng) => {
     return `https://www.google.com/maps/?q=${lat},${lng}`
+}
+
+export const checkInitElement = (code) => {
+    const defaultInitCode = process.env.HG_CODE || "init"
+    console.log(code);
+    return code === defaultInitCode
 }

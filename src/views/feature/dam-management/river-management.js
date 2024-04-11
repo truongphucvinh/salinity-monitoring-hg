@@ -35,7 +35,7 @@ import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import { createRiver,  deleteRiver,  getAllRivers,  getRiverById,  updateRiver } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
-import { googleMapLink, removeVietnameseAccents, searchRelatives, splitCoordinates } from "src/tools"
+import { checkInitElement, googleMapLink, removeVietnameseAccents, searchRelatives, splitCoordinates } from "src/tools"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthChecker from "src/views/customs/my-authchecker"
@@ -147,13 +147,15 @@ const RiverManagement = () => {
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
                                     <CTableDataCell>{river?.riverName}</CTableDataCell>
                                     <CTableDataCell>{river?.riverLocation}</CTableDataCell>
-                                    <CTableDataCell>
-                                        <a href={googleMapLink(river?.riverLatitude, river?.riverLongitude)} rel="noopener noreferrer" target="_blank">
-                                            <CIcon icon={cilLocationPin} className="text-danger mx-1" role="button"/>
-                                        </a>
-                                        {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(river?.riverId)} className="text-success mx-1" role="button"/>}
-                                        {haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(river?.riverId)}  className="text-danger" role="button"/>}
-                                    </CTableDataCell>
+                                    {
+                                        checkInitElement(river?.riverCode) ? <CTableDataCell>Thông tin mặc định</CTableDataCell> : <CTableDataCell>
+                                            <a href={googleMapLink(river?.riverLatitude, river?.riverLongitude)} rel="noopener noreferrer" target="_blank">
+                                                <CIcon icon={cilLocationPin} className="text-danger mx-1" role="button"/>
+                                            </a>
+                                            {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(river?.riverId)} className="text-success mx-1" role="button"/>}
+                                            {haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(river?.riverId)}  className="text-danger" role="button"/>}
+                                        </CTableDataCell>
+                                    }
                                 </CTableRow>    
                             )
                         }) : <CTableRow>
@@ -560,7 +562,10 @@ const RiverManagement = () => {
             <>
                 {   
                     riverId ? 
-                    <CForm onSubmit={() => deleteARiver(riverId)}>
+                    <CForm onSubmit={(e) => {
+                        e.preventDefault()
+                        deleteARiver(riverId)
+                    }}>
                         <CRow>
                             <CCol md={12}>
                                 <p>Bạn có chắc muốn xóa sông, kênh, rạch này ?</p>

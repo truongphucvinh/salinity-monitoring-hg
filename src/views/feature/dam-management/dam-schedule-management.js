@@ -525,7 +525,10 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
             <>
                 {   
                     damScheduleId ? 
-                    <CForm onSubmit={() => deleteADamSchedule(damScheduleId)}>
+                    <CForm onSubmit={(e) => {
+                        e.preventDefault()
+                        deleteADamSchedule(damScheduleId)
+                    }}>
                         <CRow>
                             <CCol md={12}>
                                 <p>Bạn có chắc muốn xóa lịch mở đập này ?</p>

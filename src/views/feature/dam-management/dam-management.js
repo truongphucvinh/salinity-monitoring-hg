@@ -369,6 +369,7 @@ const DamManagement = () => {
                                 value={addDamHeight}
                                 aria-describedby="exampleFormControlInputHelpInline"
                                 required
+                                step={0.01}
                             />
                         </CCol>
                         <CCol xs={12} lg={6}>
@@ -382,6 +383,7 @@ const DamManagement = () => {
                                 value={addDamCapacity}
                                 aria-describedby="exampleFormControlInputHelpInline"
                                 required
+                                step={0.01}
                             />
                         </CCol>
                     </CRow>
@@ -686,6 +688,7 @@ const DamManagement = () => {
                                     className="mt-4"
                                     type="number"
                                     min={0}
+                                    step={0.01}
                                     placeholder="Chiều cao"
                                     feedbackInvalid="Lớn hơn 0"
                                     onChange={(e) => handleSetUpdateDamHeight(e.target.value)}
@@ -698,6 +701,7 @@ const DamManagement = () => {
                                     className="mt-4"
                                     type="number"
                                     min={0}
+                                    step={0.01}
                                     placeholder="Chiều rộng"
                                     feedbackInvalid="Lớn hơn 0"
                                     onChange={(e) => handleSetUpdateDamCapacity(e.target.value)}
@@ -826,7 +830,10 @@ const DamManagement = () => {
             <>
                 {   
                     damId ? 
-                    <CForm onSubmit={() => deleteADam(damId)}>
+                    <CForm onSubmit={(e) => {
+                        e.preventDefault()
+                        deleteADam(damId)
+                    }}>
                         <CRow>
                             <CCol md={12}>
                                 <p>Bạn có chắc muốn xóa đập này ?</p>
