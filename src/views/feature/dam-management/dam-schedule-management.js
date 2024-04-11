@@ -581,7 +581,10 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
             <CustomModal visible={addVisible} title={'Thêm lịch mở đập'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
             <CustomModal visible={updateVisible} title={'Cập nhật lịch mở đập'} body={updateForm(updateDamScheduleBeginAt)} setVisible={(value) => setUpdateVisible(value)}/>
             <CustomModal visible={deleteVisible} title={'Xóa người lịch mở đập'} body={deleteForm(deleteDamScheduleId)} setVisible={(value) => setDeleteVisible(value)}/>
-            <CForm onSubmit={onFilter}>
+            <CForm onSubmit={(e)=>{
+                e.preventDefault()
+                onFilter()
+            }}>
                 <CRow>
                     <CCol md={12} lg={2}>
                         <CFormInput

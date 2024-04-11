@@ -483,7 +483,10 @@ const DamTypeManagement = () => {
                 <CustomModal visible={addVisible} title={'Thêm loại đập'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
                 <CustomModal visible={updateVisible} title={'Cập nhật loại đập'} body={updateForm(updateDamTypeId)} setVisible={(value) => setUpdateVisible(value)}/>
                 <CustomModal visible={deleteVisible} title={'Xóa loại đập'} body={deleteForm(deleteIdDamTypeId)} setVisible={(value) => setDeleteVisible(value)}/>
-                <CForm onSubmit={onFilter}>
+                <CForm onSubmit={(e)=>{
+                    e.preventDefault()
+                    onFilter()
+                }}>
                     <CRow>
                         <CCol md={12} lg={3}>
                             <CFormInput

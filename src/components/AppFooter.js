@@ -42,8 +42,8 @@ const AppFooter = () => {
         if (updateFooter?.projectFooterRight) {
           updateData["projectFooterRight"] = updateFooter?.projectFooterRight?.trim()
         }
-        if (updateFooter?.projectFooterRight) {
-          updateData["projectFooterRight"] = updateFooter?.projectFooterRight?.trim()
+        if (updateFooter?.projectFooterRightLink) {
+          updateData["projectFooterRightLink"] = updateFooter?.projectFooterRightLink?.trim()
         }
         updateProjectById(updateData)
         .then(res => {

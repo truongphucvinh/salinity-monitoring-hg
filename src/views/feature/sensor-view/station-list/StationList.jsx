@@ -455,7 +455,7 @@ const StationList = () => {
                     </CTable>
                     {/* station list in available >> */}
 
-                    <hr />
+                    {/* <hr />
                     <div className="defined-station-table-heading">
                       <h6>Trạm tự định nghĩa</h6>
                       <CButton 
@@ -470,7 +470,6 @@ const StationList = () => {
                           <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>STT</CTableHeaderCell>
                           <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Tên trạm</CTableHeaderCell>
                           <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '35%'}}>Mô tả</CTableHeaderCell>
-                          {/* <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Liên kết đập</CTableHeaderCell> */}
                           <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Trạng thái</CTableHeaderCell>
                           <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Thao tác</CTableHeaderCell>
                         </CTableRow>
@@ -483,7 +482,6 @@ const StationList = () => {
                                 <CTableDataCell>{ index+1 }</CTableDataCell>
                                 <CTableDataCell style={{'cursor': 'pointer'}} onClick={() => handelDirectToDetail(station?.thingId)}>{ station.station.name }</CTableDataCell>
                                 <CTableDataCell>{ station.station.name }</CTableDataCell>
-                                {/* <CTableDataCell>{ station.station.name }</CTableDataCell> */}
                                 <CTableDataCell style={{display: "flex", alignItem: 'center'}}>
                                   <div className={station.station.status ? "station-status station-status--active" : "station-status station-status--inactive"}></div>
                                   {
@@ -504,18 +502,16 @@ const StationList = () => {
                           </CTableRow>
                         }
                       </CTableBody>
-                    </CTable>
+                    </CTable> */}
                   </CCardBody>
                 </CCard>
-                <div style={{height: '100px'}}></div>
               </CCol>
             </CRow>
-            :
+            {/* :
             <div className="error">
               Lỗi kết nối. Vui lòng thử lại sau. &nbsp;
               <span onClick={() => window.location.reload()}>Thử lại</span>
-            </div>
-        }
+            </div> */}
 
         {/* create station modal */}
         <Modal

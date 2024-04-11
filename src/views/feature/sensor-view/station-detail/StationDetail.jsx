@@ -688,11 +688,10 @@ const StationDetail = () => {
           }
       </>
     }
-
+    const defaultPageCode = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_sensor_detail"
     return (<>
       <CustomIntroduction 
-        title={'THÔNG TIN TRẠM CHI TIẾT'}
-        content={'Hỗ trợ theo dõi thông tin chi tiết của trạm cảm biến'}
+        pageCode={defaultPageCode}
       />
       {
         !error ?
