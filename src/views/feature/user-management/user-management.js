@@ -36,12 +36,14 @@ import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
-import { checkCurrentUser, searchRelatives } from "src/tools"
+import { checkCurrentUser, checkUserCanNotChange, searchRelatives } from "src/tools"
 import CustomAuthChecker from "src/views/customs/my-authchecker"
 import CustomIntroduction from "src/views/customs/my-introduction"
 
 const UserManagement = () => {
 
+    const defaultPageCode="U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_user_management"
+    const defaultRoleAdminId="65b74ca2526ef32c8be0ca07"||process.env.HG_ROLE_ID_ADMIN_DEFAULT
     // User Management Data
     const [listUsers, setListUsers] = useState([])
     // const [listDomains, setListDomains] = useState([])
@@ -83,15 +85,6 @@ const UserManagement = () => {
             .catch(err => {
                 // Do nothing
             })
-            
-            // getAllDomains()
-            // .then(res => {
-            //     const domains = res?.data?.data?.result
-            //     setListDomains(domains)
-            // })
-            // .catch(err => {
-            //     // Do nothing
-            // })
 
             getPermissionsOfDomain(defaultDomainId)
             .then(res => {
@@ -180,15 +173,24 @@ const UserManagement = () => {
                     {
                         filteredUsers?.length !== 0 ? filteredUsers.map((user, index) => {
                             return (
-                                <CTableRow key={user._id}>
+                                <CTableRow key={user?._id}>
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
                                     <CTableDataCell>{user?.username}</CTableDataCell>
                                     <CTableDataCell>{user?.email}</CTableDataCell>
                                     <CTableDataCell>{user?.fullName}</CTableDataCell>
-                                    <CTableDataCell>
-                                        {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(user?._id)} className="text-success mx-1" role="button"/>}
-                                        {haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(user?._id)}  className="text-danger" role="button"/>}
-                                    </CTableDataCell>
+                                    {
+                                        !checkUserCanNotChange(user?._id)?.status ? <CTableDataCell>
+                                            {
+                                                checkUserCanNotChange(user?._id)?.canEdit ? <>
+                                                    {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(user?._id)} className="text-success mx-1" role="button"/>}                                            
+                                                </> : <>{`${checkUserCanNotChange(user?._id)?.msg}`}</>
+                                            }
+                                        </CTableDataCell> : <CTableDataCell>
+                                            {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(user?._id)} className="text-success mx-1" role="button"/>}
+                                            {haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(user?._id)}  className="text-danger" role="button"/>}
+                                        </CTableDataCell>
+                                    }
+
                                 </CTableRow>    
                             )
                         }) : <CTableRow>
@@ -250,8 +252,8 @@ const UserManagement = () => {
     const createNewUser = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             // This is backup for general domain and role selection also
@@ -399,7 +401,9 @@ const UserManagement = () => {
                     >
                         <option selected="" value="" >Vai trò</option>
                         {
-                            listRoles && Array.isArray(listRoles) && listRoles.map((role) => {
+                            listRoles && Array.isArray(listRoles) && listRoles.filter((role) => {
+                                return role?._id !== defaultRoleAdminId
+                            }).map((role) => {
                                 return  <option key={role?._id} value={role?._id}>{role?.name}</option>
                             })
                         }
@@ -509,8 +513,8 @@ const UserManagement = () => {
     const updateAUser = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             // This is backup for update user with the general domain selections
@@ -654,7 +658,7 @@ const UserManagement = () => {
                             </CCol>
                         </CRow> */}
                         {
-                            !checkCurrentUser(updateId) && <CRow>
+                            checkUserCanNotChange(updateId)?.status && <CRow>
                                 <CCol lg={12}>
                                     <CFormSelect 
                                         aria-label="Default select example" 
@@ -665,7 +669,9 @@ const UserManagement = () => {
                                     >
                                         <option selected="" value="" >Vai trò</option>
                                         {
-                                            listRoles && Array.isArray(listRoles) && listRoles.map((role) => {
+                                            listRoles && Array.isArray(listRoles) && listRoles.filter((role) => {
+                                                return role?._id !== defaultRoleAdminId
+                                            }).map((role) => {
                                                 return  <option key={role?._id} value={role?._id}>{role?.name}</option>
                                             })
                                         }
@@ -722,7 +728,10 @@ const UserManagement = () => {
             <>
                 {   
                     userId ? 
-                    <CForm onSubmit={() => deleteAUser(userId)}>
+                    <CForm onSubmit={(e) => {
+                        e.preventDefault()
+                        deleteAUser(userId)
+                    }}>
                         <CRow>
                             <CCol md={12}>
                                 <p>Bạn có chắc muốn xóa người dùng này ?</p>
@@ -752,8 +761,7 @@ const UserManagement = () => {
     return (
         <>
         <CustomIntroduction 
-            title={'QUẢN LÝ TÀI KHOẢN NGƯỜI DÙNG'}
-            content={'Hỗ trợ quản lý thông tin tài khoản người dùng, cung cấp tài khoản'}
+            pageCode={defaultPageCode}
         />
         <CRow>
             <CustomAuthChecker />
@@ -768,7 +776,7 @@ const UserManagement = () => {
             <CCardBody>
                 <CustomModal visible={addVisible} title={'Thêm người dùng'} body={addForm(addLoaded)} setVisible={(value) => setAddVisible(value)}/>
                 <CustomModal visible={updateVisible} title={'Cập nhật người dùng'} body={updateForm(updateId)} setVisible={(value) => setUpdateVisible(value)}/>
-                <CustomModal visible={deleteVisible} title={'Xóa người người dùng'} body={deleteForm(deleteId)} setVisible={(value) => setDeleteVisible(value)}/>
+                <CustomModal visible={deleteVisible} title={'Xóa người dùng'} body={deleteForm(deleteId)} setVisible={(value) => setDeleteVisible(value)}/>
                 <CForm onSubmit={onFilter}>
                     <CRow>
                         <CCol md={12} lg={3}>

@@ -16,7 +16,7 @@ import station from "src/services/station"
 import observation from "src/services/observation"
 
 const HomePage = () => {
-
+    const defaultPageCode="U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_homepage"
     const damListData = {
         listDams: [],
         isLoadedListDams: false,
@@ -73,7 +73,8 @@ const HomePage = () => {
             // Do nothing
         })
     }
-    const onFilter = () => {
+    const onFilter = (e) => {
+        e.preventDefault()
         if (damName) {
             handleFilteredListDams(listDams?.filter(dam => dam?.damName && searchRelatives(dam?.damName, damName)))
         }else {
@@ -169,7 +170,7 @@ const HomePage = () => {
     
     const searchComponent = () => {
         return (
-            <CForm onSubmit={onFilter}>
+            <CForm onSubmit={e => onFilter(e)}>
                 <CRow>
                     <CCol md={12} lg={3}>
                         <CustomDateTimePicker 
@@ -361,8 +362,7 @@ const HomePage = () => {
     return (
         <>
         <CustomIntroduction 
-            title={'HỆ THỐNG GIÁM SÁT ĐỘ MẶN VÀ LỊCH ĐÓNG MỞ CỐNG / ĐẬP'}
-            content={'Hệ thống hỗ trợ quản lý các thông tin về lịch đóng / mở của hệ thống cống / đập và cảm biến trên địa bàn tỉnh Hậu Giang'}
+            pageCode={defaultPageCode}
         />
         <CRow>
             <CCol xs>

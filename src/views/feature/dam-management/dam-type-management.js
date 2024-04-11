@@ -34,7 +34,7 @@ import { createDamType, deleteDamType, getAllDamTypes, getDamTypeById, updateDam
 import CustomSpinner from "src/views/customs/my-spinner"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
-import { searchRelatives } from "src/tools"
+import { checkInitElement, searchRelatives } from "src/tools"
 import CustomAuthChecker from "src/views/customs/my-authchecker"
 import CustomIntroduction from "src/views/customs/my-introduction"
 
@@ -143,10 +143,12 @@ const DamTypeManagement = () => {
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
                                     <CTableDataCell>{damType?.damTypeName}</CTableDataCell>
                                     <CTableDataCell>{damType?.damTypeDescription}</CTableDataCell>
-                                    <CTableDataCell>
+                                    {
+                                        checkInitElement(damType?.damTypeCode) ? <CTableDataCell>Thông tin mặc định</CTableDataCell> : <CTableDataCell>
                                         {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(damType?.damTypeId)} className="text-success mx-1" role="button"/>}
                                         {haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(damType?.damTypeId)}  className="text-danger" role="button"/>}
-                                    </CTableDataCell>
+                                        </CTableDataCell>
+                                    }
                                 </CTableRow>    
                             )
                         }) : <CTableRow>
@@ -182,8 +184,8 @@ const DamTypeManagement = () => {
     const createNewDamType = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             const damType = {
@@ -321,8 +323,8 @@ const DamTypeManagement = () => {
     const updateADamType = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             const damType = {
@@ -367,6 +369,7 @@ const DamTypeManagement = () => {
                                     className="mt-4"
                                     type="text"
                                     placeholder="Tên loại đập"
+                                    required
                                     maxLength={50}
                                     feedbackInvalid="Ít hơn 50 ký tự"
                                     onChange={(e) => handleSetUpdateDamTypeName(e.target.value)}
@@ -431,7 +434,10 @@ const DamTypeManagement = () => {
             <>
                 {   
                     damTypeId ? 
-                    <CForm onSubmit={() => deleteADamType(damTypeId)}>
+                    <CForm onSubmit={(e) => {
+                        e.preventDefault()
+                        deleteADamType(damTypeId)
+                    }}>
                         <CRow>
                             <CCol md={12}>
                                 <p>Bạn có chắc muốn xóa loại đập này ?</p>
@@ -457,11 +463,11 @@ const DamTypeManagement = () => {
         setUpdateState(updateData)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addVisible, updateVisible])
+    const defaultPageCode = 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_dam_type_management'
     return (
         <>
         <CustomIntroduction 
-            title={'QUẢN LÝ LOẠI CỐNG / ĐẬP'}
-            content={'Hỗ trợ quản lý thông tin về các loại hình cống / đập đang được sử dụng tại tỉnh Hậu Giang'}
+            pageCode={defaultPageCode}
         />
         <CRow>
         <CustomAuthChecker />
@@ -476,7 +482,7 @@ const DamTypeManagement = () => {
             <CCardBody>
                 <CustomModal visible={addVisible} title={'Thêm loại đập'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
                 <CustomModal visible={updateVisible} title={'Cập nhật loại đập'} body={updateForm(updateDamTypeId)} setVisible={(value) => setUpdateVisible(value)}/>
-                <CustomModal visible={deleteVisible} title={'Xóa người loại đập'} body={deleteForm(deleteIdDamTypeId)} setVisible={(value) => setDeleteVisible(value)}/>
+                <CustomModal visible={deleteVisible} title={'Xóa loại đập'} body={deleteForm(deleteIdDamTypeId)} setVisible={(value) => setDeleteVisible(value)}/>
                 <CForm onSubmit={onFilter}>
                     <CRow>
                         <CCol md={12} lg={3}>

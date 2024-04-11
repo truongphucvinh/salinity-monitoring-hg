@@ -401,8 +401,8 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
     const updateADamSchedule = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             // Re-use the previous isLock status 
@@ -525,7 +525,10 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
             <>
                 {   
                     damScheduleId ? 
-                    <CForm onSubmit={() => deleteADamSchedule(damScheduleId)}>
+                    <CForm onSubmit={(e) => {
+                        e.preventDefault()
+                        deleteADamSchedule(damScheduleId)
+                    }}>
                         <CRow>
                             <CCol md={12}>
                                 <p>Bạn có chắc muốn xóa lịch mở đập này ?</p>

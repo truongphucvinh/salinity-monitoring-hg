@@ -379,14 +379,33 @@ const StationList = () => {
     navigate(`station-detail/${thingId}`);
   }
 
-  return (
-      <>
-        <CustomIntroduction 
-          title={'QUẢN LÝ TRẠM CẢM BIẾN'}
-          content={'Hỗ trợ quản lý thông tin các trạm cảm biến tại các vị trí trực thuộc tỉnh Hậu Giang'}
-        />
-        {
-          !error ? 
+  const generateSensorName = (rawName) => {
+    var generatedName = '';
+    switch(rawName) {
+      case 'do_pH':
+        generatedName = "Độ pH";
+        break;
+      case 'muc_nuoc':
+        generatedName = "Mực nước";
+        break;
+      case 'nhiet_do':
+        generatedName = "Nhiệt độ";
+        break;
+      case 'do_man':
+        generatedName = "Độ mặn";
+        break;
+      default:
+        generatedName = rawName;
+        break;    
+    }
+    return generatedName;
+  }
+    const defaultPageCode = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_station_management"
+    return (
+        <>
+          <CustomIntroduction 
+            pageCode={defaultPageCode}
+          />
           <CRow>
               <CCol>
                 <CCard>

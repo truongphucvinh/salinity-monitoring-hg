@@ -35,7 +35,7 @@ import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import { createRiver,  deleteRiver,  getAllRivers,  getRiverById,  updateRiver } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
-import { removeVietnameseAccents, searchRelatives, splitCoordinates } from "src/tools"
+import { checkInitElement, googleMapLink, removeVietnameseAccents, searchRelatives, splitCoordinates } from "src/tools"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthChecker from "src/views/customs/my-authchecker"
@@ -147,13 +147,15 @@ const RiverManagement = () => {
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
                                     <CTableDataCell>{river?.riverName}</CTableDataCell>
                                     <CTableDataCell>{river?.riverLocation}</CTableDataCell>
-                                    <CTableDataCell>
-                                        <a href={`https://www.google.com/maps/?q=${river?.riverLatitude},${river?.riverLongitude}`} rel="noopener noreferrer" target="_blank">
-                                            <CIcon icon={cilLocationPin} className="text-danger mx-1" role="button"/>
-                                        </a>
-                                        {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(river?.riverId)} className="text-success mx-1" role="button"/>}
-                                        {haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(river?.riverId)}  className="text-danger" role="button"/>}
-                                    </CTableDataCell>
+                                    {
+                                        checkInitElement(river?.riverCode) ? <CTableDataCell>Thông tin mặc định</CTableDataCell> : <CTableDataCell>
+                                            <a href={googleMapLink(river?.riverLatitude, river?.riverLongitude)} rel="noopener noreferrer" target="_blank">
+                                                <CIcon icon={cilLocationPin} className="text-danger mx-1" role="button"/>
+                                            </a>
+                                            {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(river?.riverId)} className="text-success mx-1" role="button"/>}
+                                            {haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(river?.riverId)}  className="text-danger" role="button"/>}
+                                        </CTableDataCell>
+                                    }
                                 </CTableRow>    
                             )
                         }) : <CTableRow>
@@ -207,8 +209,8 @@ const RiverManagement = () => {
     const createNewRiverRecord = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             const river = {
@@ -408,8 +410,8 @@ const RiverManagement = () => {
     const updateARiver = (e) => {
         // validation
         const form = e.currentTarget
+        e.preventDefault()
         if (form.checkValidity() === false) {
-            e.preventDefault()
             e.stopPropagation()
         } else {
             const river = {
@@ -456,6 +458,7 @@ const RiverManagement = () => {
                                     className="mt-4"
                                     type="text"
                                     placeholder="Tên sông, kênh, rạch"
+                                    required
                                     onChange={(e) => handleSetUpdateRiverName(e.target.value)}
                                     value={updateRiverName}
                                     aria-describedby="exampleFormControlInputHelpInline"
@@ -486,14 +489,11 @@ const RiverManagement = () => {
                                         feedbackInvalid="Không bỏ trống và phải là một cặp số gồm vĩ độ và kinh độ"
                                         onChange={(e) => handleSetUpdateLatLngAutomatically(e.target.value)}
                                         aria-describedby="exampleFormControlInputHelpInline"
-                                        required
                                         id="button-addon2"
                                     />
-                                    <CButton type="button" className="text-white" color="primary" id="button-addon2">
-                                        <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">
-                                            <CIcon icon={cilLocationPin} style={{color: "white", width: "18px",  height: "18px"}}/>
-                                        </a>
-                                    </CButton>
+                                    <a href={googleMapLink(updateRiverLatitude, updateRiverLongitude)} className="btn btn-primary text-white" target="_blank" rel="noopener noreferrer">
+                                        <CIcon icon={cilLocationPin} style={{color: "white", width: "18px",  height: "18px"}}/>
+                                    </a>
                                 </CInputGroup>
                             </CCol>
                         </CRow>
@@ -562,7 +562,10 @@ const RiverManagement = () => {
             <>
                 {   
                     riverId ? 
-                    <CForm onSubmit={() => deleteARiver(riverId)}>
+                    <CForm onSubmit={(e) => {
+                        e.preventDefault()
+                        deleteARiver(riverId)
+                    }}>
                         <CRow>
                             <CCol md={12}>
                                 <p>Bạn có chắc muốn xóa sông, kênh, rạch này ?</p>
@@ -588,12 +591,11 @@ const RiverManagement = () => {
         setUpdateState(updateData)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addVisible, updateVisible])
-
+    const defaultPageCode = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_river_management"
     return (
         <>
         <CustomIntroduction 
-            title={'QUẢN LÝ SÔNG / KÊNH / RẠCH'}
-            content={'Hỗ trợ quản lý thông tin về hệ thống sông / kênh / rạch trên địa bàn tỉnh Hậu Giang'}
+            pageCode={defaultPageCode}
         />
         <CRow>
         <CustomAuthChecker />
