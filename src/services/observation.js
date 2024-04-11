@@ -26,7 +26,6 @@ export default  {
     getDataStation: async function(serialStation, startDate, endDate, page, limit) {
         try {
             const responseLogin = await station.login();
-            console.log(`https://document.rynangate.com/api/v1/get-data-stations?so_serial=${serialStation}&tu_ngay=${startDate}&den_ngay=${endDate}&limit=${limit}`);
             const response = await axios.get(`https://document.rynangate.com/api/v1/get-data-stations?so_serial=${serialStation}&tu_ngay=${startDate}&den_ngay=${endDate}&limit=${limit}`,
                 {
                     headers: {

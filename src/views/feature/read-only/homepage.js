@@ -9,6 +9,7 @@ import CustomIntroduction from "src/views/customs/my-introduction"
 import CustomModal from "src/views/customs/my-modal"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomSpinner from "src/views/customs/my-spinner"
+import { useNavigate } from 'react-router-dom';
 
 //service 
 import station from "src/services/station"
@@ -306,16 +307,21 @@ const HomePage = () => {
             })
     }, [])
 
+    const navigate = useNavigate()
+    const handelDirectToDetail = (serialStation) => {
+        navigate(`/station-list/station-detail/${serialStation}`);
+    }
+
     const showSensorStationList = () => {
         return <>
-            <CTable bordered align="middle" className="mb-0 border" hover responsive>
+            <CTable bordered align="middle" className="mb-0 border" responsive>
                 <CTableHead  className="text-nowrap">
                     <CTableRow>
                         <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>STT</CTableHeaderCell>
-                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Tên trạm</CTableHeaderCell>
-                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Cảm biến</CTableHeaderCell>
-                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Giá trị </CTableHeaderCell>
-                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Thời gian</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Trạm</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Cảm biến</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Giá trị </CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Thời gian</CTableHeaderCell>
                     </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -325,7 +331,15 @@ const HomePage = () => {
                                 if(sensorIndex==0) {
                                     return <CTableRow key={sensorIndex}>
                                         <CTableDataCell rowSpan={station?.sensor?.sensor?.length}>{ stationIndex+1 }</CTableDataCell>
-                                        <CTableDataCell rowSpan={station?.sensor?.sensor?.length}>{ station.ten_thiet_bi }</CTableDataCell>
+                                        <CTableDataCell rowSpan={station?.sensor?.sensor?.length}>
+                                            <span 
+                                                style={{cursor: 'pointer'}}
+                                                onClick={() => handelDirectToDetail(station?.so_serial)}
+                                            >
+                                                <b>{ station.ten_thiet_bi }</b>
+                                            </span> <br/>
+                                            { station.khu_vuc_lap_dat }
+                                        </CTableDataCell>
                                         <CTableDataCell>{ sensor.name }</CTableDataCell>
                                         <CTableDataCell>{ sensor.value }</CTableDataCell>
                                         <CTableDataCell>{ sensor.time }</CTableDataCell>
@@ -340,22 +354,6 @@ const HomePage = () => {
                             })
                         })
                     }
-                {/* {
-                        rynanStationList.map((station, index) => {
-                            return <CTableRow key={index}>
-                            <CTableDataCell rowSpan={2}>{index}</CTableDataCell>
-                            <CTableDataCell rowSpan={2}>Tên trạm</CTableDataCell>
-                            <CTableDataCell>12</CTableDataCell>
-                            <CTableDataCell>Giá trị </CTableDataCell>
-                            <CTableDataCell>Thời gian</CTableDataCell>
-                        </CTableRow>
-                        })
-                } */}
-                    {/* <CTableRow>
-                        <CTableDataCell>d</CTableDataCell>
-                        <CTableDataCell>12</CTableDataCell>
-                        <CTableDataCell>3</CTableDataCell>
-                    </CTableRow> */}
                 </CTableBody>
             </CTable>
         </>

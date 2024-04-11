@@ -34,12 +34,21 @@
 }
 
 .station-detail2 {
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        &__reload {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+    }
     &__body {
         height: 700px;
         &__date-range-sort {
             display: flex;
             input {
                 margin-left: 10px;
+                min-width: 150px;
             }
             label + input {
                 margin-right: 10px;
@@ -185,7 +194,7 @@
     padding: 20px;
     margin-top: 85px;
     margin-right: 114px;
-    width: 420px;
+    width: 430px;
     position: absolute;
     z-index: 5;
     background-color: white;
@@ -199,6 +208,7 @@
             &__input-group {
                 margin-top: 10px;
                 input {
+                    min-width: 150px;
                     margin-left: 10px;
                 }
                 label + input {
@@ -231,9 +241,24 @@
     }
     &__button {
         clear: left;
-        margin-top: 20px;
+        margin-top: 25px;
         display: flex;
         justify-content: right;
+        &__close {
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+            cursor: pointer;
+            background-color: #f8f8f8;
+            border-radius: 3px;
+            padding: 8px 18px;
+            border: 1px solid #e8e8e8;
+            transition: all 0.3s ease;
+            &:hover {
+                background-color: #f1f1f1;
+                transition: all 0.3s ease;
+            }
+        }
         &__download {
             border: none;
             padding: 8px 18px;
@@ -260,4 +285,24 @@
         background-color: #f1f1f1;
         transition: all 0.3s ease;
     }
+}
+
+.error {
+    text-align: center;
+    margin-top: 200px;
+    span {
+        color: blue;
+        cursor: pointer;
+    }
+}
+
+.spin {
+    animation: spin 1s linear forwards;
+}
+
+@keyframes spin { 
+    100% { 
+        -webkit-transform: rotate(360deg); 
+        transform:rotate(360deg); 
+    } 
 }
