@@ -294,11 +294,9 @@ const RiverManagement = () => {
                                     required
                                     id="button-addon2"
                                 />
-                                <CButton type="button" className="text-white" color="primary" id="button-addon2">
-                                    <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">
+                                    <a href="https://www.google.com/maps" className="btn btn-primary text-white" target="_blank" rel="noopener noreferrer">
                                         <CIcon icon={cilLocationPin} style={{color: "white", width: "18px",  height: "18px"}}/>
                                     </a>
-                                </CButton>
                             </CInputGroup>
                         </CCol>
                     </CRow>
