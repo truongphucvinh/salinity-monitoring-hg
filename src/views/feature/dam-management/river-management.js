@@ -609,7 +609,10 @@ const RiverManagement = () => {
                 <CustomModal visible={addVisible} title={'Thêm sông, kênh, rạch'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
                 <CustomModal visible={updateVisible} title={'Cập nhật sông, kênh, rạch'} body={updateForm(updateRiverId)} setVisible={(value) => setUpdateVisible(value)}/>
                 <CustomModal visible={deleteVisible} title={'Xóa người sông, kênh, rạch'} body={deleteForm(deleteRiverId)} setVisible={(value) => setDeleteVisible(value)}/>
-                <CForm onSubmit={onFilter}>
+                <CForm onSubmit={(e)=>{
+                    e.preventDefault()
+                    onFilter()
+                }}>
                     <CRow>
                         <CCol md={12} lg={3}>
                             <CFormInput

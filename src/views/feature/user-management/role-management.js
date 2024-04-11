@@ -849,7 +849,10 @@ const RoleManagement = () => {
                 <CustomModal visible={addVisible} title={'Thêm vai trò'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
                 <CustomModal visible={updateVisible} title={'Cập nhật vai trò'} body={updateForm(isUpdateModule)} setVisible={(value) => setUpdateVisible(value)}/>
                 <CustomModal visible={deleteVisible} title={'Xóa vai trò'} body={deleteForm(deleteRoleId, deletePermissionId)} setVisible={(value) => setDeleteVisible(value)}/>
-                <CForm onSubmit={onFilter}>
+                <CForm onSubmit={(e) => {
+                    e.preventDefault()
+                    onFilter()
+                }}>
                     <CRow>
                         <CCol md={12} lg={3}>
                             <CFormInput
