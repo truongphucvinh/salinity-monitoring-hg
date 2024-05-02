@@ -1,6 +1,6 @@
 import { cilLocationPin, cilMagnifyingGlass, cilReload } from "@coreui/icons"
 import CIcon from "@coreui/icons-react"
-import { CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow, CSpinner, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from "@coreui/react"
+import { CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow, CSpinner, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CModal } from "@coreui/react"
 import React, { useEffect, useState } from "react"
 import { getAllDamScheduleBySelectedDate, getAllDamSchedules } from "src/services/dam-services"
 import { damStatusConverter, damStatusConverterV2, getDamScheduleBeginAt, getDamScheduleEndAt, searchRelatives } from "src/tools"
@@ -10,10 +10,15 @@ import CustomModal from "src/views/customs/my-modal"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomSpinner from "src/views/customs/my-spinner"
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faXmark, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
+import './homepage.scss';
 
 //service 
 import station from "src/services/station"
 import observation from "src/services/observation"
+import newsService from "src/services/news-service"
+import News from "./newspage/newspage"
 
 const HomePage = () => {
     const defaultPageCode="U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_homepage"
@@ -358,6 +363,227 @@ const HomePage = () => {
             </CTable>
         </>
     }
+
+    // NEWS
+    // homepage interface after back from detailed news
+    useEffect(() => {
+        var openedCode = sessionStorage.getItem("openedCode");
+        if(openedCode) {
+            const element = document.getElementById("news");
+            element?.scrollIntoView({ behavior: 'smooth' });
+            if(openedCode === '1') {
+                setVisibleAllNews(true);
+            }
+            sessionStorage.removeItem("openedCode");
+        }
+    }, [])
+
+    const [newsList, setNewsList] = useState([
+        {
+            postId: 1,
+            postTitle: "Xâm nhập mặn tại đồng bằng sông Cửu Long duy trì mức cao",
+            postContent: "Theo nhận định của Trung tâm Dự báo khí tượng thủy văn quốc gia, từ ngày 1-10/5, khu vực miền Tây Nam Bộ phổ biến ít mưa; ngày nắng nóng, có nơi nắng nóng gay gắt. Tuy mưa không nhiều nhưng cần chú ý có thể xuất hiện mưa dông nhiệt cục bộ vào chiều tối dễ kèm theo lốc, sét và gió giật mạnh nguy hiểm. Nhiệt độ cao nhất tại miền Tây Nam Bộ phổ biến từ 34-37 độ C, có nơi cao hơn. Mực nước trên sông Tiền và sông Hậu thời kỳ này biến đổi chậm theo triều. Mực nước cao nhất tuần tại Tân Châu là 1,10m, tại Châu Đốc 1,30m, ở mức tương đương và cao hơn trung bình nhiều năm cùng kỳ khoảng 0,05m.",
+            postAvatar: "https://image.nhandan.vn/w800/Uploaded/2024/huounvj/2024_05_01/man-2264.jpg.webp",
+            postCreatorName: "Nguyễn Văn A",
+            postCreatedAt: "Thứ 5, 02/05/2024 9:32 (GMT+7)"
+        },
+        {
+            postId: 2,
+            postTitle: "Hồ Dầu Tiếng tiếp cứu nước ngọt cho Nam Bộ",
+            postContent: "Những ngày này, hồ Dầu Tiếng, hồ thuỷ lợi lớn nhất Đông Nam Á với trữ lượng nước ngọt lên đến 1,5 tỷ mét khối vẫn ngày đêm “xuôi dòng” tiếp cứu nguồn nước ngọt cho các tỉnh miền nam, phục vụ tưới tiêu cho sản xuất nông nghiệp ở: Tây Ninh, Bình Dương, Thành phố Hồ Chí Minh và Long An. Hạn hán và xâm nhập mặn đang ở mức báo động. Các địa phương ở Nam Bộ như giải toả “cơn khát” khi tiếp cận nguồn nước từ thượng nguồn hồ Dầu Tiếng, qua đó giúp nhân dân ổn định hoạt động sản xuất nông nghiệp và sinh hoạt hằng ngày.",
+            postAvatar: "https://image.nhandan.vn/w790/Uploaded/2024/wpgfbfjstpy/2024_04_26/anh-1-chon-532.jpg.webp",
+            postCreatorName: "Nguyễn Hiền",
+            postCreatedAt: "Thứ 4, 01/05/2024 8:05 (GMT+7)"
+        },
+        {
+            postId: 3,
+            postTitle: "Phòng chống hạn, mặn cho cây trồng",
+            postContent: "Những tháng qua, nắng nóng kéo dài, hạn hán, thiếu nước, xâm nhập mặn xảy ra ở nhiều địa phương trên cả nước. Hàng trăm hồ chứa thủy lợi nhỏ cạn nước, hàng chục nghìn ha cây trồng bị ảnh hưởng, nhất là khu vực miền trung, Tây Nguyên và Đồng bằng sông Cửu Long. Cục Thủy lợi (Bộ Nông nghiệp và Phát triển nông thôn) cho biết, đến giữa tháng 4, các hồ chứa thủy lợi khu vực Bắc Bộ đạt 57% dung tích thiết kế, Bắc Trung Bộ đạt 59%, Nam Trung Bộ đạt 66%, Đông Nam Bộ đạt 56%, đặc biệt khu vực Tây Nguyên chỉ đạt 40% dung tích thiết kế, trong đó Kon Tum 43%, Gia Lai 37%, Đắk Lắk 38%, Đắk Nông 40%, Lâm Đồng 54%. Cũng qua thống kê, khoảng 182 hồ chứa nhỏ bị cạn nước ảnh hưởng đến phục vụ sản xuất nông nghiệp. Hạn hán, xâm nhập mặn, thiếu nước làm gần 10.300 ha cây trồng ở các địa phương: Bình Thuận, Bình Phước, Gia Lai, Kon Tum, Sóc Trăng bị ảnh hưởng. Khu vực Tây Nguyên là nơi có hàng triệu héc-ta cây công nghiệp như: Cà-phê, hồ tiêu, điều, mắc-ca…",
+            postAvatar: "https://image.nhandan.vn/w800/Uploaded/2024/hutmhz/2024_04_23/han-man-6712.jpg.webp",
+            postCreatorName: "Cao Văn",
+            postCreatedAt: "Thứ 6, 26/04/2024 9:32 (GMT+7)"
+        },
+        {
+            postId: 4,
+            postTitle: "Cung cấp đủ nước sinh hoạt cho người dân vùng hạn, mặn",
+            postContent: "Trung tâm dự báo Khí tượng-Thủy văn quốc gia nhận định, năm 2024, xâm nhập mặn tại các tỉnh Đồng bằng sông Cửu Long sẽ cao hơn, phức tạp hơn so với trung bình nhiều năm; mặn tiến sâu hơn bên trong các hệ thống sông. Để bảo đảm đời sống, sản xuất của người dân trong vùng hạn, mặn, thời gian qua, hàng loạt giải pháp đã được các địa phương triển khai như bảo vệ lúa an toàn, cấp nước sạch cho người dân, vận hành hệ thống cống linh hoạt ngăn mặn…Theo Đài Khí tượng-Thủy văn khu vực Nam Bộ, tại Đồng bằng sông Cửu Long, xâm nhập mặn mùa khô năm 2023-2024 ở mức sớm và sâu hơn trung bình nhiều năm, vào sâu hơn bên trong các hệ thống sông. Tính từ đầu mùa khô đến nay, đợt xâm nhập sâu nhất xuất hiện, với ranh mặn 4‰, tiến sâu vào đất liền 40-66 km, có nơi sâu hơn, ranh mặn 1‰ tại hai tỉnh Tiền Giang và Bến Tre vào sâu 70-76 km tùy theo sông. Đến thời điểm hiện tại, mức độ xâm nhập mặn các tỉnh Sóc Trăng, Long An, Trà Vinh, Tiền Giang... mặn phổ biến vẫn cao hơn so với trung bình nhiều năm, xấp xỉ so với năm 2016. Đáng chú ý, tại tỉnh Bến Tre, xâm nhập mặn ở mức xấp xỉ ranh mặn sâu nhất năm 2016, xâm nhập mặn trên sông Cổ Chiên đã sâu hơn ranh mặn sâu nhất năm 2016. Trong khi đó, dự báo tổng lượng mưa tháng 4 và 5 thấp hơn so với trung bình nhiều năm, nguồn nước từ sông Mê Công chảy về Đồng bằng sông Cửu Long vẫn thiếu hụt.",
+            postAvatar: "https://image.nhandan.vn/w800/Uploaded/2024/buimsbvibuvwsi/2024_04_16/8-moi-2-8788.jpg.webp",
+            postCreatorName: "Hoài Anh",
+            postCreatedAt: "Thứ 6, 26/04/2024 9:32 (GMT+7)"
+        },
+        {
+            postId: 5,
+            postTitle: "Dự báo xâm nhập mặn khu vực Nam Bộ từ ngày 22-28/4",
+            postContent: "Dự báo, từ ngày 11-20/4, xâm nhập mặn ở đồng bằng sông Cửu Long ở mức cao vào đầu tuần, sau đó giảm dần vào cuối tuần. Cảnh báo trong tháng 4, xâm nhập mặn tăng cao ở khu vực Nam Bộ khả năng tập trung từ ngày 22-28/4. Theo nhận định của Trung tâm Dự báo khí tượng thủy văn quốc gia, từ ngày 11-20/4, khu vực miền Tây Nam Bộ tiếp tục phổ biến ít mưa, ngày nắng nóng, có nơi nắng nóng gay gắt. Tuy mưa không nhiều nhưng người dân cần chú ý có thể xuất hiện mưa dông cục bộ vào chiều tối và khả năng kèm theo lốc, sét, gió giật mạnh nguy hiểm. Nhiệt độ cao nhất tại miền Tây Nam Bộ phổ biến từ 34-37 độ C, có nơi cao hơn. Trong thời kỳ này, mực nước trên sông Tiền và sông Hậu dao động theo triều với xu thế xuống dần vào cuối tuần. Mực nước cao nhất tuần tại Tân Châu là 1,40m, tại Châu Đốc 1,55m, ở mức cao hơn trung bình nhiều năm cùng kỳ từ 0,1-0,3m.",
+            postAvatar: "https://image.nhandan.vn/w800/Uploaded/2024/huounvj/2024_04_10/6983jpg-2438.jpg.webp",
+            postCreatorName: "Văn Hoàng",
+            postCreatedAt: "Thứ 5, 25/04/2024 9:32 (GMT+7)"
+        },
+    ]);
+    const [latestNews, setLatestNews] = useState([
+        {
+            postId: 1,
+            postTitle: "Xâm nhập mặn tại đồng bằng sông Cửu Long duy trì mức cao",
+            postContent: "Theo nhận định của Trung tâm Dự báo khí tượng thủy văn quốc gia, từ ngày 1-10/5, khu vực miền Tây Nam Bộ phổ biến ít mưa; ngày nắng nóng, có nơi nắng nóng gay gắt. Tuy mưa không nhiều nhưng cần chú ý có thể xuất hiện mưa dông nhiệt cục bộ vào chiều tối dễ kèm theo lốc, sét và gió giật mạnh nguy hiểm. Nhiệt độ cao nhất tại miền Tây Nam Bộ phổ biến từ 34-37 độ C, có nơi cao hơn. Mực nước trên sông Tiền và sông Hậu thời kỳ này biến đổi chậm theo triều. Mực nước cao nhất tuần tại Tân Châu là 1,10m, tại Châu Đốc 1,30m, ở mức tương đương và cao hơn trung bình nhiều năm cùng kỳ khoảng 0,05m.",
+            postAvatar: "https://image.nhandan.vn/w800/Uploaded/2024/huounvj/2024_05_01/man-2264.jpg.webp",
+            postCreatorName: "Nguyễn Văn A",
+            postCreatedAt: "Thứ 5, 02/05/2024 9:32 (GMT+7)"
+        },
+        {
+            postId: 2,
+            postTitle: "Hồ Dầu Tiếng tiếp cứu nước ngọt cho Nam Bộ",
+            postContent: "Những ngày này, hồ Dầu Tiếng, hồ thuỷ lợi lớn nhất Đông Nam Á với trữ lượng nước ngọt lên đến 1,5 tỷ mét khối vẫn ngày đêm “xuôi dòng” tiếp cứu nguồn nước ngọt cho các tỉnh miền nam, phục vụ tưới tiêu cho sản xuất nông nghiệp ở: Tây Ninh, Bình Dương, Thành phố Hồ Chí Minh và Long An. Hạn hán và xâm nhập mặn đang ở mức báo động. Các địa phương ở Nam Bộ như giải toả “cơn khát” khi tiếp cận nguồn nước từ thượng nguồn hồ Dầu Tiếng, qua đó giúp nhân dân ổn định hoạt động sản xuất nông nghiệp và sinh hoạt hằng ngày.",
+            postAvatar: "https://image.nhandan.vn/w790/Uploaded/2024/wpgfbfjstpy/2024_04_26/anh-1-chon-532.jpg.webp",
+            postCreatorName: "Nguyễn Hiền",
+            postCreatedAt: "Thứ 4, 01/05/2024 8:05 (GMT+7)"
+        },
+        {
+            postId: 3,
+            postTitle: "Phòng chống hạn, mặn cho cây trồng",
+            postContent: "Những tháng qua, nắng nóng kéo dài, hạn hán, thiếu nước, xâm nhập mặn xảy ra ở nhiều địa phương trên cả nước. Hàng trăm hồ chứa thủy lợi nhỏ cạn nước, hàng chục nghìn ha cây trồng bị ảnh hưởng, nhất là khu vực miền trung, Tây Nguyên và Đồng bằng sông Cửu Long. Cục Thủy lợi (Bộ Nông nghiệp và Phát triển nông thôn) cho biết, đến giữa tháng 4, các hồ chứa thủy lợi khu vực Bắc Bộ đạt 57% dung tích thiết kế, Bắc Trung Bộ đạt 59%, Nam Trung Bộ đạt 66%, Đông Nam Bộ đạt 56%, đặc biệt khu vực Tây Nguyên chỉ đạt 40% dung tích thiết kế, trong đó Kon Tum 43%, Gia Lai 37%, Đắk Lắk 38%, Đắk Nông 40%, Lâm Đồng 54%. Cũng qua thống kê, khoảng 182 hồ chứa nhỏ bị cạn nước ảnh hưởng đến phục vụ sản xuất nông nghiệp. Hạn hán, xâm nhập mặn, thiếu nước làm gần 10.300 ha cây trồng ở các địa phương: Bình Thuận, Bình Phước, Gia Lai, Kon Tum, Sóc Trăng bị ảnh hưởng. Khu vực Tây Nguyên là nơi có hàng triệu héc-ta cây công nghiệp như: Cà-phê, hồ tiêu, điều, mắc-ca…",
+            postAvatar: "https://image.nhandan.vn/w800/Uploaded/2024/hutmhz/2024_04_23/han-man-6712.jpg.webp",
+            postCreatorName: "Cao Văn",
+            postCreatedAt: "Thứ 6, 26/04/2024 9:32 (GMT+7)"
+        },
+        {
+            postId: 4,
+            postTitle: "Cung cấp đủ nước sinh hoạt cho người dân vùng hạn, mặn",
+            postContent: "Trung tâm dự báo Khí tượng-Thủy văn quốc gia nhận định, năm 2024, xâm nhập mặn tại các tỉnh Đồng bằng sông Cửu Long sẽ cao hơn, phức tạp hơn so với trung bình nhiều năm; mặn tiến sâu hơn bên trong các hệ thống sông. Để bảo đảm đời sống, sản xuất của người dân trong vùng hạn, mặn, thời gian qua, hàng loạt giải pháp đã được các địa phương triển khai như bảo vệ lúa an toàn, cấp nước sạch cho người dân, vận hành hệ thống cống linh hoạt ngăn mặn…Theo Đài Khí tượng-Thủy văn khu vực Nam Bộ, tại Đồng bằng sông Cửu Long, xâm nhập mặn mùa khô năm 2023-2024 ở mức sớm và sâu hơn trung bình nhiều năm, vào sâu hơn bên trong các hệ thống sông. Tính từ đầu mùa khô đến nay, đợt xâm nhập sâu nhất xuất hiện, với ranh mặn 4‰, tiến sâu vào đất liền 40-66 km, có nơi sâu hơn, ranh mặn 1‰ tại hai tỉnh Tiền Giang và Bến Tre vào sâu 70-76 km tùy theo sông. Đến thời điểm hiện tại, mức độ xâm nhập mặn các tỉnh Sóc Trăng, Long An, Trà Vinh, Tiền Giang... mặn phổ biến vẫn cao hơn so với trung bình nhiều năm, xấp xỉ so với năm 2016. Đáng chú ý, tại tỉnh Bến Tre, xâm nhập mặn ở mức xấp xỉ ranh mặn sâu nhất năm 2016, xâm nhập mặn trên sông Cổ Chiên đã sâu hơn ranh mặn sâu nhất năm 2016. Trong khi đó, dự báo tổng lượng mưa tháng 4 và 5 thấp hơn so với trung bình nhiều năm, nguồn nước từ sông Mê Công chảy về Đồng bằng sông Cửu Long vẫn thiếu hụt.",
+            postAvatar: "https://image.nhandan.vn/w800/Uploaded/2024/buimsbvibuvwsi/2024_04_16/8-moi-2-8788.jpg.webp",
+            postCreatorName: "Hoài Anh",
+            postCreatedAt: "Thứ 6, 26/04/2024 9:32 (GMT+7)"
+        },
+    ]);
+    const [visibleAllNews, setVisibleAllNews] = useState(false);
+
+    useEffect(() => {
+        newsService.getAllNews()
+            .then((res) => {
+                console.log("this is posts api", res);
+                // setNewsList(res);
+                // setLatestNews([...res].splice(1, 5));
+                
+                //fake data
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+    }, [])
+
+    const handleVisibleAllnews = () => {
+        setVisibleAllNews(true);
+    }
+
+    const handleDirectNewsDetail = (newsId, openedCode) => { //openedCode: 0: open from show, 1 open from all-news
+        navigate(`news/${newsId}`);
+        sessionStorage.setItem('openedCode', openedCode);
+    }
+
+    const renderNews = () => {
+        return <>
+            <CRow >
+                <CCol>
+                    <CCard className="mb-4">
+                        <CCardHeader className="news-header">
+                            <div className="news-header__title">Tin tức mới nhất</div>
+                            {
+                                newsList.length > 4 && 
+                                    <div className="news-header__view-more" 
+                                        onClick={() => handleVisibleAllnews()}
+                                    >
+                                        Xem tất cả
+                                    </div>
+                            }
+                        </CCardHeader>
+                        <CCardBody>
+                            {/* { showNews() } */}
+                            <div className="news" id="news">
+                                {
+                                    newsList.length !== 0 ? 
+                                        <div className="news__image-list">
+                                        {
+                                            latestNews.map((news) => {
+                                                return <>
+                                                        <div className="news__image-list__item" onClick={() => {handleDirectNewsDetail(news?.postId, 0)}}>
+                                                            {/* <div className="news__image-list__item__image"> */}
+                                                            <div>
+                                                                <img src={news.postAvatar} alt="image error" />
+                                                            {/* </div> */}
+                                                            </div>
+                                                            <div className="news__image-list__item__title">
+                                                                { news?.postTitle }
+                                                            </div>
+                                                            <div className="news__image-list__item__brief">
+                                                                { news?.postContent.substring(0, 100) }
+                                                            </div>
+                                                        </div>
+                                                    
+                                                </>
+                                            })
+                                        }
+                                        </div>
+                                    :
+                                        <div style={{textAlign: 'center'}}>Chưa có tin tức được cập nhật</div>
+                                }
+                                
+                            </div>
+                        </CCardBody>
+                    </CCard>
+                </CCol>
+            </CRow>
+        </>
+    }
+
+    const renderNewsListModal = () => {
+        return <>
+            <CModal
+                backdrop="static"
+                alignment="center"
+                visible={visibleAllNews}
+                onClose={() => setVisibleAllNews(false)}
+                aria-labelledby="StaticBackdropExampleLabel"
+                size="xl"
+            >
+                <div className="all-news-modal">
+                    <div className="all-news-modal__header">
+                        <div className="all-news-modal__header__title">
+                            <span>Tin tức</span>
+                            {/* <div className="all-news-modal__header__title__search-input">
+                                <FontAwesomeIcon icon={faMagnifyingGlass} /> |
+                                <input type="text" />
+                            </div> */}
+                        </div>
+                        <div className="all-news-modal__header__close" onClick={() => setVisibleAllNews(false)}>
+                            <FontAwesomeIcon icon={faXmark}/>
+                        </div>
+                    </div>
+                    <div className="all-news-modal__list">
+                        <div className="virtual">
+                            {
+                                newsList.map((news) => {
+                                    return <>
+                                        <div className="all-news-modal__list__item" onClick={() => {handleDirectNewsDetail(news?.postId, 1)}}>
+                                            <div className="all-news-modal__list__item__image">
+                                                <img src={news.postAvatar} alt="image error" />
+                                            </div>
+                                            <div className="all-news-modal__list__item__info">
+                                                <div className="all-news-modal__list__item__info__title">
+                                                    { news?.postTitle }
+                                                </div>
+                                                <div className="all-news-modal__list__item__info__brief">
+                                                    { news?.postContent.substring(0, 100) }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                })
+                            }
+                        </div>
+                    </div>
+                </div>
+            </CModal>
+        </>
+    }
     
     return (
         <>
@@ -397,6 +623,13 @@ const HomePage = () => {
                 </CCard>
             </CCol>
         </CRow>
+
+        {/* NEWS */}
+        { renderNews() }
+
+        {/* MORE NEWS */}
+        { renderNewsListModal() }
+        
         </>
     )
 }
