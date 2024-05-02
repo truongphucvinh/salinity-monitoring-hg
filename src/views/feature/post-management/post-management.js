@@ -26,6 +26,7 @@ import {
     cilReload,
     cilPlus
   } from '@coreui/icons'
+import "./post-management.css"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
@@ -324,8 +325,12 @@ const PostManagement = () => {
                                     console.log( 'Focus.', editor );
                                 } }
                                 config={{
-                                    height: "500px",
-                                    minHeight: "300px" // Add this line
+                                    simpleUpload: {
+                                        uploadUrl: 'https://myserver.herokuapp.com/image-upload'
+                                      },
+                                      toolbar: ['heading', '|', 'bold', 'italic', 'blockQuote', 'link', 'numberedList', 'bulletedList', 'insertTable',
+                                        'tableColumn', 'tableRow', 'mergeTableCells', 'mediaEmbed', '|', 'undo', 'redo']
+                                    
                                 }}
                             />
                         </CCol>
@@ -386,8 +391,8 @@ const PostManagement = () => {
         }
     }
     const handleSetUpdatePostAvatar = (value) => {
-        setAddState(prev => {
-            return {...prev, addPostAvatar: value}
+        setUpdateState(prev => {
+            return {...prev, updatePostAvatar: value}
         })
     }
     const handleSetUpdatePostAvatarImage = (event) => {
@@ -475,6 +480,7 @@ const PostManagement = () => {
                         noValidate
                         validated={updateValidated}
                     >
+                        <img src={updatePostAvatar}/>
                         <CRow>
                             <CCol lg={12}>
                                 <CFormInput
@@ -538,8 +544,12 @@ const PostManagement = () => {
                                     console.log( 'Focus.', editor );
                                 } }
                                 config={{
-                                    height: "500px",
-                                    minHeight: "300px" // Add this line
+                                    simpleUpload: {
+                                        uploadUrl: 'https://myserver.herokuapp.com/image-upload'
+                                      },
+                                      toolbar: ['heading', '|', 'bold', 'italic', 'blockQuote', 'link', 'numberedList', 'bulletedList', 'insertTable',
+                                        'tableColumn', 'tableRow', 'mergeTableCells', 'mediaEmbed', '|', 'undo', 'redo']
+                                    
                                 }}
                             />
                         </CCol>
