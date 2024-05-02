@@ -1,6 +1,6 @@
 import { cilLocationPin, cilMagnifyingGlass, cilReload } from "@coreui/icons"
 import CIcon from "@coreui/icons-react"
-import { CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow, CSpinner, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from "@coreui/react"
+import { CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow, CSpinner, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CModal } from "@coreui/react"
 import React, { useEffect, useState } from "react"
 import { getAllDamScheduleBySelectedDate, getAllDamSchedules } from "src/services/dam-services"
 import { damStatusConverter, damStatusConverterV2, getDamScheduleBeginAt, getDamScheduleEndAt, searchRelatives } from "src/tools"
@@ -9,11 +9,15 @@ import CustomIntroduction from "src/views/customs/my-introduction"
 import CustomModal from "src/views/customs/my-modal"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomSpinner from "src/views/customs/my-spinner"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faXmark, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
 import { useNavigate } from 'react-router-dom';
+import './homepage.scss';
 
 //service 
-import station from "src/services/station"
-import observation from "src/services/observation"
+import stationService from "src/services/station"
+import observationService from "src/services/observation"
+import newsService from "src/services/news-service"
 
 const HomePage = () => {
 
@@ -269,13 +273,13 @@ const HomePage = () => {
     const [rynanStationList, setRynanStationList] = useState([]);
     useEffect(() => {
         //get Rynan station list 
-        station.getStationListByRyan()
+        stationService.getStationListByRyan()
             .then((res) => {
                 setRynanStationList(res.data);
                 res.data.map((station) => {
                     var currentDate = new Date();
                     var dateStr = `${currentDate.getFullYear()}/${addZero(currentDate.getMonth()+1)}/${addZero(currentDate.getDate())}`;
-                    observation.getDataStation(station?.so_serial, "2024/01/01", dateStr, 1, 100000000)
+                    observationService.getDataStation(station?.so_serial, "2024/01/01", dateStr, 1, 100000000)
                         .then((seperatedRes) => {
                             var sensorList = [];
                             for(const sensor in seperatedRes.data[0]) {
@@ -310,6 +314,19 @@ const HomePage = () => {
     const handelDirectToDetail = (serialStation) => {
         navigate(`/station-list/station-detail/${serialStation}`);
     }
+
+    // homepage interface after back from detailed news
+    useEffect(() => {
+        var openedCode = sessionStorage.getItem("openedCode");
+        if(openedCode) {
+            const element = document.getElementById("news");
+            element?.scrollIntoView({ behavior: 'smooth' });
+            if(openedCode === '1') {
+                setVisibleAllNews(true);
+            }
+            sessionStorage.removeItem("openedCode");
+        }
+    }, [])
 
     const showSensorStationList = () => {
         return <>
@@ -357,6 +374,199 @@ const HomePage = () => {
             </CTable>
         </>
     }
+
+
+    //NEWS
+    const [newsList, setNewsList] = useState([]);
+    const [latestNews, setLatestNews] = useState([]);
+    const [visibleAllNews, setVisibleAllNews] = useState(true);
+
+    useEffect(() => {
+        newsService.getAllNews()
+            .then((res) => {
+                console.log("this is posts api", res);
+                setNewsList(res);
+                setLatestNews([...res].splice(1, 5));
+                
+                //fake data
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+    }, [])
+
+    const handleVisibleAllnews = () => {
+        setVisibleAllNews(true);
+    }
+
+    const handleDirectNewsDetail = (newsId, openedCode) => { //openedCode: 0: open from show, 1 open from all-news
+        navigate(`news/${newsId}`);
+        sessionStorage.setItem('openedCode', openedCode);
+    }
+
+    const renderNews = () => {
+        return <>
+            <CRow >
+                <CCol>
+                    <CCard className="mb-4">
+                        <CCardHeader className="news-header">
+                            <div className="news-header__title">Tin tức mới nhất</div>
+                            {
+                                newsList.length >= 0 && 
+                                    <div className="news-header__view-more" 
+                                        onClick={() => handleVisibleAllnews()}
+                                    >
+                                        Xem tất cả
+                                    </div>
+                            }
+                        </CCardHeader>
+                        <CCardBody>
+                            {/* { showNews() } */}
+                            <div className="news" id="news">
+                                {
+                                    newsList.length !== 0 ? 
+                                        <div className="news__image-list">
+                                            <div className="news__image-list__item" onClick={() => {handleDirectNewsDetail(1, 0)}}>
+                                                {/* <div className="news__image-list__item__image"> */}
+                                                <div>
+                                                    <img src="https://vcdn1-dulich.vnecdn.net/2022/04/01/MaPiLengHaGiangVnExpress-16488-3513-7729-1648806038.jpg?w=0&h=0&q=100&dpr=2&fit=crop&s=lFRvWQkOmXNG_PtKd7ylvw" alt="image error" />
+                                                {/* </div> */}
+                                                </div>
+                                                <div className="news__image-list__item__title">
+                                                    Tin tức 1
+                                                </div>
+                                                <div className="news__image-list__item__brief">
+                                                    Tóm tắt tin tức 1
+                                                </div>
+                                            </div>
+                                            <div className="news__image-list__item" onClick={() => {handleDirectNewsDetail(1, 0)}}>
+                                                {/* <div className="news__image-list__item__image"> */}
+                                                <div>
+                                                    <img src="https://vcdn1-dulich.vnecdn.net/2022/04/01/MaPiLengHaGiangVnExpress-16488-3513-7729-1648806038.jpg?w=0&h=0&q=100&dpr=2&fit=crop&s=lFRvWQkOmXNG_PtKd7ylvw" alt="image error" />
+                                                {/* </div> */}
+                                                </div>
+                                                <div className="news__image-list__item__title">
+                                                    Tin tức 1
+                                                </div>
+                                                <div className="news__image-list__item__brief">
+                                                    Tóm tắt tin tức 1
+                                                </div>
+                                            </div>
+                                            <div className="news__image-list__item" onClick={() => {handleDirectNewsDetail(1, 0)}}>
+                                                {/* <div className="news__image-list__item__image"> */}
+                                                <div>
+                                                    <img src="https://vcdn1-dulich.vnecdn.net/2022/04/01/MaPiLengHaGiangVnExpress-16488-3513-7729-1648806038.jpg?w=0&h=0&q=100&dpr=2&fit=crop&s=lFRvWQkOmXNG_PtKd7ylvw" alt="image error" />
+                                                {/* </div> */}
+                                                </div>
+                                                <div className="news__image-list__item__title">
+                                                    Tin tức 1
+                                                </div>
+                                                <div className="news__image-list__item__brief">
+                                                    Tóm tắt tin tức 1
+                                                </div>
+                                            </div>
+                                            <div className="news__image-list__item" onClick={() => {handleDirectNewsDetail(1, 0)}}>
+                                                {/* <div className="news__image-list__item__image"> */}
+                                                <div>
+                                                    <img src="https://vcdn1-dulich.vnecdn.net/2022/04/01/MaPiLengHaGiangVnExpress-16488-3513-7729-1648806038.jpg?w=0&h=0&q=100&dpr=2&fit=crop&s=lFRvWQkOmXNG_PtKd7ylvw" alt="image error" />
+                                                {/* </div> */}
+                                                </div>
+                                                <div className="news__image-list__item__title">
+                                                    Tin tức 1
+                                                </div>
+                                                <div className="news__image-list__item__brief">
+                                                    Tóm tắt tin tức 1
+                                                </div>
+                                            </div>
+                                        </div>
+                                    :
+                                        <div style={{textAlign: 'center'}}>Chưa có tin tức được cập nhật</div>
+                                }
+                                
+                            </div>
+                        </CCardBody>
+                    </CCard>
+                </CCol>
+            </CRow>
+        </>
+    }
+
+    const renderNewsListModal = () => {
+        return <>
+            <CModal
+                backdrop="static"
+                alignment="center"
+                visible={visibleAllNews}
+                onClose={() => setVisibleAllNews(false)}
+                aria-labelledby="StaticBackdropExampleLabel"
+                size="xl"
+            >
+                <div className="all-news-modal">
+                    <div className="all-news-modal__header">
+                        <div className="all-news-modal__header__title">
+                            <span>Tin tức</span>
+                            {/* <div className="all-news-modal__header__title__search-input">
+                                <FontAwesomeIcon icon={faMagnifyingGlass} /> |
+                                <input type="text" />
+                            </div> */}
+                        </div>
+                        <div className="all-news-modal__header__close" onClick={() => setVisibleAllNews(false)}>
+                            <FontAwesomeIcon icon={faXmark}/>
+                        </div>
+                    </div>
+                    <div className="all-news-modal__list">
+                        <div className="virtual">
+                            <div className="all-news-modal__list__item" onClick={() => {handleDirectNewsDetail(1, 1)}}>
+                                <div className="all-news-modal__list__item__image">
+                                    <img src="https://vcdn1-dulich.vnecdn.net/2022/04/01/MaPiLengHaGiangVnExpress-16488-3513-7729-1648806038.jpg?w=0&h=0&q=100&dpr=2&fit=crop&s=lFRvWQkOmXNG_PtKd7ylvw" alt="image error" />
+                                </div>
+                                <div className="all-news-modal__list__item__info">
+                                    <div className="all-news-modal__list__item__info__title">Tin tức</div>
+                                    <div className="all-news-modal__list__item__info__brief">Tóm tắt tin tức 1</div>
+                                </div>
+                            </div>
+                            <div className="all-news-modal__list__item">
+                                <div className="all-news-modal__list__item__image">
+                                    <img src="https://vcdn1-dulich.vnecdn.net/2022/04/01/MaPiLengHaGiangVnExpress-16488-3513-7729-1648806038.jpg?w=0&h=0&q=100&dpr=2&fit=crop&s=lFRvWQkOmXNG_PtKd7ylvw" alt="image error" />
+                                </div>
+                                <div className="all-news-modal__list__item__info">
+                                    <div className="all-news-modal__list__item__info__title">Tin tức</div>
+                                    <div className="all-news-modal__list__item__info__brief">Tóm tắt tin tức 1</div>
+                                </div>
+                            </div>
+                            <div className="all-news-modal__list__item">
+                                <div className="all-news-modal__list__item__image">
+                                    <img src="https://vcdn1-dulich.vnecdn.net/2022/04/01/MaPiLengHaGiangVnExpress-16488-3513-7729-1648806038.jpg?w=0&h=0&q=100&dpr=2&fit=crop&s=lFRvWQkOmXNG_PtKd7ylvw" alt="image error" />
+                                </div>
+                                <div className="all-news-modal__list__item__info">
+                                    <div className="all-news-modal__list__item__info__title">Tin tức</div>
+                                    <div className="all-news-modal__list__item__info__brief">Tóm tắt tin tức 1</div>
+                                </div>
+                            </div>
+                            <div className="all-news-modal__list__item">
+                                <div className="all-news-modal__list__item__image">
+                                    <img src="https://vcdn1-dulich.vnecdn.net/2022/04/01/MaPiLengHaGiangVnExpress-16488-3513-7729-1648806038.jpg?w=0&h=0&q=100&dpr=2&fit=crop&s=lFRvWQkOmXNG_PtKd7ylvw" alt="image error" />
+                                </div>
+                                <div className="all-news-modal__list__item__info">
+                                    <div className="all-news-modal__list__item__info__title">Tin tức</div>
+                                    <div className="all-news-modal__list__item__info__brief">Tóm tắt tin tức 1</div>
+                                </div>
+                            </div>
+                            <div className="all-news-modal__list__item">
+                                <div className="all-news-modal__list__item__image">
+                                    <img src="https://vcdn1-dulich.vnecdn.net/2022/04/01/MaPiLengHaGiangVnExpress-16488-3513-7729-1648806038.jpg?w=0&h=0&q=100&dpr=2&fit=crop&s=lFRvWQkOmXNG_PtKd7ylvw" alt="image error" />
+                                </div>
+                                <div className="all-news-modal__list__item__info">
+                                    <div className="all-news-modal__list__item__info__title">Tin tức</div>
+                                    <div className="all-news-modal__list__item__info__brief">Tóm tắt tin tức 1</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </CModal>
+        </>
+    }
     
     return (
         <>
@@ -397,6 +607,13 @@ const HomePage = () => {
                 </CCard>
             </CCol>
         </CRow>
+
+        {/* NEWS */}
+        { renderNews() }
+
+        {/* MORE NEWS */}
+        { renderNewsListModal() }
+
         </>
     )
 }
