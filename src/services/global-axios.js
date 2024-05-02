@@ -6,12 +6,12 @@ import axios from 'axios'
 // const DAM_API_URL = process.env.DAM_HOST_API_URL || 'http://localhost:8081'
 // const DAM_API_URL = process.env.DAM_HOST_API_URL || 'http://172.30.37.182:8081'
 // Docker Local
-const POST_API_URL = process.env.POST_API_URL || 'http://127.0.0.1:8083'
-const DAM_API_URL = process.env.DAM_HOST_API_URL || 'http://localhost:8082'
+// const POST_API_URL = process.env.POST_API_URL || 'http://127.0.0.1:8083'
+// const DAM_API_URL = process.env.DAM_HOST_API_URL || 'http://localhost:8082'
 // Server
-// const POST_API_URL = process.env.POST_API_URL || 'http://103.221.220.183:8085'
+const POST_API_URL = process.env.POST_API_URL || 'http://103.221.220.183:8085'
 const GENERAL_API_URL = process.env.GENERAL_HOST_API_URL || 'http://103.221.220.183:8083'
-// const DAM_API_URL = process.env.DAM_HOST_API_URL || 'http://103.221.220.183:8084'
+const DAM_API_URL = process.env.DAM_HOST_API_URL || 'http://103.221.220.183:8084'
 const AUTH_API_URL = process.env.AUTH_HOST_API_URL || 'http://dev.iotlab.net.vn:5000'
 // const AUTH_API_URL = process.env.AUTH_HOST_API_URL || 'http://dev.iotlab.net.vn:90'
 
