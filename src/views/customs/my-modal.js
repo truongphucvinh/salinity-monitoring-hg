@@ -8,10 +8,11 @@ import {
     CModalFooter
 } from "@coreui/react"
 
-const CustomModal = ({title, body, visible, setVisible}) => {
+const CustomModal = ({title, body, visible, setVisible, isLarge = false}) => {
     return (
         <>
-            <CModal
+            {isLarge ? <CModal
+                size="xl"
                 backdrop="static"
                 visible={visible}
                 onClose={() => setVisible(false)}
@@ -23,7 +24,19 @@ const CustomModal = ({title, body, visible, setVisible}) => {
             <CModalBody>
                 {body}
             </CModalBody>
-            </CModal>
+            </CModal> : <CModal
+                backdrop="static"
+                visible={visible}
+                onClose={() => setVisible(false)}
+                aria-labelledby="LiveDemoExampleLabel"
+            >
+            <CModalHeader onClose={() => setVisible(false)}>
+                <CModalTitle id="LiveDemoExampleLabel">{title}</CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+                {body}
+            </CModalBody>
+            </CModal>}
         </>
     )
 }

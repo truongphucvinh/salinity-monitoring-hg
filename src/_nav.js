@@ -74,7 +74,7 @@ const _nav = [
     component:  CNavItem,
     name: 'Quản lý bài viết',
     to: '/post-management',
-    icon: <CIcon icon={cilEqualizer} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
     code: 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_post_management'
     // fix here
   }

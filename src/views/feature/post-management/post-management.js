@@ -26,6 +26,7 @@ import {
     cilReload,
     cilPlus
   } from '@coreui/icons'
+import "./post-management.css"
 import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
@@ -38,6 +39,8 @@ import { checkInitElement, formatDate, formatDateToDay, getPostCreatedAt, search
 import CustomAuthChecker from "src/views/customs/my-authchecker"
 import CustomIntroduction from "src/views/customs/my-introduction"
 import { createPost, deletePost, getAllPosts, getPostById, updatePost } from "src/services/post-services"
+import { CKEditor } from "@ckeditor/ckeditor5-react"
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic"
 
 const PostManagement = () => {
 
@@ -137,7 +140,8 @@ const PostManagement = () => {
                   <CTableRow>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Tiêu đề</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '50%'}}>Ngày tạo</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Tác giả</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Ngày tạo</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Thao tác</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
@@ -148,6 +152,7 @@ const PostManagement = () => {
                                 <CTableRow key={post?.postId}>
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
                                     <CTableDataCell>{post?.postTitle}</CTableDataCell>
+                                    <CTableDataCell>{post?.postCreatorName}</CTableDataCell>
                                     <CTableDataCell>{getPostCreatedAt(post)}</CTableDataCell>
                                     <CTableDataCell>
                                         {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(post?.postId)} className="text-success mx-1" role="button"/>}
@@ -171,11 +176,25 @@ const PostManagement = () => {
         addPostTitle: "",
         addPostContent: "",
         addPostCreatorName: "",
+        addPostAvatar: "",
         addPostTagIds: []
     }
     const [addState, setAddState] = useState(addData)
-    const { addPostTitle, addPostContent, addPostCreatorName, addPostTagIds } = addState
+    const { addPostTitle, addPostContent, addPostCreatorName, addPostAvatar, addPostTagIds } = addState
     const [addValidated, setAddValidated] = useState(false)
+    const handleSetAddPostAvatar = (value) => {
+        setAddState(prev => {
+            return {...prev, addPostAvatar: value}
+        })
+    }
+    const handleSetAddPostAvatarImage = (event) => {
+        const file = event?.target?.files[0]
+        const reader = new FileReader()
+        reader.onloadend = function() {
+            handleSetAddPostAvatar(reader.result)
+        }
+        reader.readAsDataURL(file);
+    }
     const handleSetAddPostTitle = (value) => {
         setAddState(prev => {
             return { ...prev, addPostTitle: value }
@@ -207,6 +226,7 @@ const PostManagement = () => {
                 postContent: addPostContent.trim(),
                 postCreatorName: addPostCreatorName.trim(),
                 postCreatedAt: formatDateToDay(),
+                postAvatar: addPostAvatar,
                 postTagIds: []
                 // fix here
             }
@@ -270,20 +290,49 @@ const PostManagement = () => {
                             />
                         </CCol>
                     </CRow>
-                    {/* Fix here later */}
                     <CRow>
                         <CCol lg={12}>
-                            <CFormTextarea
+                            <CFormInput
                                 className="mt-4"
-                                type="text"
-                                placeholder="Mô tả bài viết"
-                                maxLength={250}
-                                feedbackInvalid="Không bỏ trống và ít hơn 250 ký tự"
-                                onChange={(e) => handleSetAddPostContent(e.target.value)}
-                                value={addPostContent}
-                                rows={3}
+                                type="file"
+                                placeholder="Hình đại diện bài viết"
+                                maxLength={50}
+                                feedbackInvalid="Không bỏ trống"
+                                onChange={handleSetAddPostAvatarImage}
                                 aria-describedby="exampleFormControlInputHelpInline"
-                            ></CFormTextarea>
+                                required
+                            />
+                        </CCol>
+                    </CRow>
+                    {/* Fix here later */}
+                    <CRow>
+                        <CCol lg={12} className="mt-4">
+                            <CKEditor
+                                editor={ ClassicEditor }
+                                data="<p>Soạn thảo bài viết tại đây&nbsp;5!</p>"
+                                onReady={ editor => {
+                                    // You can store the "editor" and use when it is needed.
+                                    console.log( 'Editor is ready to use!', editor );
+                                } }
+                                onChange={ ( event,editor ) => {
+                                    let data = editor?.getData()
+                                    handleSetAddPostContent(data)
+                                } }
+                                onBlur={ ( event, editor ) => {
+                                    console.log( 'Blur.', editor );
+                                } }
+                                onFocus={ ( event, editor ) => {
+                                    console.log( 'Focus.', editor );
+                                } }
+                                config={{
+                                    simpleUpload: {
+                                        uploadUrl: 'https://myserver.herokuapp.com/image-upload'
+                                      },
+                                      toolbar: ['heading', '|', 'bold', 'italic', 'blockQuote', 'link', 'numberedList', 'bulletedList', 'insertTable',
+                                        'tableColumn', 'tableRow', 'mergeTableCells', 'mediaEmbed', '|', 'undo', 'redo']
+                                    
+                                }}
+                            />
                         </CCol>
                     </CRow>
                     <CRow>
@@ -302,10 +351,11 @@ const PostManagement = () => {
         updatePostTitle: '',
         updatePostContent: '',
         updatePostCreatorName: '',
-        updatePostTagIds: ''
+        updatePostAvatar: "",
+        updatePostTagIds: []
     }
     const [updateState, setUpdateState] = useState(updateData)
-    const { updatePostId, updatePostTitle, updatePostContent, updatePostTagIds, updatePostCreatorName } = updateState
+    const { updatePostId, updatePostTitle, updatePostContent, updatePostTagIds, updatePostCreatorName, updatePostAvatar } = updateState
     const [updateValidated, setUpdateValidated] = useState(false)
     const getAPostById = (postId) => {
         if (postId) {
@@ -318,6 +368,7 @@ const PostManagement = () => {
                         updatePostTitle: post?.postTitle,
                         updatePostContent: post?.postContent,
                         updatePostCreatorName: post?.postCreatorName,
+                        updatePostAvatar: post?.postAvatar,
                         updatePostTagIds: []
                         // fix here
                     }
@@ -339,14 +390,27 @@ const PostManagement = () => {
             })
         }
     }
+    const handleSetUpdatePostAvatar = (value) => {
+        setUpdateState(prev => {
+            return {...prev, updatePostAvatar: value}
+        })
+    }
+    const handleSetUpdatePostAvatarImage = (event) => {
+        const file = event?.target?.files[0]
+        const reader = new FileReader()
+        reader.onloadend = function() {
+            handleSetUpdatePostAvatar(reader.result)
+        }
+        reader.readAsDataURL(file);
+    }
     const handleSetUpdatePostId = (value) => {
         setUpdateState(prev => {
             return { ...prev, updatePostId: value }
         })
     }
-    const openUpdateModal = (damTypeId) => {
-        handleSetUpdatePostId(damTypeId)
-        getAPostById(damTypeId)
+    const openUpdateModal = (postId) => {
+        handleSetUpdatePostId(postId)
+        getAPostById(postId)
         setUpdateVisible(true)
     }
     const handleSetUpdatePostTitle = (value) => {
@@ -380,7 +444,8 @@ const PostManagement = () => {
                 postId: updatePostId,
                 postTitle: updatePostTitle,
                 postContent: updatePostContent,
-                postCreator: updatePostCreatorName,
+                postCreatorName: updatePostCreatorName,
+                postAvatar: updatePostAvatar,
                 postTagIds: []
                 // fix here
             }
@@ -415,6 +480,7 @@ const PostManagement = () => {
                         noValidate
                         validated={updateValidated}
                     >
+                        <img src={updatePostAvatar}/>
                         <CRow>
                             <CCol lg={12}>
                                 <CFormInput
@@ -447,19 +513,47 @@ const PostManagement = () => {
                         </CRow>
                         <CRow>
                             <CCol lg={12}>
-                                <CFormTextarea
+                                <CFormInput
                                     className="mt-4"
-                                    type="text"
-                                    placeholder="Mô tả bài viết"
-                                    onChange={(e) => handleSetUpdatePostContent(e.target.value)}
-                                    value={updatePostContent}
-                                    rows={3}
-                                    maxLength={250}
-                                    feedbackInvalid="Ít hơn 250 ký tự"
+                                    type="file"
+                                    placeholder="Hình đại diện bài viết"
+                                    maxLength={50}
+                                    feedbackInvalid="Không bỏ trống"
+                                    onChange={handleSetUpdatePostAvatarImage}
                                     aria-describedby="exampleFormControlInputHelpInline"
-                                ></CFormTextarea>
+                                />
                             </CCol>
                         </CRow>
+                        <CRow>
+                        <CCol lg={12} className="mt-4">
+                            <CKEditor
+                                editor={ ClassicEditor }
+                                data={updatePostContent}
+                                onReady={ editor => {
+                                    // You can store the "editor" and use when it is needed.
+                                    console.log( 'Editor is ready to use!', editor );
+                                } }
+                                onChange={ ( event,editor ) => {
+                                    let data = editor?.getData()
+                                    handleSetUpdatePostContent(data)
+                                } }
+                                onBlur={ ( event, editor ) => {
+                                    console.log( 'Blur.', editor );
+                                } }
+                                onFocus={ ( event, editor ) => {
+                                    console.log( 'Focus.', editor );
+                                } }
+                                config={{
+                                    simpleUpload: {
+                                        uploadUrl: 'https://myserver.herokuapp.com/image-upload'
+                                      },
+                                      toolbar: ['heading', '|', 'bold', 'italic', 'blockQuote', 'link', 'numberedList', 'bulletedList', 'insertTable',
+                                        'tableColumn', 'tableRow', 'mergeTableCells', 'mediaEmbed', '|', 'undo', 'redo']
+                                    
+                                }}
+                            />
+                        </CCol>
+                    </CRow>
                         <CRow>
                             <CCol lg={12} className="d-flex justify-content-end">
                                 <CButton type="submit" className="mt-4" color="primary">Hoàn tất</CButton>
@@ -547,8 +641,8 @@ const PostManagement = () => {
             <CToaster ref={toaster} push={toast} placement="top-end" />
             <CCardHeader>Danh sách bài viết</CCardHeader>
             <CCardBody>
-                <CustomModal visible={addVisible} title={'Thêm bài viết'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
-                <CustomModal visible={updateVisible} title={'Cập nhật bài viết'} body={updateForm(updatePostId)} setVisible={(value) => setUpdateVisible(value)}/>
+                <CustomModal isLarge={true} visible={addVisible} title={'Thêm bài viết'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
+                <CustomModal isLarge={true} visible={updateVisible} title={'Cập nhật bài viết'} body={updateForm(updatePostId)} setVisible={(value) => setUpdateVisible(value)}/>
                 <CustomModal visible={deleteVisible} title={'Xóa bài viết'} body={deleteForm(deletePostId)} setVisible={(value) => setDeleteVisible(value)}/>
                 <CForm onSubmit={(e)=>{
                     e.preventDefault()
@@ -568,7 +662,7 @@ const PostManagement = () => {
                             <CFormInput
                                 className="mb-2"
                                 type="text"
-                                placeholder="Mô tả bài viết"
+                                placeholder="Tên tác giả"
                                 onChange={(e) => handleSetPostCreatorName(e.target.value)}
                                 aria-describedby="exampleFormControlInputHelpInline"
                             />
