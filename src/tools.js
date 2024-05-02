@@ -67,6 +67,16 @@ export const formatDate = (response) => {
     return `${year}-${month}-${day}T${hours}:${minutes}`
 }
 
+export const formatDateToDay = () => {
+    let date = new Date();
+    let year = date.getFullYear();
+    let month = ("0" + (date.getMonth() + 1)).slice(-2);
+    let day = ("0" + date.getDate()).slice(-2);
+    let hours = ("0" + date.getHours()).slice(-2);
+    let minutes = ("0" + date.getMinutes()).slice(-2);
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
 export const damStatusConverter = (dam) => {
     if (dam?.damCurrentStatus?.damStatusName === "OPEN") {
         return {
@@ -103,6 +113,10 @@ export const getDamScheduleBeginAt = (damSchedule) => {
 
 export const getDamScheduleEndAt = (damSchedule) => {
     return `${damSchedule?.damScheduleEndAt[3]}:${damSchedule?.damScheduleEndAt[4] ? damSchedule?.damScheduleEndAt[4] : '00'}:${damSchedule?.damScheduleEndAt[5] ? damSchedule?.damScheduleEndAt[5] : '00'} ${damSchedule?.damScheduleEndAt[2]}/${damSchedule?.damScheduleEndAt[1]}/${damSchedule?.damScheduleEndAt[0]}`
+}
+
+export const getPostCreatedAt = (post) => {
+    return `${post?.postCreatedAt[3]}:${post?.postCreatedAt[4] ? post?.postCreatedAt[4] : '00'}:${post?.postCreatedAt[5] ? post?.postCreatedAt[5] : '00'} ${post?.postCreatedAt[2]}/${post?.postCreatedAt[1]}/${post?.postCreatedAt[0]}`
 }
 
 export const getLoggedUserRole = () => {

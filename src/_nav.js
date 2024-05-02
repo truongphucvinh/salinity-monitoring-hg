@@ -69,6 +69,14 @@ const _nav = [
     to: '/station-list',
     icon: <CIcon icon={cilEqualizer} customClassName="nav-icon" />,
     code: 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_sensor_station_management'
+  },
+  {
+    component:  CNavItem,
+    name: 'Quản lý bài viết',
+    to: '/post-management',
+    icon: <CIcon icon={cilEqualizer} customClassName="nav-icon" />,
+    code: 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_post_management'
+    // fix here
   }
 ]
 

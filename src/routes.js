@@ -1,4 +1,5 @@
 import React from 'react'
+import PostManagement from './views/feature/post-management/post-management'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const HomePage = React.lazy(() => import('./views/feature/read-only/homepage'))
@@ -70,6 +71,7 @@ const routes = [
   { path: '/dam-type-management', name: 'Quản lý loại đập', element: DamTypeManagement }, 
   { path: '/role-management', name: 'Quản lý vai trò', element: RoleManagement }, 
   { path: '/user-management', name: 'Quản lý người dùng', element: UserManagement },
+  { path: '/post-management', name: 'Quản lý bài viết', element: PostManagement },
   // { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/dashboard', name: 'Dashboard', element: HomePage },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
