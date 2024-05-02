@@ -16,7 +16,8 @@ import {
     CForm,
     CToaster,
     CSpinner,
-    CFormTextarea
+    CFormTextarea,
+    CImage
   } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -211,7 +212,9 @@ const PostManagement = () => {
         })
     }
     const handleSetAddPostTagIds = (value) => {
-        return {...prev, addPostTagIds: value}
+        setAddState(prev => {
+            return {...prev, addPostTagIds: value}
+        })
     }
 
     const createNewPost = (e) => {
@@ -260,6 +263,21 @@ const PostManagement = () => {
                     noValidate
                     validated={addValidated}
                 >
+                    <CRow>
+                        <CCol lg={12}>
+                            {
+                                addPostAvatar && <>
+                                    <p>Hình ảnh tiêu đề</p>
+                                    <CImage 
+                                        src={addPostAvatar}
+                                        width={"200px"}
+                                        height={"200px"}
+                                    />
+                                </>
+                            }
+
+                        </CCol>
+                    </CRow>
                     <CRow>
                         <CCol lg={12}>
                             <CFormInput
@@ -480,7 +498,21 @@ const PostManagement = () => {
                         noValidate
                         validated={updateValidated}
                     >
-                        <img src={updatePostAvatar}/>
+                        <CRow>
+                            <CCol lg={12}>
+                                {
+                                    updatePostAvatar && <>
+                                        <p>Hình ảnh tiêu đề</p>
+                                        <CImage 
+                                            src={updatePostAvatar}
+                                            width={"200px"}
+                                            height={"200px"}
+                                        />
+                                    </>
+                                }
+
+                            </CCol>
+                        </CRow>
                         <CRow>
                             <CCol lg={12}>
                                 <CFormInput
