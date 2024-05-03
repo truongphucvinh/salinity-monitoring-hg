@@ -480,8 +480,9 @@ const HomePage = () => {
         //     postCreatedAt: "Thứ 6, 26/04/2024 9:32 (GMT+7)"
         // },
     ]);
-    const [filteredNewsList, setFilteredNewsList] = useState([])
-    const [visibleAllNews, setVisibleAllNews] = useState(false);
+    const [filteredNewsList, setFilteredNewsList] = useState([]);
+    const [visibleAllNews, setVisibleAllNews] = useState(true);
+    const [visibleInputSearch, setVisibleInputSearch] = useState(false);
     const onResetNews = () => {
         setFilteredNewsList(newsList)
         if (newsList?.length > 4) {
@@ -562,8 +563,8 @@ const HomePage = () => {
                                             latestNews.map((news) => {
                                                 return <>
                                                         <div className="news__image-list__item" onClick={() => {handleDirectNewsDetail(news?.postId, 0)}}>
-                                                            {/* <div className="news__image-list__item__image"> */}
-                                                            <div>
+                                                            <div className="news__image-list__item__image">
+                                                            {/* <div> */}
                                                                 <img src={news.postAvatar} alt="image error" />
                                                             {/* </div> */}
                                                             </div>
@@ -605,10 +606,10 @@ const HomePage = () => {
                     <div className="all-news-modal__header">
                         <div className="all-news-modal__header__title">
                             <span>Tin tức</span>
-                            {/* <div className="all-news-modal__header__title__search-input">
-                                <FontAwesomeIcon icon={faMagnifyingGlass} /> |
+                            <div className={"all-news-modal__header__title__search-input " + visibleInputSearch ? "all-news-modal__header__title__search-input--enabled" : ""}>
+                                <FontAwesomeIcon icon={faMagnifyingGlass} />
                                 <input type="text" />
-                            </div> */}
+                            </div>
                         </div>
                         <div className="all-news-modal__header__close" onClick={() => setVisibleAllNews(false)}>
                             <FontAwesomeIcon icon={faXmark}/>
