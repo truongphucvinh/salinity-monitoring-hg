@@ -48,9 +48,9 @@ const UserManagement = () => {
     const [listUsers, setListUsers] = useState([])
     // const [listDomains, setListDomains] = useState([])
     const [listRoles, setListRoles] = useState([])
-    const secretKey = process.env.AUTH_TOKEN || 'oda_dev'
+    const secretKey = process.env.REACT_APP_AUTH_TOKEN
     const defaultDomainId = process.env.HG_DOMAIN_ID || '65b0cbba526ef32c8be05f1d'
-    const defaultAuthorizationCode = process.env.HG_MODULE_USER_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_user_management"
+    const defaultAuthorizationCode = process.env.REACT_APP_HG_MODULE_USER_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_user_management"
     // Checking feature's module
     const defaultModuleAddFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_user_management_add_user"
     const defaultModuleUpdateFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_user_management_update_user"

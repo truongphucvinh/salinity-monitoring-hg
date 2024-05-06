@@ -40,7 +40,7 @@ import CustomIntroduction from "src/views/customs/my-introduction"
 
 const DamTypeManagement = () => {
 
-    const defaultAuthorizationCode = process.env.HG_MODULE_DAM_TYPE_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_type_management"
+    const defaultAuthorizationCode = process.env.REACT_APP_HG_MODULE_DAM_TYPE_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_type_management"
     // Checking feature's module
     const defaultModuleAddFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_type_management_add_dam_type"
     const defaultModuleUpdateFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_type_management_update_dam_type"

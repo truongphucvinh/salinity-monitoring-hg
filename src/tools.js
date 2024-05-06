@@ -240,7 +240,7 @@ export const googleMapLink = (lat, lng) => {
 }
 
 export const checkInitElement = (code) => {
-    const defaultInitCode = process.env.HG_CODE || "init"
+    const defaultInitCode = process.env.REACT_APP_HG_CODE || "init"
     console.log(code);
     return code === defaultInitCode
 }

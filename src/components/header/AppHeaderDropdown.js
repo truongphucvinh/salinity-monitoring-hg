@@ -133,7 +133,7 @@ const AppHeaderDropdown = () => {
     }
     handleUpdateValidatedState(true, true)
   }
-  const secretKey = process.env.AUTH_TOKEN || 'oda_dev'
+  const secretKey = process.env.REACT_APP_AUTH_TOKEN
   const updatePassword = (e) => {
     const form = e.currentTarget
     e.preventDefault()

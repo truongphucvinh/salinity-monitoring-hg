@@ -11,7 +11,7 @@ import { createFailIcon, createSuccessIcon } from "./my-icon"
 
 const CustomIntroduction = ({title,content,pageCode}) => {
     const defaultProjectCode = process.env.HG_GENERAL_PROJECT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_project"
-    const defaultAuthorizationCode = process.env.HG_MODULE_GENERAL_INFORMATION_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_general_information_management"
+    const defaultAuthorizationCode = process.env.REACT_APP_HG_MODULE_GENERAL_INFORMATION_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_general_information_management"
     // Checking feature's module
     const defaultModuleUpdateHeader = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_general_information_management_update_header_information"
     const [havingUpdateHeader, setHavingUpdateHeader] = useState(false)
