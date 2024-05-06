@@ -21,6 +21,20 @@ export const getSpecificGeneralInformation = (projectCode, pageCode, projects) =
     }
 }
 
+export const getProjectByCode = (projectCode, projects) => {
+    if (projects) {
+        let filteredProjects = projects?.filter(project => {
+            return project?.projectCode === projectCode
+        })
+        if (filteredProjects) {
+            return filteredProjects[0]
+        }else {
+            return null
+        }
+    }
+    return null 
+}
+
 export const onFilterUsers = (listUsers, domainId) => {
     return listUsers.filter(user => {
         return user?.permission?.domain === domainId
