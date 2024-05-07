@@ -1,8 +1,11 @@
 import axios from "axios";
+import { useState } from "react";
 
 const BASE_URL = "http://103.221.220.183:8026/"
 
+
 export default {
+
     getStationList: async function() {
         try {
             const response = await axios.get(BASE_URL+'things')
@@ -33,14 +36,16 @@ export default {
     //Rynan
     login: async function() {
         try {
-            const response = await axios.post("https://document.rynangate.com/api/v1/auth", {
-                "user_name" : "demo.partner",
-                "password" : "DemoPartner@123"
+            const response = await axios.post("https://api-mekong.rynangate.com/api/v1/auth", {
+                "user_name" : "myi.partner",
+                "password" : "Myi@2024"
             }, {
                 headers: {
-                    "x-api-key" : "baK5nWEBD6ARJNU8uPSMTrfq"
+                    "x-api-key" : "Qy1z8uyQoVC603KLov9vxC5J"
                 }
             });
+            sessionStorage.setItem("rynanToken", response.data.token);
+            console.log("login: ", response.data);
             return response.data;
         } catch(error) {
             throw error
@@ -49,15 +54,23 @@ export default {
 
     getStationListByRyan: async function() { // inclding stations are gotten by Ryan api
         try {
-            const responseLogin = await this.login();
-            const response = await axios.get("https://document.rynangate.com/api/v1/get-list-stations",
+            var rynanToken = sessionStorage.getItem("rynanToken");
+            console.log("abc: ", rynanToken);
+            if(!rynanToken) {
+                console.log("xyz");
+                const responseRynanAPI = await this.login();
+                sessionStorage.setItem("rynanToken", responseRynanAPI.token);
+                rynanToken = responseRynanAPI.token;
+            }
+            const response = await axios.get("https://api-mekong.rynangate.com/api/v1/get-list-stations",
                 {
                     headers: {
-                        "x-access-token" : responseLogin.token,
-                        "x-api-key" : "baK5nWEBD6ARJNU8uPSMTrfq"
+                        "x-access-token" : rynanToken,
+                        "x-api-key" : "Qy1z8uyQoVC603KLov9vxC5J"
                     }
                 }
             );
+            console.log("sensor list: ", response.data);
             return response.data;
         } catch (error) {
             throw error;

@@ -25,15 +25,17 @@ export default  {
     //Rynan
     getDataStation: async function(serialStation, startDate, endDate, page, limit) {
         try {
-            const responseLogin = await station.login();
-            const response = await axios.get(`https://document.rynangate.com/api/v1/get-data-stations?so_serial=${serialStation}&tu_ngay=${startDate}&den_ngay=${endDate}&limit=${limit}`,
+            // const responseLogin = await station.login();
+            var rynanToken = sessionStorage.getItem("rynanToken");
+            const response = await axios.get(`https://api-mekong.rynangate.com/api/v1/get-data-stations?so_serial=${serialStation}&tu_ngay=${startDate}&den_ngay=${endDate}&limit=${limit}`,
                 {
                     headers: {
-                        "x-access-token" : responseLogin.token,
-                        "x-api-key" : "baK5nWEBD6ARJNU8uPSMTrfq"
+                        "x-access-token" : rynanToken,
+                        "x-api-key" : "Qy1z8uyQoVC603KLov9vxC5J"
                     }
                 }
             );
+            console.log("sensor value: ", response.data);
             return response.data;
         } catch (error) {
             throw error;

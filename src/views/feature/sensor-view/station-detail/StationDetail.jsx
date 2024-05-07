@@ -116,6 +116,8 @@ const StationDetail = () => {
     const [stationInfo, setStationInfo] = useState();
     const [dataStation, setDataStation] = useState({})
 
+    const [pointArray, setPointArray] = useState([]); // mang data trong dataSation  
+
     //auto reload 
     // setInterval(() => {
     //   setReload(!reload);
@@ -140,17 +142,53 @@ const StationDetail = () => {
 
     const [reload, setReload] = useState(false);
 
+
+    const [responseDataStationRynan, setResponseDataStationRynan] = useState([]);
+
     useEffect(() => {
+      console.log("test date range sort use effect: ", selectedDateRangeSort);
       setIsLoadingSensorList(true);
+
       var currentDate = new Date();
-      var dateStr = `${currentDate.getFullYear()}/${addZero(currentDate.getMonth()+1)}/${addZero(currentDate.getDate())}`;
-      observation.getDataStation(id, "2024/01/01", dateStr, 1, 100000000) //1000?
+      var previousDate = new Date();
+      previousDate.setDate(currentDate.getDate() - 7); // lay du lieu 7 ngay gan nhat-
+
+      //min, max
+      dateRange.startDate = "2024-04-15";
+      dateRange.endDate = `${currentDate.getFullYear()}-${addZero(currentDate.getMonth()+1)}-${addZero(currentDate.getDate())}`;
+
+      var startDate, endDate;
+      // khi reloa van giu data range truoc do
+      console.log("dat: ", !selectedDateRangeSort.from=='')
+      if(!selectedDateRangeSort.from=='') {
+        console.log("abccccc:");
+        currentDate = new Date(selectedDateRangeSort.to);
+        previousDate = new Date(selectedDateRangeSort.from);
+      }
+      endDate = `${currentDate.getFullYear()}/${addZero(currentDate.getMonth()+1)}/${addZero(currentDate.getDate())}`;
+      startDate = `${previousDate.getFullYear()}/${addZero(previousDate.getMonth()+1)}/${addZero(previousDate.getDate())}`;
+      console.log("startdate, enddate: ", startDate, endDate);
+
+      selectedDateRange.to = endDate.replaceAll("/", "-");
+      selectedDateRange.from = startDate.replaceAll("/", "-");
+      selectedDateRangeSort.to = endDate.replaceAll("/", "-");
+      selectedDateRangeSort.from = startDate.replaceAll("/", "-");
+      // setSelectedDateRangeSort({from: startDate.replaceAll("/", "-"), to: endDate.replaceAll("/", "-")});
+      
+
+      observation.getDataStation(id, startDate, endDate, 1, 100000000) //1000?
         .then((res) => {
+          setResponseDataStationRynan(res);
+          console.log("responess data station", res);
+
           setSensorValueListForDownloading([...res.data]);
+
+          //sort/reverse
           var reverseSensorValueList = [...res.data];
           setSensorValueList(reverseSensorValueList.reverse());
           setSensorValueListSort([...sensorValueList]);
-          //station list
+
+          // get sensor list
           var sensorList = [];
           var ltsValue = [];
           for(const sensor in res.data[0]) {
@@ -158,7 +196,7 @@ const StationDetail = () => {
               sensorList.push(sensor);
               setSensorListRynan(sensorList);
 
-              //set latest value for all sensor
+              //get latest value for all sensor
               let ltsValue1Sensor = {sensorName: '', sensorValue: 0, time: ''};
               ltsValue1Sensor.sensorName = sensor;
               ltsValue1Sensor.sensorValue = res.data[res.data.length-1][sensor];
@@ -168,7 +206,8 @@ const StationDetail = () => {
               setLatestSensorValue(ltsValue);
             }
           }
-          //options array
+
+          handleSetDataStaion();
           var pointArray = [];
           res?.data.forEach((multi, index) => {
             var point = {
@@ -180,23 +219,8 @@ const StationDetail = () => {
             if(selectingSensorRynan === "") {
               setSelectingSensorRynan(sensorList[0]);
             }
-
-            //dateRage
-            var dateTime, strDate;
-            if(index===0 || index===res?.data.length-1) { // start point or end point
-              dateTime = new Date(point.x);
-              strDate = `${dateTime.getFullYear()}-${addZero(dateTime.getMonth()+1)}-${addZero(dateTime.getDate())}`;
-              if(index === 0) {
-                dateRange.startDate = strDate;
-                selectedDateRange.from = dateRange.startDate;
-                selectedDateRangeSort.from = dateRange.startDate;
-              } else {
-                dateRange.endDate = strDate;
-                selectedDateRange.to = dateRange.endDate;
-                selectedDateRangeSort.to = dateRange.endDate;
-              }
-            }
           })
+          setPointArray(pointArray);
           return pointArray;
         })
         .then((res) => {
@@ -236,14 +260,82 @@ const StationDetail = () => {
         })
         .catch((error) => {
           setError(true);
-          // console.log("error: ", error);
         })
-    }, [selectingSensorRynan, reload])
+    }, [reload, selectedDateRangeSort]) //selectingSensorRynan,    
 
-    const handleChangeSensorViewRynan = (sensorName, index) => {
+    const handleChangeSensorViewRynan = async (sensorName, index) => {
       setActiveKey(index);
       setSelectingSensorRynan(sensorName);
     }
+
+    useEffect(() => {
+      handleSetDataStaion();
+    }, [selectingSensorRynan]);
+
+    const handleSetDataStaion = () => { //loc va set options cho chart
+      var pointArray = [];
+      responseDataStationRynan.data?.forEach((multi, index) => {
+        var point = {
+          x: new Date(multi.ngay_gui).getTime(),
+          y: Number(selectingSensorRynan === "" ? multi[sensorList[0]] : multi[selectingSensorRynan]),
+          color: '#1a2848'
+        }
+        pointArray.push(point);
+        if(selectingSensorRynan === "") {
+          setSelectingSensorRynan(sensorList[0]);
+        }
+
+        //dateRage
+        var dateTime, strDate;
+        if(index===0 || index===responseDataStationRynan?.data.length-1) { // start point or end point
+          dateTime = new Date(point.x);
+          strDate = `${dateTime.getFullYear()}-${addZero(dateTime.getMonth()+1)}-${addZero(dateTime.getDate())}`;
+          // if(index === 0) {
+          //   dateRange.startDate = strDate;
+          //   selectedDateRange.from = dateRange.startDate;
+          //   selectedDateRangeSort.from = dateRange.startDate;
+          // } else {
+          //   dateRange.endDate = strDate;
+          //   selectedDateRange.to = dateRange.endDate;
+          //   selectedDateRangeSort.to = dateRange.endDate;
+          // }
+        }
+      })
+      console.log("point array: ", pointArray);
+      setDataStation(
+        {
+          chart: {
+            type: 'line',
+            height: 550, // Set the desired height here
+          },
+          plotOptions: {
+            series: {
+                color: '#1a2848'
+            }
+          },
+          tooltip: {
+            formatter: function() {
+              var sendDTime = new Date(this.x);
+              var strTime= `${addZero(sendDTime.getHours())}:${addZero(sendDTime.getMinutes())}:${addZero(sendDTime.getSeconds())}, ${addZero(sendDTime.getDate())}/${addZero(sendDTime.getMonth()+1)}/${sendDTime.getFullYear()}`;
+              var strTimeShow = `Thời gian: <b> ${strTime} </b><br/>Giá trị: <b>${this.y}</b>` 
+              return strTimeShow; 
+            }
+          },
+          series: [{
+            data: pointArray,
+            zoneAxis: 'x',
+            marker: {
+              symbol: "circle",
+              radius: 2,
+              enabled: true
+            },
+            // zones: [{value: 3}, {value: 5, color: 'red'}]
+            // zones: zones(colors[0])
+          }]
+        }
+      )
+    }
+
     const handleChangeViewModeRynan = (modeName) => {
       setViewMode(modeName);
       setVisibleDownloadCard(undefined);
@@ -306,32 +398,23 @@ const StationDetail = () => {
 
     var sensorValueListAfterFilter;
     const handleSelectedDateRangeSort = async (e) => {
-      var from, to;
       if(e.target.name==="from") { //from thay doi
-        if(new Date(e.target.value) <= new Date(selectedDateRangeSort.to)) { //ok
+        console.log("test date range: ", handleCaculateDatePeriod(new Date(e.target.value), new Date(selectedDateRangeSort.to)), "   ", handleCaculateDatePeriod(new Date(selectedDateRangeSort.to), new Date(e.target.value)));
+        if((new Date(e.target.value) <= new Date(selectedDateRangeSort.to)) && (handleCaculateDatePeriod(new Date(e.target.value), new Date(selectedDateRangeSort.to)) <= 7)) { //ok
           setSelectedDateRangeSort({ ...selectedDateRangeSort, from: e.target.value });
-          from = e.target.value;
-          to = selectedDateRangeSort.to;
-          sensorValueListAfterFilter = sensorValueList.filter((item) => {
-            return ((new Date(item.ngay_gui).getTime()) >= (new Date(from.substring(0, 4), Number(from.substring(5, 7))-1, from.substring(8, 10), 0, 0, 0, 0).getTime()) 
-                && (new Date(item.ngay_gui).getTime()) <= (new Date(to.substring(0, 4), Number(to.substring(5, 7) - 1), to.substring(8, 10), 23, 59, 59, 59).getTime()))
-          })
-          setSensorValueListSort(sensorValueListAfterFilter);
-          console.log("aaaa: ", sensorValueListAfterFilter);  
         }
       }
       else { //to thay doi
-        if(new Date(e.target.value) >= new Date(selectedDateRangeSort.from)) { //ok
+        if((new Date(e.target.value) >= new Date(selectedDateRangeSort.from)) && (handleCaculateDatePeriod(new Date(selectedDateRangeSort.from), new Date(e.target.value)) <= 7)) { //ok
           setSelectedDateRangeSort({ ...selectedDateRangeSort, to: e.target.value });
-          from =selectedDateRangeSort.from;
-          to = e.target.value;
-          sensorValueListAfterFilter = sensorValueList.filter((item) => {
-            return ((new Date(item.ngay_gui).getTime()) >= (new Date(from.substring(0, 4), Number(from.substring(5, 7))-1, from.substring(8, 10), 0, 0, 0, 0).getTime()) 
-                && (new Date(item.ngay_gui).getTime()) <= (new Date(to.substring(0, 4), Number(to.substring(5, 7) - 1), to.substring(8, 10), 23, 59, 59, 59).getTime()))
-          })
-          setSensorValueListSort(sensorValueListAfterFilter);
         }
       }
+    }
+
+    const handleCaculateDatePeriod = (startDate, endDate) => { //tinh khoang cach giua 2 ngay
+      // console.log("khoang cach giua 2 ngay la: ", (endDate.getTime() - startDate.getTime())/(24*60*60*1000));
+      var period = (endDate.getTime() - startDate.getTime())/(24*60*60*1000);
+      return period < 0 ? period*(-1) : period;
     }
 
     const handleExportExcel = () => {
@@ -389,6 +472,10 @@ const StationDetail = () => {
       setSensorValueListSort(reverseList);
     }
 
+    const handleFilterByPeriod = () => {
+
+    }
+
     const generateHeader = () => {
       return <>
         <CCardHeader className="station-detail2__header">
@@ -420,16 +507,26 @@ const StationDetail = () => {
         <CRow>
           <CCol xs={5}>
             {
-              viewMode === 'table' && 
+              // viewMode === 'table' && 
               <div className="station-detail2__body__date-range-sort">
                 <label htmlFor="">Từ</label>
                 <input type="date" 
                   value={selectedDateRangeSort.from} 
-                  min={dateRange.startDate}
+                  min="2024-04-15"
+                  // {dateRange.startDate}
                   max={dateRange.endDate}
                   name="from"
                   onChange={handleSelectedDateRangeSort}
                 />
+                {/* <select name="" id="">
+                  <option value="">1 ngày</option>
+                  <option value="">2 ngày</option>
+                  <option value="">3 ngày</option>
+                  <option value="">4 ngày</option>
+                  <option value="">5 ngày</option>
+                  <option value="">6 ngày</option>
+                  <option value="">7 ngày</option>
+                </select> */}
                 <label htmlFor="">đến</label>
                 <input 
                   type="date" value={selectedDateRangeSort.to} 
@@ -438,6 +535,9 @@ const StationDetail = () => {
                   name="to"
                   onChange={handleSelectedDateRangeSort}
                 />
+                <div className="station-detail2__body__date-range-sort__search-btn">
+                  Xem
+                </div>
               </div>
             }
           </CCol>
@@ -688,7 +788,8 @@ const StationDetail = () => {
           }
       </>
     }
-    const defaultPageCode = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_sensor_detail"
+    const defaultPageCode = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_sensor_detail";
+
     return (<>
       <CustomIntroduction 
         pageCode={defaultPageCode}
