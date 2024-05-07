@@ -2,33 +2,10 @@ import { APIProvider, Map } from "@vis.gl/react-google-maps"
 import React, { useEffect, useState } from "react"
 import CustomMarker from "./my-google-marker-api";
 
-const CustomAPIMap = () => {
-
-    const markers = [
-        {
-        id: 1,
-        name: "Chicago, Illinois",
-        position: { lat: 41.881832, lng: -87.623177 }
-        },
-        {
-        id: 2,
-        name: "Denver, Colorado",
-        position: { lat: 39.739235, lng: -104.99025 }
-        },
-        {
-        id: 3,
-        name: "Los Angeles, California",
-        position: { lat: 34.052235, lng: -118.243683 }
-        },
-        {
-        id: 4,
-        name: "New York, New York",
-        position: { lat: 40.712776, lng: -74.005974 }
-        }
-    ];
+const CustomAPIMap = ({markers}) => {
     const initConfigMap = {
         bounds: '',
-        zoom: 5,
+        zoom: 10,
         mapId: 'DMS_MAP_ID'
     } 
     const [mapConfigurations, setMapConfigurations] = useState(initConfigMap)
@@ -56,27 +33,29 @@ const CustomAPIMap = () => {
         }
         handleSetBounds(bounds)
     }
-
     useEffect(() => {
-        setUpBounds()
-    }, [])
-
+        if (markers) {
+            setUpBounds()
+        }
+    }, markers)
     return <>
         <APIProvider 
-            apiKey={process.env.REACT_APP_GOOGLE_MAP_API_KEY}
+            apiKey={'AIzaSyBSCtdFNSPSmLdV7CUfZyVFf8y_lM-lT1Y'}
         >
             <Map 
-                style={{width: '100wh', height: '100vh'}}
+                style={{width: '100%', minHeight: '80vh'}}
                 defaultBounds={bounds}
                 zoom={zoom}
                 mapId={mapId}
                 onZoomChanged={(e) => handleSetZoom(e?.target?.value)}
             >
-                {markers.map(({id, name, position}) => {
+                
+                {markers?.map(({id, name, position, customMarker}) => {
                     return  <CustomMarker 
                         key={id}
                         position={position}
                         content={name}
+                        customMarker={customMarker}
                     />
                 })}
             </Map>
