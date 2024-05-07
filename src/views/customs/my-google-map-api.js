@@ -21,10 +21,10 @@ const CustomAPIMap = ({markers}) => {
         })
     }
     const setUpBounds = async() => {
-        let minLat = Math.min(...markers.map(({position}) => position.lat));
-        let maxLat = Math.max(...markers.map(({position}) => position.lat));
-        let minLng = Math.min(...markers.map(({position}) => position.lng));
-        let maxLng = Math.max(...markers.map(({position}) => position.lng));
+        let minLat = Math.min(...markers.map(({position}) => position?.lat));
+        let maxLat = Math.max(...markers.map(({position}) => position?.lat));
+        let minLng = Math.min(...markers.map(({position}) => position?.lng));
+        let maxLng = Math.max(...markers.map(({position}) => position?.lng));
         let bounds = {
             east: maxLng,
             west: minLng,
@@ -37,10 +37,10 @@ const CustomAPIMap = ({markers}) => {
         if (markers) {
             setUpBounds()
         }
-    }, markers)
+    }, [markers])
     return <>
         <APIProvider 
-            apiKey={'AIzaSyBSCtdFNSPSmLdV7CUfZyVFf8y_lM-lT1Y'}
+            apiKey={process.env.REACT_APP_GOOGLE_MAP_API_KEY}
         >
             <Map 
                 style={{width: '100%', minHeight: '80vh'}}

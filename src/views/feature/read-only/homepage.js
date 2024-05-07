@@ -1,6 +1,6 @@
 import { cilLocationPin, cilMagnifyingGlass, cilReload } from "@coreui/icons"
 import CIcon from "@coreui/icons-react"
-import { CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow, CSpinner, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CModal } from "@coreui/react"
+import { CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow, CSpinner, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CModal, CFormCheck } from "@coreui/react"
 import React, { useEffect, useState } from "react"
 import { getAllDamScheduleBySelectedDate, getAllDamSchedules, getAllDams } from "src/services/dam-services"
 import { convertDateFormat, damStatusConverter, damStatusConverterV2, getDamScheduleBeginAt, getDamScheduleEndAt, getDatetimeFromDB, searchRelatives } from "src/tools"
@@ -63,6 +63,23 @@ const HomePage = () => {
     }
     const [damList, setDamList] = useState(null)
     const [damMarkers, setDamMarkers] = useState(null)
+    const [mapViewMode, setMapViewMode] = useState(1)
+    const [sensorList, setSensorList] = useState(null)
+    const [sensorMarkers, setSensorMarkers] = useState(null)
+    const [commonMarkers, setCommonMarkers] = useState(null)
+    // 1 -> All, 2 -> Just dams, 3 -> Just stations
+    const handleSetMapViewMode = (value) => {
+        if ([1,2,3]?.includes(value)) {
+            setMapViewMode(value)
+            if (value === 1) {
+                setCommonMarkers([...damMarkers, ...sensorMarkers])
+            }else if (value === 2) {
+                setCommonMarkers([...damMarkers])
+            }else {
+                setCommonMarkers([...sensorMarkers])
+            }
+        }
+    }
     const damToMarker = (dam) => {
         let renderDamMarker = <>
             <h4>{dam?.damName}</h4>
@@ -80,8 +97,6 @@ const HomePage = () => {
         }
         return damMarker
     }
-    const [sensorList, setSensorList] = useState(null)
-    const [sensorMarkers, setSensorMarkers] = useState(null)
     const sensorToMarker = (sensor) => {
         let renderMarker = <>
             <h4>{sensor?.ten_thiet_bi}</h4>
@@ -124,23 +139,28 @@ const HomePage = () => {
                 }) 
                 setDamMarkers(dams)
                 setDamMarkers(damMarkersList)
+                station.getStationListByRynanNewVersion()
+                .then(res => {
+                    const sensors = res?.data
+                    let sensorMarkerList = sensors?.map(sensor => {
+                        return sensorToMarker(sensor)
+                    })
+                    setSensorList(sensors)
+                    setSensorMarkers(sensorMarkerList)
+                    
+                    if (damMarkersList && sensorMarkerList) {
+                        setCommonMarkers([...damMarkersList, ...sensorMarkerList])
+                    }
+                })
+                .catch(err => {
+                    // Do nothing
+                })
             }
         }) 
         .catch(err => {
             // Do nothing
         })
-        station.getStationListByRynanNewVersion()
-        .then(res => {
-            const sensors = res?.data
-            let sensorMarkerList = sensors?.map(sensor => {
-                return sensorToMarker(sensor)
-            })
-            setSensorList(sensors)
-            setSensorMarkers(sensorMarkerList)
-        })
-        .catch(err => {
-            // Do nothing
-        })
+        
     }
     const onFilter = (e) => {
         e.preventDefault()
@@ -719,10 +739,25 @@ const HomePage = () => {
                         Vị trí tất cả cống / đập và trạm cảm biến
                     </CCardHeader>
                     <CCardBody>
-                        { damMarkers && sensorMarkers ?  <CustomAPIMap 
-                            markers={[...damMarkers, ...sensorMarkers]}
-                        /> : null}
-
+                        <CRow className="mb-3">
+                            <CCol xs={12} md={12} lg={12} style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center'}}>
+                                <div style={{marginRight: '30px'}}><CFormCheck onChange={() => handleSetMapViewMode(1)} type="radio" name="mapViewCheck" id="mapViewCheck1" label="Tất cả" checked={mapViewMode === 1} /></div>
+                                <div style={{marginRight: '30px'}}><CFormCheck onChange={() => handleSetMapViewMode(2)} type="radio" name="mapViewCheck" id="mapViewCheck2" label="Cống / Đập" checked={mapViewMode === 2}/></div>
+                                <div style={{marginRight: '30px'}}><CFormCheck onChange={() => handleSetMapViewMode(3)} type="radio" name="mapViewCheck" id="mapViewCheck3" label="Trạm cảm biến" checked={mapViewMode === 3}/></div>
+                            </CCol>
+                        </CRow>
+                        <CRow>
+                            <CCol md={12} lg={12}>
+                                {/* { 
+                                    damMarkers && sensorMarkers ? mapViewMode === 1 ? <CustomAPIMap 
+                                        markers={[...damMarkers, ...sensorMarkers]}
+                                    /> : mapViewMode === 2 ? <CustomAPIMap markers={damMarkers} /> : <CustomAPIMap  markers={sensorMarkers}/> : null
+                                } */}
+                                {
+                                    commonMarkers && <CustomAPIMap markers={commonMarkers} />
+                                }
+                            </CCol>
+                        </CRow>
                     </CCardBody>
                 </CCard>
             </CCol>
