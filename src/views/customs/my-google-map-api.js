@@ -40,7 +40,7 @@ const CustomAPIMap = ({markers}) => {
     }, markers)
     return <>
         <APIProvider 
-            apiKey={'AIzaSyBSCtdFNSPSmLdV7CUfZyVFf8y_lM-lT1Y'}
+            apiKey={process.env.REACT_APP_GOOGLE_MAP_API_KEY}
         >
             <Map 
                 style={{width: '100%', minHeight: '80vh'}}
