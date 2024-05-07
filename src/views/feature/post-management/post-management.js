@@ -45,7 +45,7 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic"
 
 const PostManagement = () => {
 
-    const defaultAuthorizationCode = process.env.HG_MODULE_POST_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_post_management"
+    const defaultAuthorizationCode = process.env.REACT_APP_HG_MODULE_POST_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_post_management"
     // Checking feature's module
     const defaultModuleAddFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_post_management_add_post"
     const defaultModuleUpdateFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_post_management_update_post"

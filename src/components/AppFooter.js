@@ -9,7 +9,7 @@ import { createFailIcon, createSuccessIcon } from 'src/views/customs/my-icon'
 import createToast from 'src/views/customs/my-toast'
 
 const AppFooter = () => {
-  const defaultAuthorizationCode = process.env.HG_MODULE_GENERAL_INFORMATION_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_general_information_management"
+  const defaultAuthorizationCode = process.env.REACT_APP_HG_MODULE_GENERAL_INFORMATION_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_general_information_management"
   // Checking feature's module
   const defaultModuleUpdateFooter = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_general_information_management_update_footer_information"
   const [havingUpdateFooter, setHavingUpdateFooter] = useState(false)

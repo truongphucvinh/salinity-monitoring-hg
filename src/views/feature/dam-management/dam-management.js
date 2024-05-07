@@ -46,7 +46,7 @@ import CustomAuthChecker from "src/views/customs/my-authchecker"
 import CustomIntroduction from "src/views/customs/my-introduction"
 
 const DamManagement = () => {
-    const defaultAuthorizationCode = process.env.HG_MODULE_DAM_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management"
+    const defaultAuthorizationCode = process.env.REACT_APP_HG_MODULE_DAM_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management"
     const defaultModuleAddFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management_add_dam"
     const defaultModuleUpdateFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management_update_dam"
     const defaultModuleDeleteFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management_delete_dam"

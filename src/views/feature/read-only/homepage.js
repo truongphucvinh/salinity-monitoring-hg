@@ -2,8 +2,8 @@ import { cilLocationPin, cilMagnifyingGlass, cilReload } from "@coreui/icons"
 import CIcon from "@coreui/icons-react"
 import { CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow, CSpinner, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CModal } from "@coreui/react"
 import React, { useEffect, useState } from "react"
-import { getAllDamScheduleBySelectedDate, getAllDamSchedules } from "src/services/dam-services"
-import { damStatusConverter, damStatusConverterV2, getDamScheduleBeginAt, getDamScheduleEndAt, searchRelatives } from "src/tools"
+import { getAllDamScheduleBySelectedDate, getAllDamSchedules, getAllDams } from "src/services/dam-services"
+import { convertDateFormat, damStatusConverter, damStatusConverterV2, getDamScheduleBeginAt, getDamScheduleEndAt, getDatetimeFromDB, searchRelatives } from "src/tools"
 import CustomDateTimePicker from "src/views/customs/my-datetimepicker/my-datetimepicker"
 import CustomIntroduction from "src/views/customs/my-introduction"
 import CustomModal from "src/views/customs/my-modal"
@@ -13,12 +13,13 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faXmark, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
 import './homepage.scss';
+import damMarker from "../../../icons/dam.png"
 
 //service 
 import station from "src/services/station"
 import observation from "src/services/observation"
 import newsService from "src/services/news-service"
-import News from "./newspage/newspage"
+import CustomAPIMap from "src/views/customs/my-google-map-api"
 
 const HomePage = () => {
     const defaultPageCode="U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_homepage"
@@ -60,6 +61,42 @@ const HomePage = () => {
             return {...prev, pickedDate: value}
         })
     }
+    const [damList, setDamList] = useState(null)
+    const [damMarkers, setDamMarkers] = useState(null)
+    const damToMarker = (dam) => {
+        let renderDamMarker = <>
+            <h4>{dam?.damName}</h4>
+            <div>{dam?.damRiver?.riverName}</div>
+            <div>Trạng thái: <strong>{damStatusConverterV2(dam?.damCurrentStatus)?.status}</strong></div>
+            <div>Ngày xây dựng: <strong>{getDatetimeFromDB(dam?.damConstructedAt)}</strong></div>
+            <div>Chiều dài: <strong>{dam?.damHeight}</strong> mét</div>
+            <div>Chiều rộng: <strong>{dam?.damCapacity}</strong> mét</div>
+        </>
+        let damMarker = {
+            id: dam?.damId,
+            name: renderDamMarker,
+            position: {lat: dam?.damLatitude, lng: dam?.damLongitude},
+            customMarker: "dam"
+        }
+        return damMarker
+    }
+    const [sensorList, setSensorList] = useState(null)
+    const [sensorMarkers, setSensorMarkers] = useState(null)
+    const sensorToMarker = (sensor) => {
+        let renderMarker = <>
+            <h4>{sensor?.ten_thiet_bi}</h4>
+            <div>{sensor?.khu_vuc_lap_dat}</div>
+            <div>Trạng thái: <strong>{sensor?.trang_thai === 1 ? 'THỰC THI' : 'TẠM DỪNG'}</strong></div>
+            <div>Ngày lặp đặt: <strong>{convertDateFormat(sensor?.ngay_lap_dat)}</strong></div>
+        </>
+        let marker = {
+            id: sensor?.ma_thiet_bi,
+            name: renderMarker,
+            position: {lat: sensor?.vi_do, lng: sensor?.kinh_do},
+            customMarker: ".station"
+        }
+        return marker
+    }
     const rebaseAllData = () => {
         let currentDate = new Date()
         if (!pickedDate) {
@@ -75,6 +112,33 @@ const HomePage = () => {
             handleIsLoadedDams(true)
         })
         .catch((err) => {
+            // Do nothing
+        })
+        getAllDams()
+        .then(res => {
+            const dams = res?.data
+            if (dams) {
+                setDamList(dams)
+                let damMarkersList = dams?.map(dam => {
+                    return damToMarker(dam)
+                }) 
+                setDamMarkers(dams)
+                setDamMarkers(damMarkersList)
+            }
+        }) 
+        .catch(err => {
+            // Do nothing
+        })
+        station.getStationListByRynanNewVersion()
+        .then(res => {
+            const sensors = res?.data
+            let sensorMarkerList = sensors?.map(sensor => {
+                return sensorToMarker(sensor)
+            })
+            setSensorList(sensors)
+            setSensorMarkers(sensorMarkerList)
+        })
+        .catch(err => {
             // Do nothing
         })
     }
@@ -647,8 +711,25 @@ const HomePage = () => {
         <CustomIntroduction 
             pageCode={defaultPageCode}
         />
+
         <CRow>
-            <CCol xs>
+            <CCol xs={12}>
+                <CCard className="mb-4">
+                    <CCardHeader>
+                        Vị trí tất cả cống / đập và trạm cảm biến
+                    </CCardHeader>
+                    <CCardBody>
+                        { damMarkers && sensorMarkers ?  <CustomAPIMap 
+                            markers={[...damMarkers, ...sensorMarkers]}
+                        /> : null}
+
+                    </CCardBody>
+                </CCard>
+            </CCol>
+        </CRow>
+
+        <CRow>
+            <CCol xs={12}>
                 <CCard className="mb-4">
                     <CCardHeader>
                         Lịch mở cống / đập
@@ -666,6 +747,8 @@ const HomePage = () => {
                 </CCard>
             </CCol>
         </CRow>
+
+
 
         {/* SENSOR STATION */}
         <CRow>

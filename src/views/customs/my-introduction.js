@@ -3,15 +3,15 @@ import CIcon from "@coreui/icons-react"
 import { CButton, CCol, CForm, CFormInput, CRow, CSpinner, CToaster } from "@coreui/react"
 import React, { useEffect, useRef, useState } from "react"
 import CustomAuthorizationCheckerChildren from "./my-authorizationchecker-children"
-import { getAllProjects, updatePageById } from "src/services/general-services"
-import { getSpecificGeneralInformation } from "src/tools"
+import { createPage, getAllProjects, updatePageById } from "src/services/general-services"
+import { getProjectByCode, getSpecificGeneralInformation } from "src/tools"
 import CustomModal from "./my-modal"
 import createToast from "./my-toast"
 import { createFailIcon, createSuccessIcon } from "./my-icon"
 
 const CustomIntroduction = ({title,content,pageCode}) => {
     const defaultProjectCode = process.env.HG_GENERAL_PROJECT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_project"
-    const defaultAuthorizationCode = process.env.HG_MODULE_GENERAL_INFORMATION_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_general_information_management"
+    const defaultAuthorizationCode = process.env.REACT_APP_HG_MODULE_GENERAL_INFORMATION_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_general_information_management"
     // Checking feature's module
     const defaultModuleUpdateHeader = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_general_information_management_update_header_information"
     const [havingUpdateHeader, setHavingUpdateHeader] = useState(false)
@@ -21,6 +21,28 @@ const CustomIntroduction = ({title,content,pageCode}) => {
         pageId: "",
         pageHeaderTitle: "",
         pageHeaderBody: ""
+    }
+    const addPageData = {
+        addPageHeaderTitle: '',
+        addPageHeaderBody: '',
+        addPageProjectId: ''
+    }
+    const [addPageState, setAddPageState] = useState(addPageData)
+    const {addPageHeaderTitle, addPageHeaderBody, addPageProjectId} = addPageState
+    const handleSetAddProjectId = (value) => {
+        setAddPageState((prev) => {
+            return {...prev, addPageProjectId: value}
+        })
+    }
+    const handleSetAddPageTitle = (value) => {
+        setAddPageState((prev) => {
+            return {...prev, addPageHeaderTitle: value}
+        })
+    }
+    const handleSetAddPageBody = (value) => {
+        setAddPageState((prev) => {
+            return {...prev, addPageHeaderBody: value}
+        })
     }
     const [updatePageState, setUpdatePageState] = useState(updatePageData)
     const {pageId, pageHeaderTitle, pageHeaderBody} = updatePageState
@@ -49,6 +71,10 @@ const CustomIntroduction = ({title,content,pageCode}) => {
                     setPage(pageObj?.page)
                 }
             }
+            const projectObj = getProjectByCode(projectCode, res?.data)
+            if (projectObj) {
+                handleSetAddProjectId(projectObj?.projectId)
+            }
         })
         .catch(err => {
             // Do nothing
@@ -58,7 +84,9 @@ const CustomIntroduction = ({title,content,pageCode}) => {
     const [updateHeaderVisible, setUpdateHeaderVisible] = useState(false)
     const openUpdateHeaderModal = () => {
         setUpdateHeaderVisible(true)
-        setUpdatePageState(page)
+        if (page) {
+            setUpdatePageState(page)    
+        }
         setUpdateFormValidate(false)
     }
     
@@ -68,17 +96,46 @@ const CustomIntroduction = ({title,content,pageCode}) => {
         if (form.checkValidity() === false) {
             e.stopPropagation()
         }else {
-            if (updatePageState) {
-                let updateData = {
-                    pageId: pageId
+            if (page) {
+                if (updatePageState) {
+                    let updateData = {
+                        pageId: pageId
+                    }
+                    if (pageHeaderTitle) {
+                        updateData["pageHeaderTitle"] = pageHeaderTitle?.trim()
+                    }
+                    if (pageHeaderBody) {
+                        updateData["pageHeaderBody"] = pageHeaderBody?.trim()
+                    }
+                    updatePageById(updateData)
+                    .then(res => {
+                        getProjectInformation(defaultProjectCode, pageCode)
+                        setUpdateHeaderVisible(false)
+                        addToast(createToast({
+                            title: 'Cập nhật tiêu đề',
+                            content: 'Cập nhật tiêu đề thành công !',
+                            icon: createSuccessIcon()
+                        }))
+                    })
+                    .catch(err => {
+                        // Do nothing
+                        addToast(createToast({
+                            title: 'Cập nhật tiêu đề',
+                            content: 'Cập nhật tiêu đề không thành công !',
+                            icon: createFailIcon()
+                        }))
+                    })
                 }
-                if (pageHeaderTitle) {
-                    updateData["pageHeaderTitle"] = pageHeaderTitle?.trim()
+            } else {
+                let addPage = {
+                    pageName: "Quản lý bài viết",
+                    pageCode: pageCode,
+                    pageProjectId: addPageProjectId,
+                    pageHeaderTitle: addPageHeaderTitle,
+                    pageHeaderBody: addPageHeaderBody
                 }
-                if (pageHeaderBody) {
-                    updateData["pageHeaderBody"] = pageHeaderBody?.trim()
-                }
-                updatePageById(updateData)
+                console.log(addPage);
+                createPage(addPage)
                 .then(res => {
                     getProjectInformation(defaultProjectCode, pageCode)
                     setUpdateHeaderVisible(false)
@@ -97,6 +154,7 @@ const CustomIntroduction = ({title,content,pageCode}) => {
                     }))
                 })
             }
+
         }
         setUpdateFormValidate(true)
     }
@@ -142,7 +200,45 @@ const CustomIntroduction = ({title,content,pageCode}) => {
                             <CButton type="submit" className="mt-4" color="primary">Xác nhận</CButton>
                         </CCol>
                     </CRow>
-                </CForm> : <CSpinner />
+                </CForm> : <CForm 
+                    onSubmit={e => updateHeaderPage(e)} 
+                    noValidate
+                    validated={updateFormValidate}
+                >
+                    <CRow>
+                        <CCol lg={12}>
+                            <CFormInput
+                                className="mt-4"
+                                type="text"
+                                required
+                                placeholder="Tiêu đề trang Web"
+                                feedbackInvalid="Chưa nhập tiêu đề!"
+                                onChange={(e) => handleSetAddPageTitle(e.target.value)}
+                                value={addPageHeaderTitle}
+                                aria-describedby="exampleFormControlInputHelpInline"
+                            />
+                        </CCol>
+                    </CRow>
+                    <CRow>
+                        <CCol lg={12}>
+                            <CFormInput
+                                className="mt-4"
+                                type="text"
+                                required
+                                placeholder="Mô tả tiêu đề trang Web"
+                                feedbackInvalid="Chưa nhập mô tả!"
+                                onChange={(e) => handleSetAddPageBody(e.target.value)}
+                                value={addPageHeaderBody}
+                                aria-describedby="exampleFormControlInputHelpInline"
+                            />
+                        </CCol>
+                    </CRow>
+                    <CRow>
+                        <CCol lg={12} className="d-flex justify-content-end">
+                            <CButton type="submit" className="mt-4" color="primary">Xác nhận</CButton>
+                        </CCol>
+                    </CRow>
+                </CForm>
             }
         </>)
     }
@@ -163,7 +259,7 @@ const CustomIntroduction = ({title,content,pageCode}) => {
         </CRow>
         {
             havingUpdateHeader && <CRow>
-                <CCol sx>
+                <CCol sx={12}>
                     <div className="d-flex justify-content-center mb-4">
                         <CButton className="btn btn-primary" onClick={openUpdateHeaderModal}>
                             <CIcon icon={cilPencil} className="me-2"/>
