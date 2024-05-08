@@ -864,6 +864,8 @@ const DamManagement = () => {
     return (<>
         <CustomIntroduction 
             pageCode={defaultPageCode}
+            title="QUẢN LÝ CỐNG / ĐẬP"
+            content="Hỗ trợ quản lý các thông tin chung về hệ thống cống / đập trực thuộc tỉnh Hậu Giang"
         />
             <CRow>
         {/* Checking the authentication here */}

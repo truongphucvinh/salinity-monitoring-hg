@@ -762,6 +762,8 @@ const UserManagement = () => {
         <>
         <CustomIntroduction 
             pageCode={defaultPageCode}
+            title="QUẢN LÝ TÀI KHOẢN NGƯỜI DÙNG"
+            content="Hỗ trợ quản lý thông tin tài khoản người dùng, cung cấp tài khoản"
         />
         <CRow>
             <CustomAuthChecker />

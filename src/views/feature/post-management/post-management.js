@@ -661,6 +661,8 @@ const PostManagement = () => {
         <>
         <CustomIntroduction 
             pageCode={defaultPageCode}
+            title="QUẢN LÝ BÀI VIẾT"
+            content="Hỗ trợ người dùng đăng tải và thao tác với các tin tức mới"
         />
         <CRow>
         <CustomAuthChecker />

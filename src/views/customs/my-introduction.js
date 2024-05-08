@@ -9,13 +9,14 @@ import CustomModal from "./my-modal"
 import createToast from "./my-toast"
 import { createFailIcon, createSuccessIcon } from "./my-icon"
 
-const CustomIntroduction = ({title,content,pageCode}) => {
+const CustomIntroduction = ({title = "Tiêu đề",content = "Lời giới thiệu", pageCode}) => {
     const defaultProjectCode = process.env.HG_GENERAL_PROJECT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_project"
     const defaultAuthorizationCode = process.env.REACT_APP_HG_MODULE_GENERAL_INFORMATION_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_general_information_management"
     // Checking feature's module
     const defaultModuleUpdateHeader = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_general_information_management_update_header_information"
     const [havingUpdateHeader, setHavingUpdateHeader] = useState(false)
     const [page, setPage] = useState(null)
+    const [isApiWorked, setIsApiWorked] = useState(true)
     // State + Handlers to update
     const updatePageData = {
         pageId: "",
@@ -69,6 +70,7 @@ const CustomIntroduction = ({title,content,pageCode}) => {
             if (pageObj) {
                 if (pageObj?.status === true) {
                     setPage(pageObj?.page)
+                    setIsApiWorked(true)
                 }
             }
             const projectObj = getProjectByCode(projectCode, res?.data)
@@ -78,6 +80,7 @@ const CustomIntroduction = ({title,content,pageCode}) => {
         })
         .catch(err => {
             // Do nothing
+            setIsApiWorked(false)
         })
     }
     // Modal to update header of page
@@ -247,30 +250,40 @@ const CustomIntroduction = ({title,content,pageCode}) => {
     }, [])
     const [toast, addToast] = useState(0)
     const toaster = useRef()
-    return (<>
-        <CToaster ref={toaster} push={toast} placement="top-end" />
-        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateHeader} setExternalState={setHavingUpdateHeader}/>
-        <CustomModal visible={updateHeaderVisible} title={'Cập nhật tiêu đề'} body={updateHeaderForm(page)} setVisible={(value) => setUpdateHeaderVisible(value)}/>
-        <CRow>
-            <CCol xs>
-                <p className="text-center fs-2 fw-bold">{page && page?.pageHeaderTitle}</p>
-                <p className="text-center fs-5">{page && page?.pageHeaderBody}</p>
-            </CCol>
-        </CRow>
-        {
-            havingUpdateHeader && <CRow>
-                <CCol sx={12}>
-                    <div className="d-flex justify-content-center mb-4">
-                        <CButton className="btn btn-primary" onClick={openUpdateHeaderModal}>
-                            <CIcon icon={cilPencil} className="me-2"/>
-                            Cập nhật
-                        </CButton>
-                    </div>
-                </CCol>
-            </CRow>
-        }
-
-    </>)
+    return (
+        <>
+            {isApiWorked ? <>
+                <CToaster ref={toaster} push={toast} placement="top-end" />
+                <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateHeader} setExternalState={setHavingUpdateHeader}/>
+                <CustomModal visible={updateHeaderVisible} title={'Cập nhật tiêu đề'} body={updateHeaderForm(page)} setVisible={(value) => setUpdateHeaderVisible(value)}/>
+                <CRow>
+                    <CCol xs>
+                        <p className="text-center fs-2 fw-bold">{page ? page?.pageHeaderTitle : title}</p>
+                        <p className="text-center fs-5">{page ? page?.pageHeaderBody : content}</p>
+                    </CCol>
+                </CRow>
+                {
+                    havingUpdateHeader && <CRow>
+                        <CCol sx={12}>
+                            <div className="d-flex justify-content-center mb-4">
+                                <CButton className="btn btn-primary" onClick={openUpdateHeaderModal}>
+                                    <CIcon icon={cilPencil} className="me-2"/>
+                                    Cập nhật
+                                </CButton>
+                            </div>
+                        </CCol>
+                    </CRow>
+                }
+            </> : <>
+                <CRow>
+                    <CCol xs>
+                        <p className="text-center fs-2 fw-bold">{title}</p>
+                        <p className="text-center fs-5">{content}</p>
+                    </CCol>
+                </CRow>
+            </>}
+        </>
+    )
 }
 
 export default CustomIntroduction

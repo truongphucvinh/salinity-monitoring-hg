@@ -231,3 +231,20 @@ REACT_APP_HG_GENERAL_PROJECT=
 # Default Cascade defender values
 REACT_APP_HG_CODE=
 ```
+
+
+# Google Maps Pricing and Usage
+
+https://developers.google.com/maps/billing-and-pricing/pricing?hl=en&_gl=1*1dsnd7v*_ga*MTMzMjYwNDIzNC4xNzE0ODY4Nzgw*_ga_NRWSTWS78N*MTcxNTA5NjMyMC41LjEuMTcxNTA5NjM4OS4wLjAuMA..#mobile-dynamic
+
+https://mapsplatform.google.com/pricing/
+
+https://developers.google.com/maps/documentation/javascript/usage-and-billing
+
+
+Helpdesk:
+https://developers.google.com/maps/support#creating-a-support-case
+
+Your account has been detected within a prohibited territory (Google Policy):
+
+https://console.cloud.google.com/google/maps-apis/support/createcase?_gl=1*1t0vr5o*_ga*MTMzMjYwNDIzNC4xNzE0ODY4Nzgw*_ga_NRWSTWS78N*MTcxNTEzMzEzNy42LjEuMTcxNTEzNjY0Ni4wLjAuMA..&project=dms-myi-hg

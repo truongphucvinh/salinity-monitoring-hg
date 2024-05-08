@@ -83,6 +83,8 @@ const DamDetail = () => {
         <>
             <CustomIntroduction 
                 pageCode={defaultPageCode}
+                title="THÔNG TIN CỐNG / ĐẬP CHI TIẾT"
+                content="Hỗ trợ theo dõi và thao tác các thông tin cống / đập chi tiết"
             />
             {
                 isLoaded && isLoadedDamSchedules ?
