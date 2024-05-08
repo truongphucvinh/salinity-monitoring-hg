@@ -46,26 +46,6 @@ ChartJS.register(
   Legend
 );
 
-
-
-// function zones(colors) {
-//   return [{
-//     value: 1707294600000,
-//     dashStyle: 'dot',
-//     color: colors[0],
-//     // fillColor: '#7cb5ec'
-//   }, {
-//     value: 1706776200000,
-//     dashStyle: 'solid',
-//     color: colors[1]
-//   }]
-// }
-
-// const colors = [
-//   ['#7cb5ec', '#FFA262', '#7cb5ec'],
-//   ['#7cb5ec', '#8bbc21', '#7cb5ec']
-// ]
-  
 // Load Highcharts modules
 require("highcharts/modules/exporting")(Highcharts);
 
@@ -103,25 +83,26 @@ const StationDetail = () => {
     const [visibleDownloadCard, setVisibleDownloadCard] = useState();
 
     //filter
-    const [selectedDateRangeSort, setSelectedDateRangeSort] = useState({from: '', to: ''});
-
+    const [selectedDateRangeSort, setSelectedDateRangeSort] = useState({from: '', to: ''}); // value of data range input to show chart and table
     const [sensorListRynan, setSensorListRynan] = useState([]);
     const [selectingSensorRynan, setSelectingSensorRynan] = useState(""); //sensor name
     const [viewMode, setViewMode] = useState("chart"); //mode name: table, chart, etc
     const [latestSensorValue, setLatestSensorValue] = useState([]); //latest value of sensors array
-    const [sensorValueList, setSensorValueList] = useState([]); //all value for all sensor, backup
     const [sensorValueListSort, setSensorValueListSort] = useState([]); //table in screen
-    const [sensorValueListForDownloading, setSensorValueListForDownloading] = useState();
     const [isLoadingSensorList, setIsLoadingSensorList] = useState(false);
     const [stationInfo, setStationInfo] = useState();
-    const [dataStation, setDataStation] = useState({})
+    const [dataStation, setDataStation] = useState({});
 
-    const [pointArray, setPointArray] = useState([]); // mang data trong dataSation  
+    const [periodFromStartDate, setPeriodFromStartDate] = useState(0); // du lieu hien thi trong bao nhieu ngay ke tu ngay bat dau (tuy chon), su dungj trong select option
+    const [firstLoad, setFirstLoad] = useState(true);
 
-    //auto reload 
-    // setInterval(() => {
-    //   setReload(!reload);
-    // }, 5000)
+    // auto reload 
+    setInterval(() => {
+      var date = new Date();
+      if((date.getMinutes()/15 - Math.floor(date.getMinutes()/15) == 0)) {
+        setReload(!reload);
+      }
+    }, 60*1000)
 
     //lay thong tin tram
     useEffect(() => {
@@ -138,78 +119,75 @@ const StationDetail = () => {
         .catch((error) => {
           setError(true);
         })
+
+
+      var currentDate = new Date();
+      //min, max attribute for input
+      dateRange.startDate = "2024-04-15";
+      var currentDateStr = `${currentDate.getFullYear()}-${addZero(currentDate.getMonth()+1)}-${addZero(currentDate.getDate())}`;
+      dateRange.endDate = currentDateStr;
+
+      selectedDateRangeSort.from = currentDateStr;
+      selectedDateRangeSort.to = currentDateStr;
+
     }, [])
 
     const [reload, setReload] = useState(false);
 
-
     const [responseDataStationRynan, setResponseDataStationRynan] = useState([]);
 
     useEffect(() => {
-      console.log("test date range sort use effect: ", selectedDateRangeSort);
       setIsLoadingSensorList(true);
-
-      var currentDate = new Date();
-      var previousDate = new Date();
-      previousDate.setDate(currentDate.getDate() - 7); // lay du lieu 7 ngay gan nhat-
-
-      //min, max
-      dateRange.startDate = "2024-04-15";
-      dateRange.endDate = `${currentDate.getFullYear()}-${addZero(currentDate.getMonth()+1)}-${addZero(currentDate.getDate())}`;
-
-      var startDate, endDate;
-      // khi reloa van giu data range truoc do
-      console.log("dat: ", !selectedDateRangeSort.from=='')
-      if(!selectedDateRangeSort.from=='') {
-        console.log("abccccc:");
-        currentDate = new Date(selectedDateRangeSort.to);
-        previousDate = new Date(selectedDateRangeSort.from);
-      }
-      endDate = `${currentDate.getFullYear()}/${addZero(currentDate.getMonth()+1)}/${addZero(currentDate.getDate())}`;
-      startDate = `${previousDate.getFullYear()}/${addZero(previousDate.getMonth()+1)}/${addZero(previousDate.getDate())}`;
-      console.log("startdate, enddate: ", startDate, endDate);
-
-      selectedDateRange.to = endDate.replaceAll("/", "-");
-      selectedDateRange.from = startDate.replaceAll("/", "-");
-      selectedDateRangeSort.to = endDate.replaceAll("/", "-");
-      selectedDateRangeSort.from = startDate.replaceAll("/", "-");
-      // setSelectedDateRangeSort({from: startDate.replaceAll("/", "-"), to: endDate.replaceAll("/", "-")});
       
+      var startDate, endDate;
+      endDate = new Date();
+      startDate = new Date(selectedDateRangeSort.from); // get startDate
+      endDate.setTime(startDate.getTime() + (24*60*60*1000*Number(periodFromStartDate))); // calculate endDate
 
-      observation.getDataStation(id, startDate, endDate, 1, 100000000) //1000?
+      // if endDate exceed current date, reset periodFromStartDate
+      var exceedNow = (endDate.getTime() - new Date().getTime())/(24*60*60*1000);
+      if(exceedNow > 0) {
+        endDate = new Date();
+        setPeriodFromStartDate(Math.floor(handleCaculateDatePeriod(startDate, endDate)));
+      }
+
+      // format startdate, endDate for calling api
+      endDate = `${endDate.getFullYear()}/${addZero(endDate.getMonth()+1)}/${addZero(endDate.getDate())}`;
+      selectedDateRangeSort.to = endDate;
+      endDate = selectedDateRangeSort.to.replaceAll("-", "/");
+      startDate = selectedDateRangeSort.from.replaceAll("-", "/");
+
+      observation.getDataStation(id, startDate, endDate, 1, 10000)
         .then((res) => {
+          console.log("res: ", res);
           setResponseDataStationRynan(res);
-          console.log("responess data station", res);
-
-          setSensorValueListForDownloading([...res.data]);
 
           //sort/reverse
-          var reverseSensorValueList = [...res.data];
-          setSensorValueList(reverseSensorValueList.reverse());
-          setSensorValueListSort([...sensorValueList]);
+          setSensorValueListSort([...res.data].reverse());
 
           // get sensor list
           var sensorList = [];
           var ltsValue = [];
+          console.log("firstLoad: ", firstLoad);
           for(const sensor in res.data[0]) {
             if(sensor !== "trang_thai" && !isNaN(res.data[0][sensor]) && res.data[0][sensor] !== null) {
               sensorList.push(sensor);
               setSensorListRynan(sensorList);
 
               //get latest value for all sensor
-              let ltsValue1Sensor = {sensorName: '', sensorValue: 0, time: ''};
-              ltsValue1Sensor.sensorName = sensor;
-              ltsValue1Sensor.sensorValue = res.data[res.data.length-1][sensor];
-              var ltsDate = new Date(res.data[res.data.length-1].ngay_gui);
-              ltsValue1Sensor.time = addZero(ltsDate.getHours()) + ":" + addZero(ltsDate.getMinutes()) + ":" + addZero(ltsDate.getSeconds()) + ", " + addZero(ltsDate.getDate()) + '/' + addZero(ltsDate.getMonth()+1) + "/" + ltsDate.getFullYear();
-              ltsValue.push(ltsValue1Sensor);
-              setLatestSensorValue(ltsValue);
+              if(firstLoad) {
+                let ltsValue1Sensor = {sensorName: '', sensorValue: 0, time: ''};
+                ltsValue1Sensor.sensorName = sensor;
+                ltsValue1Sensor.sensorValue = res.data[res.data.length-1][sensor];
+                var ltsDate = new Date(res.data[res.data.length-1].ngay_gui);
+                ltsValue1Sensor.time = addZero(ltsDate.getHours()) + ":" + addZero(ltsDate.getMinutes()) + ":" + addZero(ltsDate.getSeconds()) + ", " + addZero(ltsDate.getDate()) + '/' + addZero(ltsDate.getMonth()+1) + "/" + ltsDate.getFullYear();
+                ltsValue.push(ltsValue1Sensor);
+                setLatestSensorValue(ltsValue);
+              }
             }
           }
-
-          handleSetDataStaion();
           var pointArray = [];
-          res?.data.forEach((multi, index) => {
+          res?.data.forEach((multi) => {
             var point = {
               x: new Date(multi.ngay_gui).getTime(),
               y: Number(selectingSensorRynan === "" ? multi[sensorList[0]] : multi[selectingSensorRynan]),
@@ -220,7 +198,6 @@ const StationDetail = () => {
               setSelectingSensorRynan(sensorList[0]);
             }
           })
-          setPointArray(pointArray);
           return pointArray;
         })
         .then((res) => {
@@ -250,18 +227,17 @@ const StationDetail = () => {
                   symbol: "circle",
                   radius: 2,
                   enabled: true
-                },
-                // zones: [{value: 3}, {value: 5, color: 'red'}]
-                // zones: zones(colors[0])
+                }
               }]
             }
           )
           setIsLoadingSensorList(false);
+          setFirstLoad(false);
         })
         .catch((error) => {
           setError(true);
         })
-    }, [reload, selectedDateRangeSort]) //selectingSensorRynan,    
+    }, [reload, selectedDateRangeSort, periodFromStartDate]) //selectingSensorRynan,    
 
     const handleChangeSensorViewRynan = async (sensorName, index) => {
       setActiveKey(index);
@@ -277,12 +253,12 @@ const StationDetail = () => {
       responseDataStationRynan.data?.forEach((multi, index) => {
         var point = {
           x: new Date(multi.ngay_gui).getTime(),
-          y: Number(selectingSensorRynan === "" ? multi[sensorList[0]] : multi[selectingSensorRynan]),
+          y: Number(selectingSensorRynan === "" ? multi[sensorListRynan[0]] : multi[selectingSensorRynan]),
           color: '#1a2848'
         }
         pointArray.push(point);
         if(selectingSensorRynan === "") {
-          setSelectingSensorRynan(sensorList[0]);
+          setSelectingSensorRynan(sensorListRynan[0]);
         }
 
         //dateRage
@@ -290,15 +266,6 @@ const StationDetail = () => {
         if(index===0 || index===responseDataStationRynan?.data.length-1) { // start point or end point
           dateTime = new Date(point.x);
           strDate = `${dateTime.getFullYear()}-${addZero(dateTime.getMonth()+1)}-${addZero(dateTime.getDate())}`;
-          // if(index === 0) {
-          //   dateRange.startDate = strDate;
-          //   selectedDateRange.from = dateRange.startDate;
-          //   selectedDateRangeSort.from = dateRange.startDate;
-          // } else {
-          //   dateRange.endDate = strDate;
-          //   selectedDateRange.to = dateRange.endDate;
-          //   selectedDateRangeSort.to = dateRange.endDate;
-          // }
         }
       })
       console.log("point array: ", pointArray);
@@ -328,9 +295,7 @@ const StationDetail = () => {
               symbol: "circle",
               radius: 2,
               enabled: true
-            },
-            // zones: [{value: 3}, {value: 5, color: 'red'}]
-            // zones: zones(colors[0])
+            }
           }]
         }
       )
@@ -371,6 +336,7 @@ const StationDetail = () => {
     //export excel
     const [selectedSensorForDownloading, setSelectedSensorForDownloading] = useState([]);
     
+    // choose sensor type for downloading
     const handleChangeSelectedSensorForDownloading = (e) => {
       if (e.target.checked) {
         setSelectedSensorForDownloading([...selectedSensorForDownloading, e.target.value]);
@@ -381,12 +347,12 @@ const StationDetail = () => {
       console.log("dateRange: ", dateRange);
     }
 
+
+    // select date range for downloading
     const handleSelectedDateRange = (e) => {
-      console.log("sensorValueListAfterFilter: ", sensorValueListAfterFilter);
       if(e.target.name==="from") { //from thay doi
         if(new Date(e.target.value) <= new Date(selectedDateRange.to)) { //ok
           setSelectedDateRange({...selectedDateRange, from: e.target.value})
-          console.log("abc: ", selectedDateRange);
         }
       }
       else {
@@ -396,69 +362,71 @@ const StationDetail = () => {
       }
     }
 
-    var sensorValueListAfterFilter;
+    // select "date from" input to show value in chart, table
     const handleSelectedDateRangeSort = async (e) => {
-      if(e.target.name==="from") { //from thay doi
-        console.log("test date range: ", handleCaculateDatePeriod(new Date(e.target.value), new Date(selectedDateRangeSort.to)), "   ", handleCaculateDatePeriod(new Date(selectedDateRangeSort.to), new Date(e.target.value)));
-        if((new Date(e.target.value) <= new Date(selectedDateRangeSort.to)) && (handleCaculateDatePeriod(new Date(e.target.value), new Date(selectedDateRangeSort.to)) <= 7)) { //ok
-          setSelectedDateRangeSort({ ...selectedDateRangeSort, from: e.target.value });
-        }
-      }
-      else { //to thay doi
-        if((new Date(e.target.value) >= new Date(selectedDateRangeSort.from)) && (handleCaculateDatePeriod(new Date(selectedDateRangeSort.from), new Date(e.target.value)) <= 7)) { //ok
-          setSelectedDateRangeSort({ ...selectedDateRangeSort, to: e.target.value });
-        }
-      }
+      setSelectedDateRangeSort({ ...selectedDateRangeSort, from: e.target.value });
     }
 
-    const handleCaculateDatePeriod = (startDate, endDate) => { //tinh khoang cach giua 2 ngay
-      // console.log("khoang cach giua 2 ngay la: ", (endDate.getTime() - startDate.getTime())/(24*60*60*1000));
+    // calculate period between two dates
+    const handleCaculateDatePeriod = (startDate, endDate) => {
       var period = (endDate.getTime() - startDate.getTime())/(24*60*60*1000);
       return period < 0 ? period*(-1) : period;
     }
 
+    const handleShowDownloadingCard = () => {
+      setVisibleDownloadCard(!visibleDownloadCard);
+      var date = new Date();
+      date = `${date.getFullYear()}-${addZero(date.getMonth()+1)}-${addZero(date.getDate())}`;
+      setSelectedDateRange({from: date, to: date});
+    }
+
+
+    // download excel file
     const handleExportExcel = () => {
       var excelSheet = [];
-      var colSheet = {};
-      colSheet.ngay_gui = '';
-      selectedSensorForDownloading.map((sensor) => {
-        colSheet[sensor] = '';
-        return sensor;
-      })
-      sensorValueListForDownloading.map((item) => {
-        //chuyen ngay trong csdl ve dang chuan utc
-        var sendDate = new Date(item.ngay_gui);
-        item.ngay_gui = `${addZero(sendDate.getHours())}:${addZero(sendDate.getMinutes())}:${addZero(sendDate.getSeconds())}, ${addZero(sendDate.getDate())}/${addZero(sendDate.getMonth()+1)}/${sendDate.getFullYear()}`;
-        var from, to;
-        from = selectedDateRange.from;
-        to = selectedDateRange.to;
-        if((new Date(sendDate).getTime()) >= (new Date(from.substring(0, 4), Number(from.substring(5, 7))-1, from.substring(8, 10), 0, 0, 0, 0).getTime()) 
-          && (new Date(sendDate).getTime()) <= (new Date(to.substring(0, 4), Number(to.substring(5, 7) - 1), to.substring(8, 10), 23, 59, 59, 59).getTime()))  
-        {
-          for(const key in colSheet) {
-            colSheet[key] = item[key];
+      var colSheet = {}; // number of column in excel of number of sensor that are chosen
+      colSheet.ngay_gui = ''; // ngay_gui column
+      var startDate, endDate;
+      // calculate date range for downloading
+      startDate = selectedDateRange.from.replaceAll("-", "/");
+      endDate = selectedDateRange.to.replaceAll("-", "/");
+      observation.getDataStation(id, startDate, endDate, 1, 10000)
+        .then((res) => {
+          selectedSensorForDownloading.map((sensor) => {
+            colSheet[sensor] = '';
+          })
+          var sendDate;
+          res?.data?.forEach((item) => {
+            //chuyen ngay trong csdl ve dang chuan utc
+            sendDate = new Date(item.ngay_gui);
+            item.ngay_gui = `${addZero(sendDate.getHours())}:${addZero(sendDate.getMinutes())}:${addZero(sendDate.getSeconds())}, ${addZero(sendDate.getDate())}/${addZero(sendDate.getMonth()+1)}/${sendDate.getFullYear()}`;
+            for(const key in colSheet) {
+              colSheet[key] = item[key];
+            }
+            excelSheet.push({...colSheet});
+          })
+          return excelSheet;
+        })
+        .then(() => {
+          var wb = XLSX.utils.book_new();
+          var ws = XLSX.utils.json_to_sheet(excelSheet);
+          var currentDate = new Date();
+          var dateStr = `${currentDate.getFullYear()}/${addZero(currentDate.getMonth()+1)}/${addZero(currentDate.getDate())}`;
+          XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+          XLSX.writeFile(wb,  `${stationInfo.ten_thiet_bi}_${dateStr}.xlsx`);
+    
+          //unckeck ckeckbox
+          let inputs = document.querySelectorAll('.ckeckbox-sensor-downloading');
+          for (let i = 0; i < inputs.length; i++) {
+              inputs[i].checked = false;
           }
-          excelSheet.push({...colSheet});
-        }
-        //tra lai dinh dang ban dau
-        item.ngay_gui = sendDate;
-        return item;
-      })
-      var wb = XLSX.utils.book_new();
-      var ws = XLSX.utils.json_to_sheet(excelSheet);
-      var currentDate = new Date();
-      var dateStr = `${currentDate.getFullYear()}/${addZero(currentDate.getMonth()+1)}/${addZero(currentDate.getDate())}`;
-      XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-      XLSX.writeFile(wb,  `${stationInfo.ten_thiet_bi}_${dateStr}.xlsx`);
-
-      //unckeck ckeckbox
-      let inputs = document.querySelectorAll('.ckeckbox-sensor-downloading');
-      for (let i = 0; i < inputs.length; i++) {
-          inputs[i].checked = false;
-      }
-      selectedDateRange.from = dateRange.startDate;
-      selectedDateRange.to = dateRange.endDate;
-      setVisibleDownloadCard(false);
+          selectedDateRange.from = dateRange.startDate;
+          selectedDateRange.to = dateRange.endDate;
+          setVisibleDownloadCard(false);
+        })
+        .catch((error) => {
+          throw error;
+        })
     }
 
     const addZero = (no) => {
@@ -466,14 +434,7 @@ const StationDetail = () => {
     }
 
     const handleSort = () => {
-      console.log("sensor list reverse: ", sensorValueListSort.reverse());
-      var reverseList = [...sensorValueListSort];
-      console.log("reverse: ", reverseList);
-      setSensorValueListSort(reverseList);
-    }
-
-    const handleFilterByPeriod = () => {
-
+      setSensorValueListSort([...sensorValueListSort].reverse());
     }
 
     const generateHeader = () => {
@@ -502,6 +463,10 @@ const StationDetail = () => {
       </>
     }
 
+    const handleChangePeriodSelect = (e) => {
+      setPeriodFromStartDate(e.target.value)
+    }
+
     const generateToolBar = () => {
       return <>
         <CRow>
@@ -518,26 +483,15 @@ const StationDetail = () => {
                   name="from"
                   onChange={handleSelectedDateRangeSort}
                 />
-                {/* <select name="" id="">
-                  <option value="">1 ngày</option>
-                  <option value="">2 ngày</option>
-                  <option value="">3 ngày</option>
-                  <option value="">4 ngày</option>
-                  <option value="">5 ngày</option>
-                  <option value="">6 ngày</option>
-                  <option value="">7 ngày</option>
-                </select> */}
-                <label htmlFor="">đến</label>
-                <input 
-                  type="date" value={selectedDateRangeSort.to} 
-                  min={dateRange.startDate} 
-                  max={dateRange.endDate} 
-                  name="to"
-                  onChange={handleSelectedDateRangeSort}
-                />
-                <div className="station-detail2__body__date-range-sort__search-btn">
-                  Xem
-                </div>
+                <select name="" id="" value={periodFromStartDate} onChange={handleChangePeriodSelect}>
+                  <option value="0">1 ngày</option>
+                  <option value="1">2 ngày</option>
+                  <option value="2">3 ngày</option>
+                  <option value="3">4 ngày</option>
+                  <option value="4">5 ngày</option>
+                  <option value="5">6 ngày</option>
+                  <option value="6">7 ngày</option>
+                </select>
               </div>
             }
           </CCol>
@@ -545,7 +499,7 @@ const StationDetail = () => {
             {
               viewMode === 'table' && 
               <button className="download-btn"
-                onClick={() => {setVisibleDownloadCard(!visibleDownloadCard)}}
+                onClick={() => handleShowDownloadingCard()}
               >
                 <FontAwesomeIcon icon={faCircleDown}/>
                 &nbsp;
