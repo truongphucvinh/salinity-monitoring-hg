@@ -594,6 +594,8 @@ const RiverManagement = () => {
         <>
         <CustomIntroduction 
             pageCode={defaultPageCode}
+            title="QUẢN LÝ SÔNG / KÊNH / RẠCH"
+            content="Hỗ trợ quản lý thông tin về hệ thống sông / kênh / rạch trên địa bàn tỉnh Hậu Giang"
         />
         <CRow>
         <CustomAuthChecker />

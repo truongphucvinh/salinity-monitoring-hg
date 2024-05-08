@@ -6,7 +6,7 @@ const CustomAPIMap = ({markers}) => {
     const initConfigMap = {
         bounds: '',
         zoom: 10,
-        mapId: 'DMS_MAP_ID'
+        mapId: process.env.REACT_APP_GOOGLE_MAP_ID
     } 
     const [mapConfigurations, setMapConfigurations] = useState(initConfigMap)
     const {bounds, zoom, mapId} = mapConfigurations

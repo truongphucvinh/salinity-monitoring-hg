@@ -1,7 +1,7 @@
 import React from "react"
 
 const CustomEmbeddedMap = ({isLoaded, lat, lng, width, height}) => {
-    const apiKey = process.env.REACT_APP_GOOGLE_MAP_API_KEY
+    const apiKey = process.env.REACT_APP_GOOGLE_MAP_EMBED_API_KEY
     const mapMode = "place"
     const getParams = (lat, lng) => {
         return `q=${lat},${lng}`

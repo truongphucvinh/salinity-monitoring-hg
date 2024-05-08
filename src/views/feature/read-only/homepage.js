@@ -88,6 +88,7 @@ const HomePage = () => {
             <div>Ngày xây dựng: <strong>{getDatetimeFromDB(dam?.damConstructedAt)}</strong></div>
             <div>Chiều dài: <strong>{dam?.damHeight}</strong> mét</div>
             <div>Chiều rộng: <strong>{dam?.damCapacity}</strong> mét</div>
+            <div>Địa điểm: <a target="_blank" rel="noopener noreferrer" href={`https://www.google.com/maps/search/?api=1&query=${dam?.damLatitude},${dam?.damLongitude}`}>Xem vị trí</a></div>
         </>
         let damMarker = {
             id: dam?.damId,
@@ -103,6 +104,7 @@ const HomePage = () => {
             <div>{sensor?.khu_vuc_lap_dat}</div>
             <div>Trạng thái: <strong>{sensor?.trang_thai === 1 ? 'THỰC THI' : 'TẠM DỪNG'}</strong></div>
             <div>Ngày lặp đặt: <strong>{convertDateFormat(sensor?.ngay_lap_dat)}</strong></div>
+            <div>Địa điểm: <a target="_blank" rel="noopener noreferrer" href={`https://www.google.com/maps/search/?api=1&query=${sensor?.vi_do},${sensor?.kinh_do}`}>Xem vị trí</a></div>
         </>
         let marker = {
             id: sensor?.ma_thiet_bi,
@@ -730,6 +732,8 @@ const HomePage = () => {
         <>
         <CustomIntroduction 
             pageCode={defaultPageCode}
+            title="HỆ THỐNG GIÁM SÁT ĐỘ MẶN VÀ LỊCH ĐÓNG MỞ CỐNG / ĐẬP"
+            content="Hệ thống hỗ trợ quản lý các thông tin về lịch đóng / mở của hệ thống cống / đập và cảm biến trên địa bàn tỉnh Hậu Giang"
         />
 
         <CRow>

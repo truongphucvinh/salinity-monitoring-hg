@@ -468,6 +468,8 @@ const DamTypeManagement = () => {
         <>
         <CustomIntroduction 
             pageCode={defaultPageCode}
+            title="QUẢN LÝ LOẠI CỐNG / ĐẬP"
+            content="Hỗ trợ quản lý thông tin về các loại hình cống / đập đang được sử dụng tại tỉnh Hậu Giang"
         />
         <CRow>
         <CustomAuthChecker />

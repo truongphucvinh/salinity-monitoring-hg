@@ -834,6 +834,8 @@ const RoleManagement = () => {
         <>
         <CustomIntroduction 
             pageCode={defaultPageCode}
+            title="QUẢN LÝ VAI TRÒ CỦA NGƯỜI DÙNG"
+            content="Hỗ trợ quản lý thông tin về vai trò và quyền hạn của người dung bên trong hệ thống"
         />
         <CRow>
         <CustomAuthChecker />
