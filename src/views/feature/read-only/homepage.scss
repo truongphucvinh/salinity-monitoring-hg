@@ -1,3 +1,14 @@
+.sensor-station-list {
+    &__no, th {
+        text-align: center;
+    }
+    &__table-content {
+        height: 495px;
+        // border: 1px solid red;
+        overflow-y: auto;
+    }
+}
+
 .news-header {
     display: flex;
     justify-content: space-between;
@@ -9,15 +20,20 @@
 }
 .news {
     &__image-list {
-        display: flex;
-        justify-content: space-between;
+        // display: flex;
+        // justify-content: space-between;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        row-gap: 40px;
         &__item {
-            width: calc(100% / 4 - 15px);
+            // width: calc(100% / 4 - 15px);
+            width: 100%;
             cursor: pointer;
             &__image {
                 width: 100%;
                 height: 250px;
-                border: 1px solid red;
+                // border: 1px solid red;
                 img {
                     width: 100%;
                     height: 100%;
@@ -143,6 +159,31 @@
                     color: rgba(0, 0, 0, 0.7);
                 }
             }
+        }
+    }
+}
+
+@media only screen and (max-width: 1400px) {
+    .news {
+        &__image-list {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+}
+
+
+@media only screen and (max-width: 1100px) {
+    .news {
+        &__image-list {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .news {
+        &__image-list {
+            grid-template-columns: repeat(1, 1fr);
         }
     }
 }
