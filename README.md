@@ -177,3 +177,74 @@ CoreUI is an MIT-licensed open source project and is completely free to use. How
 copyright 2023 creativeLabs Łukasz Holeczek.   
 
 Code released under [the MIT license](https://github.com/coreui/coreui-free-react-admin-template/blob/main/LICENSE).
+
+
+## Requirements
+Create .env file
+```bash
+# Configuration
+PORT=3000
+CHOKIDAR_USEPOLLING=true
+
+# Services
+REACT_APP_AUTH_HOST_API_URL=
+REACT_APP_DAM_HOST_API_URL=
+REACT_APP_GENERAL_HOST_API_URL=
+REACT_APP_POST_HOST_API_URL=
+
+# Authentication
+REACT_APP_AUTH_TOKEN=
+REACT_APP_GOOGLE_MAP_API_KEY=
+REACT_APP_PAGINATION_NUMBER=
+
+# Rynan Apis
+REACT_APP_RYNAN_X_API_KEY=
+REACT_APP_RYNAN_PASSWORD=
+REACT_APP_RYNAN_USERNAME=
+
+# Default Pemrission Values
+REACT_APP_HG_DOMAIN_ID=
+REACT_APP_HG_MODULE_CODE=
+REACT_APP_HG_MODULE_ADD_FEATURE=
+REACT_APP_HG_MODULE_UPDATE_FEATURE=
+REACT_APP_HG_MODULE_DELETE_FEATURE=
+REACT_APP_HG_MODULE_VIEW_FEATURE=
+REACT_APP_HG_MODULE_DAM_TYPE_MANAGEMENT=
+REACT_APP_HG_MODULE_DAM_SCHEDULE_MANAGEMENT=
+REACT_APP_HG_MODULE_DAM_MANAGEMENT=
+REACT_APP_HG_MODULE_RIVER_MANAGEMENT=
+REACT_APP_HG_MODULE_USER_MANAGEMENT=
+REACT_APP_HG_MODULE_ROLE_MANAGEMENT=
+REACT_APP_HG_MODULE_GENERAL_INFORMATION_MANAGEMENT=
+REACT_APP_HG_MODULE_POST_MANAGEMENT=
+
+# Default User to recover
+REACT_APP_HG_USER_ID_ADMIN_DEFAULT=
+
+# Default Role to recover users after delete the role
+REACT_APP_HG_ROLE_ID_DEFAULT=
+REACT_APP_HG_ROLE_ID_ADMIN_DEFAULT=
+
+# General information codes
+REACT_APP_HG_GENERAL_PROJECT=
+
+# Default Cascade defender values
+REACT_APP_HG_CODE=
+```
+
+
+# Google Maps Pricing and Usage
+
+https://developers.google.com/maps/billing-and-pricing/pricing?hl=en&_gl=1*1dsnd7v*_ga*MTMzMjYwNDIzNC4xNzE0ODY4Nzgw*_ga_NRWSTWS78N*MTcxNTA5NjMyMC41LjEuMTcxNTA5NjM4OS4wLjAuMA..#mobile-dynamic
+
+https://mapsplatform.google.com/pricing/
+
+https://developers.google.com/maps/documentation/javascript/usage-and-billing
+
+
+Helpdesk:
+https://developers.google.com/maps/support#creating-a-support-case
+
+Your account has been detected within a prohibited territory (Google Policy):
+
+https://console.cloud.google.com/google/maps-apis/support/createcase?_gl=1*1t0vr5o*_ga*MTMzMjYwNDIzNC4xNzE0ODY4Nzgw*_ga_NRWSTWS78N*MTcxNTEzMzEzNy42LjEuMTcxNTEzNjY0Ni4wLjAuMA..&project=dms-myi-hg

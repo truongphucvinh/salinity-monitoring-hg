@@ -95,5 +95,42 @@ export default {
             await this.login();
         }
         return sessionStorage.getItem('isRynanAuthentication');
+    },
+  
+    loginNewVersion: async function() {
+        const username = process.env.REACT_APP_RYNAN_USERNAME
+        const password = process.env.REACT_APP_RYNAN_PASSWORD
+        const xApiKey = process.env.REACT_APP_RYNAN_X_API_KEY
+        try {
+            const response = await axios.post("https://api-mekong.rynangate.com/api/v1/auth", {
+                "user_name" : username,
+                "password" : password
+            }, {
+                headers: {
+                    "x-api-key" : xApiKey
+                }
+            });
+            return response.data;
+        } catch(error) {
+            throw error
+        }
+    }, 
+
+    getStationListByRynanNewVersion: async function() {
+        try {
+            const xApiKey = process.env.REACT_APP_RYNAN_X_API_KEY
+            const responseLogin = await this.loginNewVersion();
+            const response = await axios.get("https://api-mekong.rynangate.com/api/v1/get-list-stations",
+                {
+                    headers: {
+                        "x-access-token" : responseLogin.token,
+                        "x-api-key" : xApiKey
+                    }
+                }
+            );
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
     }
 }

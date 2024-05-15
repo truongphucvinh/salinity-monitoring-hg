@@ -1,9 +1,9 @@
 import { cilLocationPin, cilMagnifyingGlass, cilReload } from "@coreui/icons"
 import CIcon from "@coreui/icons-react"
-import { CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow, CSpinner, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CModal } from "@coreui/react"
+import { CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow, CSpinner, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CModal, CFormCheck } from "@coreui/react"
 import React, { useEffect, useState } from "react"
-import { getAllDamScheduleBySelectedDate, getAllDamSchedules } from "src/services/dam-services"
-import { damStatusConverter, damStatusConverterV2, getDamScheduleBeginAt, getDamScheduleEndAt, searchRelatives } from "src/tools"
+import { getAllDamScheduleBySelectedDate, getAllDamSchedules, getAllDams } from "src/services/dam-services"
+import { convertDateFormat, damStatusConverter, damStatusConverterV2, getDamScheduleBeginAt, getDamScheduleEndAt, getDatetimeFromDB, searchRelatives } from "src/tools"
 import CustomDateTimePicker from "src/views/customs/my-datetimepicker/my-datetimepicker"
 import CustomIntroduction from "src/views/customs/my-introduction"
 import CustomModal from "src/views/customs/my-modal"
@@ -13,12 +13,13 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faXmark, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
 import './homepage.scss';
+import damMarker from "../../../icons/dam.png"
 
 //service 
 import station from "src/services/station"
 import observation from "src/services/observation"
 import newsService from "src/services/news-service"
-import News from "./newspage/newspage"
+import CustomAPIMap from "src/views/customs/my-google-map-api"
 
 const HomePage = () => {
     const defaultPageCode="U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_homepage"
@@ -60,6 +61,59 @@ const HomePage = () => {
             return {...prev, pickedDate: value}
         })
     }
+    const [damList, setDamList] = useState(null)
+    const [damMarkers, setDamMarkers] = useState(null)
+    const [mapViewMode, setMapViewMode] = useState(1)
+    const [sensorList, setSensorList] = useState(null)
+    const [sensorMarkers, setSensorMarkers] = useState(null)
+    const [commonMarkers, setCommonMarkers] = useState(null)
+    // 1 -> All, 2 -> Just dams, 3 -> Just stations
+    const handleSetMapViewMode = (value) => {
+        if ([1,2,3]?.includes(value)) {
+            setMapViewMode(value)
+            if (value === 1) {
+                setCommonMarkers([...damMarkers, ...sensorMarkers])
+            }else if (value === 2) {
+                setCommonMarkers([...damMarkers])
+            }else {
+                setCommonMarkers([...sensorMarkers])
+            }
+        }
+    }
+    const damToMarker = (dam) => {
+        let renderDamMarker = <>
+            <h4>{dam?.damName}</h4>
+            <div>{dam?.damRiver?.riverName}</div>
+            <div>Trạng thái: <strong>{damStatusConverterV2(dam?.damCurrentStatus)?.status}</strong></div>
+            <div>Ngày xây dựng: <strong>{getDatetimeFromDB(dam?.damConstructedAt)}</strong></div>
+            <div>Chiều dài: <strong>{dam?.damHeight}</strong> mét</div>
+            <div>Chiều rộng: <strong>{dam?.damCapacity}</strong> mét</div>
+            <div>Địa điểm: <a target="_blank" rel="noopener noreferrer" href={`https://www.google.com/maps/search/?api=1&query=${dam?.damLatitude},${dam?.damLongitude}`}>Xem vị trí</a></div>
+        </>
+        let damMarker = {
+            id: dam?.damId,
+            name: renderDamMarker,
+            position: {lat: dam?.damLatitude, lng: dam?.damLongitude},
+            customMarker: "dam"
+        }
+        return damMarker
+    }
+    const sensorToMarker = (sensor) => {
+        let renderMarker = <>
+            <h4>{sensor?.ten_thiet_bi}</h4>
+            <div>{sensor?.khu_vuc_lap_dat}</div>
+            <div>Trạng thái: <strong>{sensor?.trang_thai === 1 ? 'THỰC THI' : 'TẠM DỪNG'}</strong></div>
+            <div>Ngày lặp đặt: <strong>{convertDateFormat(sensor?.ngay_lap_dat)}</strong></div>
+            <div>Địa điểm: <a target="_blank" rel="noopener noreferrer" href={`https://www.google.com/maps/search/?api=1&query=${sensor?.vi_do},${sensor?.kinh_do}`}>Xem vị trí</a></div>
+        </>
+        let marker = {
+            id: sensor?.ma_thiet_bi,
+            name: renderMarker,
+            position: {lat: sensor?.vi_do, lng: sensor?.kinh_do},
+            customMarker: ".station"
+        }
+        return marker
+    }
     const rebaseAllData = () => {
         let currentDate = new Date()
         if (!pickedDate) {
@@ -77,6 +131,38 @@ const HomePage = () => {
         .catch((err) => {
             // Do nothing
         })
+        getAllDams()
+        .then(res => {
+            const dams = res?.data
+            if (dams) {
+                setDamList(dams)
+                let damMarkersList = dams?.map(dam => {
+                    return damToMarker(dam)
+                }) 
+                setDamMarkers(dams)
+                setDamMarkers(damMarkersList)
+                station.getStationListByRynanNewVersion()
+                .then(res => {
+                    const sensors = res?.data
+                    let sensorMarkerList = sensors?.map(sensor => {
+                        return sensorToMarker(sensor)
+                    })
+                    setSensorList(sensors)
+                    setSensorMarkers(sensorMarkerList)
+                    
+                    if (damMarkersList && sensorMarkerList) {
+                        setCommonMarkers([...damMarkersList, ...sensorMarkerList])
+                    }
+                })
+                .catch(err => {
+                    // Do nothing
+                })
+            }
+        }) 
+        .catch(err => {
+            // Do nothing
+        })
+        
     }
     const onFilter = (e) => {
         e.preventDefault()
@@ -660,9 +746,43 @@ const HomePage = () => {
         <>
         <CustomIntroduction 
             pageCode={defaultPageCode}
+            title="HỆ THỐNG GIÁM SÁT ĐỘ MẶN VÀ LỊCH ĐÓNG MỞ CỐNG / ĐẬP"
+            content="Hệ thống hỗ trợ quản lý các thông tin về lịch đóng / mở của hệ thống cống / đập và cảm biến trên địa bàn tỉnh Hậu Giang"
         />
+
         <CRow>
-            <CCol xs>
+            <CCol xs={12}>
+                <CCard className="mb-4">
+                    <CCardHeader>
+                        Vị trí tất cả cống / đập và trạm cảm biến
+                    </CCardHeader>
+                    <CCardBody>
+                        <CRow className="mb-3">
+                            <CCol xs={12} md={12} lg={12} style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center'}}>
+                                <div style={{marginRight: '30px'}}><CFormCheck onChange={() => handleSetMapViewMode(1)} type="radio" name="mapViewCheck" id="mapViewCheck1" label="Tất cả" checked={mapViewMode === 1} /></div>
+                                <div style={{marginRight: '30px'}}><CFormCheck onChange={() => handleSetMapViewMode(2)} type="radio" name="mapViewCheck" id="mapViewCheck2" label="Cống / Đập" checked={mapViewMode === 2}/></div>
+                                <div style={{marginRight: '30px'}}><CFormCheck onChange={() => handleSetMapViewMode(3)} type="radio" name="mapViewCheck" id="mapViewCheck3" label="Trạm cảm biến" checked={mapViewMode === 3}/></div>
+                            </CCol>
+                        </CRow>
+                        <CRow>
+                            <CCol md={12} lg={12}>
+                                {/* { 
+                                    damMarkers && sensorMarkers ? mapViewMode === 1 ? <CustomAPIMap 
+                                        markers={[...damMarkers, ...sensorMarkers]}
+                                    /> : mapViewMode === 2 ? <CustomAPIMap markers={damMarkers} /> : <CustomAPIMap  markers={sensorMarkers}/> : null
+                                } */}
+                                {
+                                    commonMarkers && <CustomAPIMap markers={commonMarkers} />
+                                }
+                            </CCol>
+                        </CRow>
+                    </CCardBody>
+                </CCard>
+            </CCol>
+        </CRow>
+
+        <CRow>
+            <CCol xs={12}>
                 <CCard className="mb-4">
                     <CCardHeader>
                         Lịch mở cống / đập
@@ -680,6 +800,8 @@ const HomePage = () => {
                 </CCard>
             </CCol>
         </CRow>
+
+
 
         {/* SENSOR STATION */}
         <CRow>
