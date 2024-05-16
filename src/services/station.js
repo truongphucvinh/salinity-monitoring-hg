@@ -1,14 +1,13 @@
 import axios from "axios";
-import { useState } from "react";
 
 const BASE_URL = "http://103.221.220.183:8026/"
-
+const RYNAN_URL = "https://api-mekong.rynangate.com/api/v1/"
 
 export default {
 
     getStationList: async function() {
         try {
-            const response = await axios.get(BASE_URL+'things')
+            const response = await axios.get(`${BASE_URL}things`)
             return response.data;
         } catch(error) {
             throw error;
@@ -17,7 +16,7 @@ export default {
 
     createStation: async function(thingId, stationInfo) {
         try {
-            const response = await axios.post(BASE_URL+`stations/thing/${thingId}`, stationInfo);
+            const response = await axios.post(`${BASE_URL}stations/thing/${thingId}`, stationInfo);
             return response;
         } catch(error) {
             throw error;
@@ -26,7 +25,7 @@ export default {
 
     deleteStation: async function(stationId) {
         try {
-            const response = await axios.delete(BASE_URL+`stations/${stationId}`);
+            const response = await axios.delete(`${BASE_URL}stations/${stationId}`);
             return response;
         } catch(error) {
             throw error;
@@ -36,7 +35,7 @@ export default {
     //Rynan
     login: async function() {
         try {
-            const response = await axios.post("https://api-mekong.rynangate.com/api/v1/auth", {
+            const response = await axios.post(`${RYNAN_URL}auth`, {
                 "user_name" : "myi.partner",
                 "password" : "Myi@2024"
             }, {
@@ -45,7 +44,6 @@ export default {
                 }
             });
             sessionStorage.setItem("isRynanAuthentication", response.data.token);
-            console.log("login: ", response.data);
             return response.data;
         } catch(error) {
             throw error
@@ -54,18 +52,8 @@ export default {
 
     getStationListByRyan: async function() { // inclding stations are gotten by Ryan api
         try {
-            // var rynanToken = sessionStorage.getItem("rynanToken");
-            // console.log("abc: ", rynanToken);
-            // if(!rynanToken) {
-            //     console.log("xyz");
-            //     const responseRynanAPI = await this.login();
-            //     sessionStorage.setItem("rynanToken", responseRynanAPI.token);
-            //     rynanToken = responseRynanAPI.token;
-            // }
-            console.log("rynan token: ", this.returnRynanToken());
             const ryaneToken = await this.returnRynanToken();
-            // const responseRynanAPI = await this.login();
-            const response = await axios.get("https://api-mekong.rynangate.com/api/v1/get-list-stations",
+            const response = await axios.get(`${RYNAN_URL}get-list-stations`,
                 {
                     headers: {
                         "x-access-token" : ryaneToken,
@@ -73,7 +61,6 @@ export default {
                     }
                 }
             );
-            console.log("sensor list: ", response.data);
             return response.data;
         } catch (error) {
             if(error.response.data.errorCode === "002") {
@@ -83,7 +70,7 @@ export default {
                 sessionStorage.setItem('reloadCount', String(reloadCount + 1));
                 window.location.reload();
                 } else {
-                sessionStorage.removeItem('reloadCount');
+                    sessionStorage.removeItem('reloadCount');
                 }
             }
             throw error;

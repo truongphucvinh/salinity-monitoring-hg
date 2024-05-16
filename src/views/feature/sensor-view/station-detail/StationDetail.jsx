@@ -268,7 +268,6 @@ const StationDetail = () => {
           strDate = `${dateTime.getFullYear()}-${addZero(dateTime.getMonth()+1)}-${addZero(dateTime.getDate())}`;
         }
       })
-      console.log("point array: ", pointArray);
       setDataStation(
         {
           chart: {

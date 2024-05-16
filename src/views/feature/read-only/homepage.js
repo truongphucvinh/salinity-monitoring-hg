@@ -19,6 +19,8 @@ import station from "src/services/station"
 import observation from "src/services/observation"
 import newsService from "src/services/news-service"
 import News from "./newspage/newspage"
+import { postApi } from "src/services/global-axios"
+import { getAllPosts } from "src/services/post-services"
 
 const HomePage = () => {
     const defaultPageCode="U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_homepage"
@@ -277,10 +279,8 @@ const HomePage = () => {
         //get Rynan station list 
         station.getStationListByRyan()
             .then((res) => {
-                console.log("rynan station list: ", res);
                 setRynanStationList([...res.data]);
                 res.data.map((station) => {
-                    console.log(station?.so_serial);
                     var currentDate = new Date();
                     var dateStr = `${currentDate.getFullYear()}/${addZero(currentDate.getMonth()+1)}/${addZero(currentDate.getDate())}`;
                     observation.getDataStation(station?.so_serial, dateStr, dateStr, 1, 100000000)
@@ -301,7 +301,6 @@ const HomePage = () => {
                             }
                             var x = {sensor: []};
                             x.sensor = sensorList;
-                            console.log("x: ", x);
                             return x;
                         })
                         .then((sensor) => {
@@ -309,9 +308,7 @@ const HomePage = () => {
                             return station;
                         })
                         .then((station) => {
-                            console.log("station then: ", station);
                             setRynanStationList([...res.data]);
-                            // console.log("rynan station list: ", rynanStationList);
                         })
                 })
             })
@@ -390,33 +387,7 @@ const HomePage = () => {
             sessionStorage.removeItem("openedCode");
         }
     }, [])
-    const [postTitleSearch, setPostTitleSearch] = useState('')
-    // const searchNewsComponent = () => {
-    //     return (
-    //         <CForm onSubmit={onFilterNews}>
-    //             <CRow>
-    //                 <CCol md={12} lg={6}>
-    //                     <CFormInput
-    //                         className="mb-2"
-    //                         type="text"
-    //                         placeholder="Tiêu đề bài viết"
-    //                         onChange={(e) => setPostTitleSearch(e.target.value)}
-    //                         aria-describedby="exampleFormControlInputHelpInline"
-    //                         value={postTitleSearch}
-    //                     />
-    //                 </CCol>
-    //                 <CCol md={12} lg={6}>
-    //                     <CButton color="primary" className="me-2 " type="submit">
-    //                         <CIcon icon={cilMagnifyingGlass} className="text-white"/>                             
-    //                     </CButton>
-    //                     <CButton color="success" onClick={onResetNews}>
-    //                         <CIcon icon={cilReload} className="text-white"/>   
-    //                     </CButton>
-    //                 </CCol>
-    //             </CRow>
-    //         </CForm>
-    //     )
-    // }
+
     const [newsList, setNewsList] = useState([
         {
             postId: 1,
@@ -462,7 +433,7 @@ const HomePage = () => {
     const [latestNews, setLatestNews] = useState([
         {
             postId: 1,
-            postTitle: "Xâm nhập mặn tại đồng bằng sông Cửu Long duy trì mức cao",
+            postTitle: "Xâm nhập mặn tại đồng bằng sông Cửu Long duy trì mức cao duy trì mức cao duy trì mức cao duy trì mức cao duy trì mức cao",
             postContent: "Theo nhận định của Trung tâm Dự báo khí tượng thủy văn quốc gia, từ ngày 1-10/5, khu vực miền Tây Nam Bộ phổ biến ít mưa; ngày nắng nóng, có nơi nắng nóng gay gắt. Tuy mưa không nhiều nhưng cần chú ý có thể xuất hiện mưa dông nhiệt cục bộ vào chiều tối dễ kèm theo lốc, sét và gió giật mạnh nguy hiểm. Nhiệt độ cao nhất tại miền Tây Nam Bộ phổ biến từ 34-37 độ C, có nơi cao hơn. Mực nước trên sông Tiền và sông Hậu thời kỳ này biến đổi chậm theo triều. Mực nước cao nhất tuần tại Tân Châu là 1,10m, tại Châu Đốc 1,30m, ở mức tương đương và cao hơn trung bình nhiều năm cùng kỳ khoảng 0,05m.",
             postAvatar: "https://image.nhandan.vn/w800/Uploaded/2024/huounvj/2024_05_01/man-2264.jpg.webp",
             postCreatorName: "Nguyễn Văn A",
@@ -472,11 +443,10 @@ const HomePage = () => {
             postId: 2,
             postTitle: "Hồ Dầu Tiếng tiếp cứu nước ngọt cho Nam Bộ",
             postContent: "Những ngày này, hồ Dầu Tiếng, hồ thuỷ lợi lớn nhất Đông Nam Á với trữ lượng nước ngọt lên đến 1,5 tỷ mét khối vẫn ngày đêm “xuôi dòng” tiếp cứu nguồn nước ngọt cho các tỉnh miền nam, phục vụ tưới tiêu cho sản xuất nông nghiệp ở: Tây Ninh, Bình Dương, Thành phố Hồ Chí Minh và Long An. Hạn hán và xâm nhập mặn đang ở mức báo động. Các địa phương ở Nam Bộ như giải toả “cơn khát” khi tiếp cận nguồn nước từ thượng nguồn hồ Dầu Tiếng, qua đó giúp nhân dân ổn định hoạt động sản xuất nông nghiệp và sinh hoạt hằng ngày.",
-            postAvatar: "https://opox.vn/storage/travel-blogs/must-thing-to-do/sapa-northern-vietnamjpg.jpg",
+            postAvatar: "https://image.nhandan.vn/w790/Uploaded/2024/wpgfbfjstpy/2024_04_26/anh-1-chon-532.jpg.webp",
             postCreatorName: "Nguyễn Hiền",
             postCreatedAt: "Thứ 4, 01/05/2024 8:05 (GMT+7)"
         },
-        // https://image.nhandan.vn/w790/Uploaded/2024/wpgfbfjstpy/2024_04_26/anh-1-chon-532.jpg.webp
         {
             postId: 3,
             postTitle: "Phòng chống hạn, mặn cho cây trồng",
@@ -494,45 +464,21 @@ const HomePage = () => {
             postCreatedAt: "Thứ 6, 26/04/2024 9:32 (GMT+7)"
         },
     ]);
-    const [filteredNewsList, setFilteredNewsList] = useState([]);
+
+    const [filterNewsList, setFilterNewsList] = useState([]);
     const [visibleAllNews, setVisibleAllNews] = useState(false);
     const [visibleInputSearch, setVisibleInputSearch] = useState(false);
-    const onResetNews = () => {
-        setFilteredNewsList(newsList)
-        if (newsList?.length > 4) {
-            setLatestNews([...newsList].splice(0,4))
-        }else {
-            setLatestNews(newsList)
-        }
-    }
-    // const onFilterNews = (e) => {
-    //     e.preventDefault()
-    //     if (postTitleSearch) {
-    //         let filteredList = newsList.filter(news => {
-    //             return searchRelatives(news?.postTitle, postTitleSearch)
-    //         })
-    //         if (filteredList) {
-    //             setFilteredNewsList(filteredList)
-    //             if (filteredList?.length > 4) {
-    //                 setLatestNews([...filteredList].splice(0,4))
-    //             }else {
-    //                 setLatestNews(filteredList)
-    //             }
-    //         }
-    //     }else {
-    //         onResetNews()
-    //     }
-    // }
 
     useEffect(() => {
         newsService.getAllNews()
             .then((res) => {
-                console.log("this is posts api", res);
-                // setNewsList(res);
-                // setFilteredNewsList(res)
+                // setNewsList([...res]);
+                // setFilterNewsList([...res])
                 // setLatestNews([...res].splice(0, 4));
+
+                //delete
+                setFilterNewsList([...newsList]);
                 
-                //fake data
             })
             .catch((error) => {
                 console.log(error);
@@ -540,12 +486,31 @@ const HomePage = () => {
     }, [])
 
     const handleVisibleAllnews = () => {
+        document.body.style.overflowY = "hidden"
         setVisibleAllNews(true);
     }
 
     const handleDirectNewsDetail = (newsId, openedCode) => { //openedCode: 0: open from show, 1 open from all-news
         navigate(`news/${newsId}`);
         sessionStorage.setItem('openedCode', openedCode);
+    }
+
+    const handleSearchNews = (e) => { //filter
+        var filterList = newsList.filter((news) => {
+            return news?.postTitle.includes(e.target.value);
+        })
+        setFilterNewsList(filterList);
+    }
+
+    const handleCloseSearchInput = () => {
+        setVisibleInputSearch(false);
+        setFilterNewsList([...newsList]);
+    }
+
+    const handleCloseAllNews = () => {
+        setVisibleAllNews(false);
+        setVisibleInputSearch(false);
+        setFilterNewsList([...newsList]);
     }
 
     const renderNews = () => {
@@ -565,38 +530,32 @@ const HomePage = () => {
                             }
                         </CCardHeader>
                         <CCardBody>
-                            <div>
-                                {/* {searchNewsComponent()} */}
-                            </div>
-                            {/* { showNews() } */}
                             <div className="news" id="news">
-                                {/* {
-                                    filteredNewsList.length !== 0 ?  */}
+                                {
+                                    latestNews.length !== 0 ? 
                                         <div className="news__image-list">
                                         {
                                             latestNews.map((news) => {
                                                 return <>
                                                         <div className="news__image-list__item" onClick={() => {handleDirectNewsDetail(news?.postId, 0)}}>
                                                             <div className="news__image-list__item__image">
-                                                            {/* <div> */}
                                                                 <img src={news.postAvatar} alt="image error" />
-                                                            {/* </div> */}
                                                             </div>
                                                             <div className="news__image-list__item__title">
-                                                                { news?.postTitle }
+                                                                { news?.postTitle.length > 75 ?  news?.postTitle.substring(0, 75) + "..." : news?.postTitle }
                                                             </div>
-                                                            <div className="news__image-list__item__brief" dangerouslySetInnerHTML={{__html: news?.postContent.substring(0,100)}}>
-                                                                {/* { news?.postContent.substring(0, 100) } */}
+                                                            <div 
+                                                                className="news__image-list__item__brief" 
+                                                                dangerouslySetInnerHTML={{__html: news?.postContent.length > 130 ? news?.postContent.substring(0,130) + "..." :  news?.postContent.substring(0,100)}}>
                                                             </div>
                                                         </div>
                                                 </>
                                             })
                                         }
                                         </div>
-                                    {/* :
-                                        <div style={{textAlign: 'center'}}>Chưa có tin tức được cập nhật</div>
-                                } */}
-                                
+                                    :
+                                        <div style={{textAlign: 'center'}}>Chưa có bài viết được cập nhật</div>
+                                }
                             </div>
                         </CCardBody>
                     </CCard>
@@ -619,37 +578,47 @@ const HomePage = () => {
                     <div className="all-news-modal__header">
                         <div className="all-news-modal__header__title">
                             <span>Tin tức</span>
-                            <div className={"all-news-modal__header__title__search-input " + visibleInputSearch ? "all-news-modal__header__title__search-input--enabled" : ""}>
-                                <FontAwesomeIcon icon={faMagnifyingGlass} />
-                                <input type="text" />
+                            <div className={"all-news-modal__header__title__search-input " + (visibleInputSearch? 'all-news-modal__header__title__search-input--enabled' : '')}>
+                                <FontAwesomeIcon icon={faMagnifyingGlass} onClick={() => setVisibleInputSearch(true)} />
+                                {
+                                    visibleInputSearch && <input type="text"  autoFocus onChange={e => handleSearchNews(e)} />
+                                }
                             </div>
+                            {
+                                visibleInputSearch && <div className="all-news-modal__header__title__close-search" onClick={() => handleCloseSearchInput()}>
+                                    Hủy
+                                </div>
+                            }
                         </div>
-                        <div className="all-news-modal__header__close" onClick={() => setVisibleAllNews(false)}>
+                        <div className="all-news-modal__header__title__close" onClick={() => handleCloseAllNews()}>
                             <FontAwesomeIcon icon={faXmark}/>
                         </div>
                     </div>
                     <div className="all-news-modal__list">
-                        <div className="virtual">
                             {
-                                newsList.map((news) => {
-                                    return <>
-                                        <div className="all-news-modal__list__item" onClick={() => {handleDirectNewsDetail(news?.postId, 1)}}>
-                                            <div className="all-news-modal__list__item__image">
-                                                <img src={news.postAvatar} alt="image error" />
-                                            </div>
-                                            <div className="all-news-modal__list__item__info">
-                                                <div className="all-news-modal__list__item__info__title">
-                                                    { news?.postTitle }
+                                filterNewsList.length !== 0 ? 
+                                    filterNewsList.map((news) => {
+                                        return <>
+                                            <div className="all-news-modal__list__item" onClick={() => {handleDirectNewsDetail(news?.postId, 1)}}>
+                                                <div className="all-news-modal__list__item__image">
+                                                    <img src={news.postAvatar} alt="image error" />
                                                 </div>
-                                                <div className="all-news-modal__list__item__info__brief" dangerouslySetInnerHTML={{__html: news?.postContent.substring(0, 100)}}>
-                                                    {/* { news?.postContent.substring(0, 100) } */}
+                                                <div className="all-news-modal__list__item__info">
+                                                    <div className="all-news-modal__list__item__info__title">
+                                                        { news?.postTitle.length > 75 ?  news?.postTitle.substring(0, 75) + "..." : news?.postTitle }
+                                                    </div>
+                                                    <div 
+                                                        className="all-news-modal__list__item__info__brief" 
+                                                        dangerouslySetInnerHTML={{__html: news?.postContent.length > 130 ? news?.postContent.substring(0,130) + "..." :  news?.postContent.substring(0,100)}}
+                                                    >
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </>
-                                })
+                                        </>
+                                    })
+                                : 
+                                <div className="all-news-modal__list__empty-message">Không tìm thấy bài viết phù hợp</div>
                             }
-                        </div>
                     </div>
                 </div>
             </CModal>

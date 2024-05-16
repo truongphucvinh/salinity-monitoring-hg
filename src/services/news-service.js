@@ -8,7 +8,6 @@ export default {
     getAllNews: async function() {
         try {
             const response = await axios.get(`${BASE_URL}posts`)
-            console.log("posts: ", response);
             return response.data;
         } catch(error) {
             throw error;
@@ -18,7 +17,6 @@ export default {
     getNewsById: async function(newsId) {
         try {
             const response = await axios.get(`${BASE_URL}posts/${newsId}`)
-            console.log("posts id: ", response.data);
             return response.data;
         } catch(error) {
             throw error;

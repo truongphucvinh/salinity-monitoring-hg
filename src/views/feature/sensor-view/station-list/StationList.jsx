@@ -355,7 +355,7 @@ const StationList = () => {
       if(station.so_serial == serialNo) {
         var currentDate = new Date();
         var dateStr = `${currentDate.getFullYear()}/${addZero(currentDate.getMonth()+1)}/${addZero(currentDate.getDate())}`;
-        observation.getDataStation(serialNo, "2024/01/01", dateStr, 1, 100000000) 
+        observation.getDataStation(serialNo, dateStr, dateStr, 1, 100000000) 
           .then((res) => {
             var sensorList = [];
             for(const sensor in res.data[0]) {
@@ -413,8 +413,8 @@ const StationList = () => {
                   <CCardBody>
 
                     {/* station list in available << */}
-                    <h6>Trạm sẵn có</h6>
-                    <CTable bordered align="middle" className="mb-0 border" hover responsive style={{'marginTop' : "10px"}}>
+                    {/* <h6>Trạm sẵn có</h6> */}
+                    <CTable bordered align="middle" className="mb-0 border" hover responsive>
                       <CTableHead className="text-nowrap">
                         <CTableRow>
                           <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>STT</CTableHeaderCell>
@@ -453,66 +453,12 @@ const StationList = () => {
                         }
                       </CTableBody>
                     </CTable>
-                    {/* station list in available >> */}
-
-                    {/* <hr />
-                    <div className="defined-station-table-heading">
-                      <h6>Trạm tự định nghĩa</h6>
-                      <CButton 
-                        type="button" 
-                        color="primary"
-                        onClick={handleOpenCreateStationModal}
-                      >Thêm</CButton>
-                    </div>
-                    <CTable bordered align="middle" className="mb-0 border" hover responsive style={{'marginTop' : "20px"}}>
-                      <CTableHead className="text-nowrap">
-                        <CTableRow>
-                          <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>STT</CTableHeaderCell>
-                          <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Tên trạm</CTableHeaderCell>
-                          <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '35%'}}>Mô tả</CTableHeaderCell>
-                          <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Trạng thái</CTableHeaderCell>
-                          <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Thao tác</CTableHeaderCell>
-                        </CTableRow>
-                      </CTableHead>
-                      <CTableBody>
-                        {
-                          stationList?.length !== 0 ? stationList.map((station, index) => {
-                            return <>
-                              <CTableRow onClick={() => setStationIsSelected(station)} key={index}>
-                                <CTableDataCell>{ index+1 }</CTableDataCell>
-                                <CTableDataCell style={{'cursor': 'pointer'}} onClick={() => handelDirectToDetail(station?.thingId)}>{ station.station.name }</CTableDataCell>
-                                <CTableDataCell>{ station.station.name }</CTableDataCell>
-                                <CTableDataCell style={{display: "flex", alignItem: 'center'}}>
-                                  <div className={station.station.status ? "station-status station-status--active" : "station-status station-status--inactive"}></div>
-                                  {
-                                    station.station.status ? <span>Đang hoạt động</span> : <span>Trạm đang khóa</span>
-                                  }
-                                </CTableDataCell>
-                                <CTableDataCell>
-                                  <CIcon icon={cilTouchApp} onClick={() => {}} className="text-primary mx-1" role="button"/>
-                                  <CIcon icon={cilPencil} onClick={() => handleDisplayModifyStation(station)} className="text-success mx-1" role="button"/>
-                                  <CIcon icon={cilTrash} onClick={() => handelVisibleDeletionConfirm()}  className="text-danger" role="button"/>
-                                </CTableDataCell>
-                              </CTableRow>
-                            </>
-                          })
-                          :
-                          <CTableRow>
-                            <CTableDataCell colSpan={6}><p className="text-center">{'Không có dữ liệu'}</p></CTableDataCell>
-                          </CTableRow>
-                        }
-                      </CTableBody>
-                    </CTable> */}
+                    
                   </CCardBody>
                 </CCard>
               </CCol>
             </CRow>
-            {/* :
-            <div className="error">
-              Lỗi kết nối. Vui lòng thử lại sau. &nbsp;
-              <span onClick={() => window.location.reload()}>Thử lại</span>
-            </div> */}
-
+    
         {/* create station modal */}
         <Modal
           disableAutoFocus={true}
