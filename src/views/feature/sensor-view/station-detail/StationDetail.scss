@@ -46,12 +46,28 @@
         height: 700px;
         &__date-range-sort {
             display: flex;
+            align-items: center;
             input {
                 margin-left: 10px;
                 min-width: 150px;
             }
             label + input {
                 margin-right: 10px;
+            }
+            select {
+                height: 28px;
+                width: 80px;
+                margin-right: 10px;
+                padding: auto 0;
+                padding-bottom: 2px;
+            }
+            &__search-btn {
+                padding: 3px 10px;
+                text-align: center;
+                background-color: #1a2848;
+                color: white;
+                cursor: pointer;
+                border-radius: 3px;
             }
         }
         &__formating {
