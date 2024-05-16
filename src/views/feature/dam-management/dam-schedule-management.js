@@ -38,7 +38,7 @@ import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizati
 
 const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
     
-    const defaultAuthorizationCode = process.env.HG_MODULE_DAM_SCHEDULE_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_schedule_management"
+    const defaultAuthorizationCode = process.env.REACT_APP_HG_MODULE_DAM_SCHEDULE_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_schedule_management"
     // Checking feature's module
     const defaultModuleAddFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_schedule_management_add_dam_schedule"
     const defaultModuleUpdateFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management_update_dam_schedule"

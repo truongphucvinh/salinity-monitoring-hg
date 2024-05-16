@@ -1,19 +1,9 @@
 import axios from 'axios'
 
-// Local
-// const POST_API_URL = process.env.POST_API_URL || 'http://127.0.0.1:8081'
-// const GENERAL_API_URL = process.env.GENERAL_HOST_API_URL || 'http://localhost:8081'
-// const DAM_API_URL = process.env.DAM_HOST_API_URL || 'http://localhost:8081'
-// const DAM_API_URL = process.env.DAM_HOST_API_URL || 'http://172.30.37.182:8081'
-// Docker Local
-// const POST_API_URL = process.env.POST_API_URL || 'http://127.0.0.1:8083'
-// const DAM_API_URL = process.env.DAM_HOST_API_URL || 'http://localhost:8082'
-// Server
-const POST_API_URL = process.env.POST_API_URL || 'http://103.221.220.184:8085'
-const GENERAL_API_URL = process.env.GENERAL_HOST_API_URL || 'http://103.221.220.183:8083'
-const DAM_API_URL = process.env.DAM_HOST_API_URL || 'http://103.221.220.183:8084'
-const AUTH_API_URL = process.env.AUTH_HOST_API_URL || 'http://dev.iotlab.net.vn:5000'
-// const AUTH_API_URL = process.env.AUTH_HOST_API_URL || 'http://dev.iotlab.net.vn:90'
+const POST_API_URL = process.env.REACT_APP_POST_HOST_API_URL
+const GENERAL_API_URL = process.env.REACT_APP_GENERAL_HOST_API_URL
+const AUTH_API_URL = process.env.REACT_APP_AUTH_HOST_API_URL
+const DAM_API_URL = process.env.REACT_APP_DAM_HOST_API_URL
 
 const authApi = axios.create({
     baseURL:`${AUTH_API_URL}/api/v1`,

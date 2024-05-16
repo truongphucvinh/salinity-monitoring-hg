@@ -43,7 +43,7 @@ import CustomIntroduction from "src/views/customs/my-introduction"
 
 const RiverManagement = () => {
 
-    const defaultAuthorizationCode = process.env.HG_MODULE_RIVER_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_river_management"
+    const defaultAuthorizationCode = process.env.REACT_APP_HG_MODULE_RIVER_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_river_management"
     // Checking feature's module
     const defaultModuleAddFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_river_management_add_river"
     const defaultModuleUpdateFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_river_management_update_river"
@@ -594,6 +594,8 @@ const RiverManagement = () => {
         <>
         <CustomIntroduction 
             pageCode={defaultPageCode}
+            title="QUẢN LÝ SÔNG / KÊNH / RẠCH"
+            content="Hỗ trợ quản lý thông tin về hệ thống sông / kênh / rạch trên địa bàn tỉnh Hậu Giang"
         />
         <CRow>
         <CustomAuthChecker />

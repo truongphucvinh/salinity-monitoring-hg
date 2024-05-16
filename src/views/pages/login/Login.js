@@ -47,7 +47,7 @@ const Login = () => {
   // Login Redirect
   let navigate = useNavigate() 
   // Login logic
-  const secretKey = process.env.AUTH_TOKEN || 'oda_dev'
+  const secretKey = process.env.REACT_APP_AUTH_TOKEN
   const onFinish = (e) => {
     e.preventDefault()
     const form = e.currentTarget

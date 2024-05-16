@@ -405,6 +405,8 @@ const StationList = () => {
         <>
           <CustomIntroduction 
             pageCode={defaultPageCode}
+            title='QUẢN LÝ TRẠM CẢM BIẾN'
+            content='Hỗ trợ quản lý thông tin các trạm cảm biến tại các vị trí trực thuộc tỉnh Hậu Giang'
           />
           <CRow>
               <CCol>

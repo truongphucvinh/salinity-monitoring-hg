@@ -21,6 +21,20 @@ export const getSpecificGeneralInformation = (projectCode, pageCode, projects) =
     }
 }
 
+export const getProjectByCode = (projectCode, projects) => {
+    if (projects) {
+        let filteredProjects = projects?.filter(project => {
+            return project?.projectCode === projectCode
+        })
+        if (filteredProjects) {
+            return filteredProjects[0]
+        }else {
+            return null
+        }
+    }
+    return null 
+}
+
 export const onFilterUsers = (listUsers, domainId) => {
     return listUsers.filter(user => {
         return user?.permission?.domain === domainId
@@ -107,12 +121,25 @@ export const damStatusConverterV2 = (damStatusName) => {
     }
 }
 
+export const  convertDateFormat = (dateString) => {
+    let date = new Date(dateString);
+    let day = String(date.getDate()).padStart(2, '0');
+    let month = String(date.getMonth() + 1).padStart(2, '0');
+    let year = date.getFullYear();
+
+    return day + '/' + month + '/' + year;
+}
+
 export const getDamScheduleBeginAt = (damSchedule) => {
     return `${damSchedule?.damScheduleBeginAt[3]}:${damSchedule?.damScheduleBeginAt[4] ? damSchedule?.damScheduleBeginAt[4] : '00'}:${damSchedule?.damScheduleBeginAt[5] ? damSchedule?.damScheduleBeginAt[5] : '00'} ${damSchedule?.damScheduleBeginAt[2]}/${damSchedule?.damScheduleBeginAt[1]}/${damSchedule?.damScheduleBeginAt[0]}`
 }
 
 export const getDamScheduleEndAt = (damSchedule) => {
     return `${damSchedule?.damScheduleEndAt[3]}:${damSchedule?.damScheduleEndAt[4] ? damSchedule?.damScheduleEndAt[4] : '00'}:${damSchedule?.damScheduleEndAt[5] ? damSchedule?.damScheduleEndAt[5] : '00'} ${damSchedule?.damScheduleEndAt[2]}/${damSchedule?.damScheduleEndAt[1]}/${damSchedule?.damScheduleEndAt[0]}`
+}
+
+export const getDatetimeFromDB = (response) => {
+    return `${response[2]}/${response[1]}/${response[0]}`
 }
 
 export const getPostCreatedAt = (post) => {
@@ -240,7 +267,7 @@ export const googleMapLink = (lat, lng) => {
 }
 
 export const checkInitElement = (code) => {
-    const defaultInitCode = process.env.HG_CODE || "init"
+    const defaultInitCode = process.env.REACT_APP_HG_CODE || "init"
     console.log(code);
     return code === defaultInitCode
 }

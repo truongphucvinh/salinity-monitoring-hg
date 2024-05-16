@@ -47,12 +47,12 @@ import CustomIntroduction from "src/views/customs/my-introduction"
 const RoleManagement = () => {
 
     // Recovery role
-    const defaultRoleId = "661544f6b77939e48d030119" || process.env.HG_ROLE_ID_DEFAULT
+    const defaultRoleId = "661544f6b77939e48d030119" || process.env.REACT_APP_HG_ROLE_ID_DEFAULT
     // Role Management
-    const defaultDomainId = '65b0cbba526ef32c8be05f1d' || process.env.HG_DOMAIN_ID
-    const defaultModuleCode = 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ' || process.env.HG_MODULE_CODE
-    const defaultAuthorizationCode = process.env.HG_MODULE_ROLE_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_role_management"
-    const defaultModuleViewFeature = 'view' || process.env.HG_MODULE_VIEW_FEATURE
+    const defaultDomainId = '65b0cbba526ef32c8be05f1d' || process.env.REACT_APP_HG_DOMAIN_ID
+    const defaultModuleCode = 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ' || process.env.REACT_APP_HG_MODULE_CODE
+    const defaultAuthorizationCode = process.env.REACT_APP_HG_MODULE_ROLE_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_role_management"
+    const defaultModuleViewFeature = 'view' || process.env.REACT_APP_HG_MODULE_VIEW_FEATURE
     // Checking feature's module
     const defaultModuleAddFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_role_management_add_role"
     const defaultModuleUpdateFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_role_management_update_role"
@@ -834,6 +834,8 @@ const RoleManagement = () => {
         <>
         <CustomIntroduction 
             pageCode={defaultPageCode}
+            title="QUẢN LÝ VAI TRÒ CỦA NGƯỜI DÙNG"
+            content="Hỗ trợ quản lý thông tin về vai trò và quyền hạn của người dung bên trong hệ thống"
         />
         <CRow>
         <CustomAuthChecker />

@@ -46,7 +46,7 @@ import CustomAuthChecker from "src/views/customs/my-authchecker"
 import CustomIntroduction from "src/views/customs/my-introduction"
 
 const DamManagement = () => {
-    const defaultAuthorizationCode = process.env.HG_MODULE_DAM_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management"
+    const defaultAuthorizationCode = process.env.REACT_APP_HG_MODULE_DAM_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management"
     const defaultModuleAddFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management_add_dam"
     const defaultModuleUpdateFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management_update_dam"
     const defaultModuleDeleteFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dam_management_delete_dam"
@@ -864,6 +864,8 @@ const DamManagement = () => {
     return (<>
         <CustomIntroduction 
             pageCode={defaultPageCode}
+            title="QUẢN LÝ CỐNG / ĐẬP"
+            content="Hỗ trợ quản lý các thông tin chung về hệ thống cống / đập trực thuộc tỉnh Hậu Giang"
         />
             <CRow>
         {/* Checking the authentication here */}

@@ -10,7 +10,7 @@ const CustomPagination = ({ listItems, showData, isLoaded }) => {
 
     // initial data
     const paginationData = {
-        itemsPerPage: process.env.PAGINATION_NUMBER || 5,
+        itemsPerPage: process.env.REACT_APP_PAGINATION_NUMBER,
         active: 1,
         totalPages: 0,
         items: []

@@ -42,10 +42,11 @@ import CustomIntroduction from "src/views/customs/my-introduction"
 import { createPost, deletePost, getAllPosts, getPostById, updatePost } from "src/services/post-services"
 import { CKEditor } from "@ckeditor/ckeditor5-react"
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic"
+import CustomEditor from "src/views/customs/my-editor"
 
 const PostManagement = () => {
 
-    const defaultAuthorizationCode = process.env.HG_MODULE_POST_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_post_management"
+    const defaultAuthorizationCode = process.env.REACT_APP_HG_MODULE_POST_MANAGEMENT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_post_management"
     // Checking feature's module
     const defaultModuleAddFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_post_management_add_post"
     const defaultModuleUpdateFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_post_management_update_post"
@@ -325,31 +326,9 @@ const PostManagement = () => {
                     {/* Fix here later */}
                     <CRow>
                         <CCol lg={12} className="mt-4">
-                            <CKEditor
-                                editor={ ClassicEditor }
-                                data="<p>Soạn thảo bài viết tại đây&nbsp;5!</p>"
-                                onReady={ editor => {
-                                    // You can store the "editor" and use when it is needed.
-                                    console.log( 'Editor is ready to use!', editor );
-                                } }
-                                onChange={ ( event,editor ) => {
-                                    let data = editor?.getData()
-                                    handleSetAddPostContent(data)
-                                } }
-                                onBlur={ ( event, editor ) => {
-                                    console.log( 'Blur.', editor );
-                                } }
-                                onFocus={ ( event, editor ) => {
-                                    console.log( 'Focus.', editor );
-                                } }
-                                config={{
-                                    simpleUpload: {
-                                        uploadUrl: 'https://myserver.herokuapp.com/image-upload'
-                                      },
-                                      toolbar: ['heading', '|', 'bold', 'italic', 'blockQuote', 'link', 'numberedList', 'bulletedList', 'insertTable',
-                                        'tableColumn', 'tableRow', 'mergeTableCells', 'mediaEmbed', '|', 'undo', 'redo']
-                                    
-                                }}
+                            <CustomEditor 
+                                content={addPostContent}
+                                setContent={handleSetAddPostContent}
                             />
                         </CCol>
                     </CRow>
@@ -558,31 +537,9 @@ const PostManagement = () => {
                         </CRow>
                         <CRow>
                         <CCol lg={12} className="mt-4">
-                            <CKEditor
-                                editor={ ClassicEditor }
-                                data={updatePostContent}
-                                onReady={ editor => {
-                                    // You can store the "editor" and use when it is needed.
-                                    console.log( 'Editor is ready to use!', editor );
-                                } }
-                                onChange={ ( event,editor ) => {
-                                    let data = editor?.getData()
-                                    handleSetUpdatePostContent(data)
-                                } }
-                                onBlur={ ( event, editor ) => {
-                                    console.log( 'Blur.', editor );
-                                } }
-                                onFocus={ ( event, editor ) => {
-                                    console.log( 'Focus.', editor );
-                                } }
-                                config={{
-                                    simpleUpload: {
-                                        uploadUrl: 'https://myserver.herokuapp.com/image-upload'
-                                      },
-                                      toolbar: ['heading', '|', 'bold', 'italic', 'blockQuote', 'link', 'numberedList', 'bulletedList', 'insertTable',
-                                        'tableColumn', 'tableRow', 'mergeTableCells', 'mediaEmbed', '|', 'undo', 'redo']
-                                    
-                                }}
+                            <CustomEditor 
+                                content={updatePostContent}
+                                setContent={handleSetUpdatePostContent}
                             />
                         </CCol>
                     </CRow>
@@ -661,6 +618,8 @@ const PostManagement = () => {
         <>
         <CustomIntroduction 
             pageCode={defaultPageCode}
+            title="QUẢN LÝ BÀI VIẾT"
+            content="Hỗ trợ người dùng đăng tải và thao tác với các tin tức mới"
         />
         <CRow>
         <CustomAuthChecker />

@@ -746,6 +746,8 @@ const StationDetail = () => {
     return (<>
       <CustomIntroduction 
         pageCode={defaultPageCode}
+        title="THÔNG TIN CHI TIẾT TRẠM"
+        content="Hỗ trợ xem chi tiết thông tin trạm và các chỉ số đo được theo thời gian thực"
       />
       {
         !error ?
