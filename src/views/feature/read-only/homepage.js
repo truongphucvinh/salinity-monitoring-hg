@@ -555,8 +555,9 @@ const HomePage = () => {
                                                             </div>
                                                             <div 
                                                                 className="news__image-list__item__brief" 
-                                                                dangerouslySetInnerHTML={{__html: news?.postContent.length > 95 ? news?.postContent.substring(0, 95) + "..." : news?.postContent}}
+                                                                dangerouslySetInnerHTML={{__html: news?.postContent}}
                                                                 >
+                                                                {/* .replace(/\n/g,"<br />"); cut line break */}
                                                             </div>
                                                         </div>
                                                 </>
