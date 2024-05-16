@@ -20,12 +20,25 @@ const News = () => {
     useEffect(() => {
         newsService.getNewsById(id)
             .then((res) => {
+                var createdAtArr = res.postCreatedAt;
+                var createdAtDate = new Date(createdAtArr[0], createdAtArr[1]-1, createdAtArr[2], createdAtArr[3], createdAtArr[4]);
+                res.postCreatedAtStr = `${formatDay(createdAtDate.getDay())}, ${createdAtDate.getDate()}/${createdAtDate.getMonth()+1}/${createdAtDate.getFullYear()}, ${createdAtDate.getHours()}:${createdAtDate.getMinutes()}`
+                return res;
+            })
+            .then((res) => {
                 setNewsContent(res);
             })
             .catch((error) => {
 
             })
     }, [])
+
+    const formatDay = (no) => {
+        if(no > 0 && no < 7) {
+            return `Thứ ${no+1}`;
+        }
+        return "Chủ Nhật";
+    }
 
     return <>
         <CRow>
@@ -41,7 +54,7 @@ const News = () => {
                             { newsContent?.postTitle }
                         </div>
                         <div className="news__publishcation-date">
-                            { newsContent?.postCreatedAt }
+                            { newsContent?.postCreatedAtStr }
                         </div>
                         <div className="news__content" dangerouslySetInnerHTML={{__html: newsContent?.postContent}}></div>
                         <div className="news__author">
