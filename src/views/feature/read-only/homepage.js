@@ -87,7 +87,7 @@ const HomePage = () => {
         let renderDamMarker = <>
             <h4>{dam?.damName}</h4>
             <div>{dam?.damRiver?.riverName}</div>
-            <div>Trạng thái: <strong>{damStatusConverterV2(dam?.damCurrentStatus)?.status}</strong></div>
+            <div>Trạng thái: <strong>{damStatusConverterV2(dam?.damCurrentStatus?.damStatusName)?.status}</strong></div>
             <div>Ngày xây dựng: <strong>{getDatetimeFromDB(dam?.damConstructedAt)}</strong></div>
             <div>Chiều dài: <strong>{dam?.damHeight}</strong> mét</div>
             <div>Chiều rộng: <strong>{dam?.damCapacity}</strong> mét</div>
