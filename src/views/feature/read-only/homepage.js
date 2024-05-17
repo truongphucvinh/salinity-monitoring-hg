@@ -19,10 +19,9 @@ import damMarker from "../../../icons/dam.png"
 import station from "src/services/station"
 import observation from "src/services/observation"
 import newsService from "src/services/news-service"
-import News from "./newspage/newspage"
-import { postApi } from "src/services/global-axios"
-import { getAllPosts } from "src/services/post-services"
 import CustomAPIMap from "src/views/customs/my-google-map-api"
+
+import { generateSensorName } from "src/tools"
 
 const HomePage = () => {
     const defaultPageCode="U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_homepage"
@@ -441,13 +440,13 @@ const HomePage = () => {
                                                 </span> <br/>
                                                 { station.khu_vuc_lap_dat }
                                             </CTableDataCell>
-                                            <CTableDataCell style={{'width' : '25%'}}>{ sensor.name }</CTableDataCell>
+                                            <CTableDataCell style={{'width' : '25%'}}>{ generateSensorName(sensor.name) }</CTableDataCell>
                                             <CTableDataCell style={{'width' : '20%'}}>{ sensor.value }</CTableDataCell>
                                             <CTableDataCell style={{'width' : '25%'}} rowSpan={station?.sensor?.sensor?.length}>{ sensor.time }</CTableDataCell>
                                         </CTableRow>
                                     } else {
                                         return <CTableRow key={sensorIndex}>
-                                            <CTableDataCell style={{'width' : '25%'}}>{ sensor.name }</CTableDataCell>
+                                            <CTableDataCell style={{'width' : '25%'}}>{ generateSensorName(sensor.name) }</CTableDataCell>
                                             <CTableDataCell style={{'width' : '20%'}}>{ sensor.value }</CTableDataCell>
                                             {/* <CTableDataCell>{ sensor.time }</CTableDataCell> */}
                                         </CTableRow>
@@ -464,15 +463,17 @@ const HomePage = () => {
     // NEWS
     // homepage interface after back from detailed news
     useEffect(() => {
-        var openedCode = sessionStorage.getItem("openedCode");
-        if(openedCode) {
-            const element = document.getElementById("news");
-            element?.scrollIntoView({ behavior: 'smooth' });
-            if(openedCode === '1') {
-                setVisibleAllNews(true);
+        setTimeout(() => {
+            var openedCode = sessionStorage.getItem("openedCode");
+            if(openedCode) {
+                const element = document.getElementById("news");
+                element?.scrollIntoView({ behavior: 'smooth' });
+                if(openedCode === '1') {
+                    setVisibleAllNews(true);
+                }
+                sessionStorage.removeItem("openedCode");
             }
-            sessionStorage.removeItem("openedCode");
-        }
+        }, 800)
     }, [])
 
     const [newsList, setNewsList] = useState([]);
@@ -702,7 +703,7 @@ const HomePage = () => {
             <CCol xs>
                 <CCard className="mb-4">
                     <CCardHeader>
-                        Thông tin trạm cảm biến
+                        Thông tin trạm quan trắc
                     </CCardHeader>
                     <CCardBody>
                         { showSensorStationList() }

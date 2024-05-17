@@ -20,6 +20,8 @@ import thingService from 'src/services/thing';
 import sensorService from 'src/services/sensor'
 import observation from "src/services/observation";
 
+import { generateSensorName } from 'src/tools';
+
 //bootstrap
 import { Spinner } from 'react-bootstrap';
 
@@ -379,27 +381,6 @@ const StationList = () => {
     navigate(`station-detail/${thingId}`);
   }
 
-  const generateSensorName = (rawName) => {
-    var generatedName = '';
-    switch(rawName) {
-      case 'do_pH':
-        generatedName = "Độ pH";
-        break;
-      case 'muc_nuoc':
-        generatedName = "Mực nước";
-        break;
-      case 'nhiet_do':
-        generatedName = "Nhiệt độ";
-        break;
-      case 'do_man':
-        generatedName = "Độ mặn";
-        break;
-      default:
-        generatedName = rawName;
-        break;    
-    }
-    return generatedName;
-  }
     const defaultPageCode = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_station_management"
     return (
         <>
@@ -411,7 +392,7 @@ const StationList = () => {
           <CRow>
               <CCol>
                 <CCard>
-                  <CCardHeader>Danh sách trạm cảm biến</CCardHeader>
+                  <CCardHeader>Danh sách trạm quan trắc</CCardHeader>
                   <CCardBody>
 
                     {/* station list in available << */}

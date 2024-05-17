@@ -65,7 +65,7 @@ const _nav = [
   },
   {
     component:  CNavItem,
-    name: 'Quản lý trạm',
+    name: 'Quản lý trạm quan trắc',
     to: '/station-list',
     icon: <CIcon icon={cilEqualizer} customClassName="nav-icon" />,
     code: 'U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_sensor_station_management'

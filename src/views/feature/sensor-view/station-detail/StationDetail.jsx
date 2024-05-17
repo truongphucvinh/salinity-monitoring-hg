@@ -36,6 +36,8 @@ import { useParams } from "react-router-dom";
 import CustomIntroduction from "src/views/customs/my-introduction";
 import * as XLSX from "xlsx/xlsx.mjs";
 
+import { generateSensorName } from "src/tools";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -308,28 +310,6 @@ const StationDetail = () => {
     const navigate = useNavigate()
     const backToStationList = () => {
       navigate("/station-list"); 
-    }
-
-    const generateSensorName = (rawName) => {
-      var generatedName = '';
-      switch(rawName) {
-        case 'do_pH':
-          generatedName = "Độ pH";
-          break;
-        case 'muc_nuoc':
-          generatedName = "Mực nước";
-          break;
-        case 'nhiet_do':
-          generatedName = "Nhiệt độ";
-          break;
-        case 'do_man':
-          generatedName = "Độ mặn";
-          break;
-        default:
-          generatedName = rawName;
-          break;    
-      }
-      return generatedName;
     }
 
     //export excel

@@ -271,3 +271,25 @@ export const checkInitElement = (code) => {
     console.log(code);
     return code === defaultInitCode
 }
+
+export const generateSensorName = (rawName) => {
+    var generatedName = '';
+    switch(rawName) {
+      case 'do_pH':
+        generatedName = "Độ pH";
+        break;
+      case 'muc_nuoc':
+        generatedName = "Mực nước";
+        break;
+      case 'nhiet_do':
+        generatedName = "Nhiệt độ";
+        break;
+      case 'do_man':
+        generatedName = "Độ mặn";
+        break;
+      default:
+        generatedName = rawName;
+        break;    
+    }
+    return generatedName;
+  }
