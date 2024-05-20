@@ -1,29 +1,8 @@
 import axios from 'axios'
-import station from './station';
-
-const BASE_URL = "http://103.221.220.183:8026/"
+import station from './station'
 const RYNAN_URL = "https://api-mekong.rynangate.com/api/v1/"
 
 export default  {
-    
-    getAllValueByDataStreamId: async function(dataStreamId) {
-        try {
-            const response = await axios.get(`${BASE_URL}observations/dataStreamId/${dataStreamId}`);
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    },
-
-    getLatestValueByDataStreamId: async function(dataStreamId) {
-        try {
-            const response = await axios.get(`${BASE_URL}observations/dataStreamId/${dataStreamId}/latest`);
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    },
-
     //Rynan
     getDataStation: async function(serialStation, startDate, endDate, page, limit) {
         try {
@@ -32,7 +11,7 @@ export default  {
                 {
                     headers: {
                         "x-access-token" : rynanToken,
-                        "x-api-key" : "Qy1z8uyQoVC603KLov9vxC5J"
+                        "x-api-key" : process.env.REACT_APP_RYNAN_X_API_KEY
                     }
                 }
             );

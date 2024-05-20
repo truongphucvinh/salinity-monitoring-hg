@@ -1,17 +1,12 @@
 import { useEffect, useState } from "react"
 import * as React from "react"
 import './StationDetail.scss'
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChartLine, faCircleDown, faTableCells, faChevronLeft, faSort, faRotateRight} from "@fortawesome/free-solid-svg-icons";
-
 import { useNavigate } from "react-router-dom";
-import 'animate.css'
-
-//modal 
-import { CNav, CNavItem, CNavLink, CTabContent, CCard, CCardBody, CCol, CCardHeader, CRow, CTabPane, CListGroup } from '@coreui/react';
+import 'animate.css' 
+import { CNav, CNavItem, CNavLink, CTabContent, CCard, CCardBody, CCol, CCardHeader, CRow, CTabPane } from '@coreui/react';
 import Tooltip from '@mui/material/Tooltip';
-
 //chart
 import {
   Chart as ChartJS,
@@ -26,15 +21,12 @@ import {
 //higth chart 
 import Highcharts from 'highcharts/highstock'
 import HighchartsReact from 'highcharts-react-official'
-
 //service
 import observation from "src/services/observation";
 import station from "src/services/station";
-
 import { useParams } from "react-router-dom";
 import CustomIntroduction from "src/views/customs/my-introduction";
 import * as XLSX from "xlsx/xlsx.mjs";
-
 import { generateSensorName } from "src/tools";
 
 ChartJS.register(
@@ -75,15 +67,12 @@ const StationDetail = () => {
     const { id } = useParams();
     const [error , setError] = useState(false);
     const [errorCode, setErrorCode] = useState();
-
     //tab
     const [activeKey, setActiveKey] = useState(0);
-
     //download card
     const [dateRange] = useState({startDate: '', endDate: ''});
     const [selectedDateRange, setSelectedDateRange] = useState({from: '', to: ''});
     const [visibleDownloadCard, setVisibleDownloadCard] = useState();
-
     //filter
     const [selectedDateRangeSort, setSelectedDateRangeSort] = useState({from: '', to: ''}); // value of data range input to show chart and table
     const [sensorListRynan, setSensorListRynan] = useState([]);
@@ -94,14 +83,13 @@ const StationDetail = () => {
     const [isLoadingSensorList, setIsLoadingSensorList] = useState(false);
     const [stationInfo, setStationInfo] = useState();
     const [dataStation, setDataStation] = useState({});
-
     const [periodFromStartDate, setPeriodFromStartDate] = useState(0); // du lieu hien thi trong bao nhieu ngay ke tu ngay bat dau (tuy chon), su dungj trong select option
     const [firstLoad, setFirstLoad] = useState(true);
 
     // auto reload 
     setInterval(() => {
       var date = new Date();
-      if((date.getMinutes()/15 - Math.floor(date.getMinutes()/15) == 0)) {
+      if((date.getMinutes()/15 - Math.floor(date.getMinutes()/15) === 0)) {
         setReload(!reload);
       }
     }, 60*1000)
@@ -112,7 +100,7 @@ const StationDetail = () => {
       station.getStationListByRyan()
         .then((res) => {
           res.data.forEach((station) => {
-            if(id===station.so_serial) {
+            if(id === station.so_serial) {
               setStationInfo(station);
             }
           })
@@ -122,44 +110,34 @@ const StationDetail = () => {
           setErrorCode(error?.response?.status);
           setError(true);
         })
-
-
       var currentDate = new Date();
       //min, max attribute for input
       dateRange.startDate = "2024-04-15";
       var currentDateStr = `${currentDate.getFullYear()}-${addZero(currentDate.getMonth()+1)}-${addZero(currentDate.getDate())}`;
       dateRange.endDate = currentDateStr;
-
       selectedDateRangeSort.from = currentDateStr;
       selectedDateRangeSort.to = currentDateStr;
-
     }, [])
 
     const [reload, setReload] = useState(false);
-
     const [responseDataStationRynan, setResponseDataStationRynan] = useState([]);
-
     useEffect(() => {
       setIsLoadingSensorList(true);
-      
       var startDate, endDate;
       endDate = new Date();
       startDate = new Date(selectedDateRangeSort.from); // get startDate
       endDate.setTime(startDate.getTime() + (24*60*60*1000*Number(periodFromStartDate))); // calculate endDate
-
       // if endDate exceed current date, reset periodFromStartDate
       var exceedNow = (endDate.getTime() - new Date().getTime())/(24*60*60*1000);
       if(exceedNow > 0) {
         endDate = new Date();
         setPeriodFromStartDate(Math.floor(handleCaculateDatePeriod(startDate, endDate)));
       }
-
       // format startdate, endDate for calling api
       endDate = `${endDate.getFullYear()}/${addZero(endDate.getMonth()+1)}/${addZero(endDate.getDate())}`;
       selectedDateRangeSort.to = endDate;
       endDate = selectedDateRangeSort.to.replaceAll("-", "/");
       startDate = selectedDateRangeSort.from.replaceAll("-", "/");
-
       observation.getDataStation(id, startDate, endDate, 1, 10000)
         .then((res) => {
           console.log("res: ", res);
@@ -168,12 +146,9 @@ const StationDetail = () => {
           if(now!==endDate) { //test
             res.data.pop();
           }
-
           setResponseDataStationRynan(res);
-
           //sort/reverse
           setSensorValueListSort([...res.data].reverse());
-
           // get sensor list
           var sensorList = [];
           var ltsValue = [];
@@ -182,7 +157,6 @@ const StationDetail = () => {
             if(sensor !== "trang_thai" && !isNaN(res.data[0][sensor]) && res.data[0][sensor] !== null) {
               sensorList.push(sensor);
               setSensorListRynan(sensorList);
-
               //get latest value for all sensor
               if(firstLoad) {
                 let ltsValue1Sensor = {sensorName: '', sensorValue: 0, time: ''};
@@ -270,13 +244,12 @@ const StationDetail = () => {
         if(selectingSensorRynan === "") {
           setSelectingSensorRynan(sensorListRynan[0]);
         }
-
         //dateRage
-        var dateTime, strDate;
-        if(index===0 || index===responseDataStationRynan?.data.length-1) { // start point or end point
-          dateTime = new Date(point.x);
-          strDate = `${dateTime.getFullYear()}-${addZero(dateTime.getMonth()+1)}-${addZero(dateTime.getDate())}`;
-        }
+        // var dateTime, strDate;
+        // if(index===0 || index===responseDataStationRynan?.data.length-1) { // start point or end point
+        //   dateTime = new Date(point.x);
+        //   strDate = `${dateTime.getFullYear()}-${addZero(dateTime.getMonth()+1)}-${addZero(dateTime.getDate())}`;
+        // }
       })
       setDataStation(
         {
@@ -320,9 +293,8 @@ const StationDetail = () => {
       navigate("/station-list"); 
     }
 
-    //export excel
+    //Export excel
     const [selectedSensorForDownloading, setSelectedSensorForDownloading] = useState([]);
-    
     // choose sensor type for downloading
     const handleChangeSelectedSensorForDownloading = (e) => {
       if (e.target.checked) {
@@ -331,8 +303,6 @@ const StationDetail = () => {
         setSelectedSensorForDownloading(selectedSensorForDownloading.filter((item) => item !== e.target.value));
       }
     }
-
-
     // select date range for downloading
     const handleSelectedDateRange = (e) => {
       if(e.target.name==="from") { //from thay doi
@@ -346,26 +316,21 @@ const StationDetail = () => {
         }
       }
     }
-
     // select "date from" input to show value in chart, table
     const handleSelectedDateRangeSort = async (e) => {
       setSelectedDateRangeSort({ ...selectedDateRangeSort, from: e.target.value });
     }
-
     // calculate period between two dates
     const handleCaculateDatePeriod = (startDate, endDate) => {
       var period = (endDate.getTime() - startDate.getTime())/(24*60*60*1000);
       return period < 0 ? period*(-1) : period;
     }
-
     const handleShowDownloadingCard = () => {
       setVisibleDownloadCard(!visibleDownloadCard);
       var date = new Date();
       date = `${date.getFullYear()}-${addZero(date.getMonth()+1)}-${addZero(date.getDate())}`;
       setSelectedDateRange({from: date, to: date});
     }
-
-
     // download excel file
     const handleExportExcel = () => {
       var excelSheet = [];
@@ -377,7 +342,11 @@ const StationDetail = () => {
       endDate = selectedDateRange.to.replaceAll("-", "/");
       observation.getDataStation(id, startDate, endDate, 1, 10000)
         .then((res) => {
-          selectedSensorForDownloading.map((sensor) => {
+          var now = new Date();
+          if(now!==endDate) { //test
+            res.data.pop();
+          }
+          selectedSensorForDownloading.forEach((sensor) => {
             colSheet[sensor] = '';
           })
           var sendDate;
@@ -413,15 +382,12 @@ const StationDetail = () => {
           throw error;
         })
     }
-
     const addZero = (no) => {
       return no < 10 ? '0' + no : no;
     }
-
     const handleSort = () => {
       setSensorValueListSort([...sensorValueListSort].reverse());
     }
-
     const generateHeader = () => {
       return <>
         <CCardHeader className="station-detail2__header">
@@ -447,11 +413,9 @@ const StationDetail = () => {
         </CCardHeader>
       </>
     }
-
     const handleChangePeriodSelect = (e) => {
       setPeriodFromStartDate(e.target.value)
     }
-
     const generateToolBar = () => {
       return <>
         <CRow>
@@ -544,8 +508,10 @@ const StationDetail = () => {
                     {
                       sensorListRynan.map((sensor, index) => {
                         return <span className="download-card__content__sensor-option__sensor-list__item" key={index}>
-                          <input className="ckeckbox-sensor-downloading" type="checkbox" name="sensor" value={sensor} id="" onChange={handleChangeSelectedSensorForDownloading}/>
-                          <label htmlFor="">{ generateSensorName(sensor) }</label>
+                          <div className="download-card__content__sensor-option__sensor-list__item__virtual">
+                            <input className="ckeckbox-sensor-downloading" type="checkbox" name="sensor" value={sensor} id="" onChange={handleChangeSelectedSensorForDownloading}/>
+                            <label htmlFor="">{ generateSensorName(sensor) }</label>
+                          </div>
                         </span>
                       })
                     }
@@ -763,7 +729,7 @@ const StationDetail = () => {
         :
         <div className="error">
           {
-            errorCode == 429 ? 
+            errorCode === 429 ? 
               <span>Server quá tải</span>
             :
               <span>Lỗi kết nối</span>

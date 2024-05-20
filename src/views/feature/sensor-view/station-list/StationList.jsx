@@ -1,167 +1,28 @@
 import { useState, useEffect} from 'react'
 import * as React from 'react';
 import './StationList.scss'
-
-import Box from '@mui/material/Box';
-
-import Backdrop from '@mui/material/Backdrop';
-import Modal from '@mui/material/Modal';
-import Fade from '@mui/material/Fade';
-
-//form
-import { CForm, CFormInput, CTableDataCell } from '@coreui/react';
-import Select from 'react-select';
-import makeAnimated from 'react-select/animated';
-
+import { CTableDataCell } from '@coreui/react';
 //service
-import multiDataStreamSerivce from 'src/services/multi-data-stream';
 import stationService from 'src/services/station';
-import thingService from 'src/services/thing';
-import sensorService from 'src/services/sensor'
 import observation from "src/services/observation";
-
 import { generateSensorName } from 'src/tools';
-
 //bootstrap
-import { Spinner } from 'react-bootstrap';
-
-import { CRow, CCol, CCard, CCardHeader, CCardBody } from '@coreui/react';
-import { CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody } from '@coreui/react';
+import { CRow, CCol, CCard, CCardHeader, CCardBody, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CModal } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import {  cilTouchApp } from '@coreui/icons'
-
 //modal
-import { CModal} from '@coreui/react';
 import { useNavigate } from 'react-router-dom';
 import CustomIntroduction from 'src/views/customs/my-introduction';
-const label = { inputProps: { 'aria-label': 'Switch demo' } };
-
-const animatedComponents = makeAnimated();
 
 const StationList = () => {
-    
-  //menu
-  const [anchorEl, setAnchorEl] = React.useState(null);
 
   const [stationIsSelected, setStationIsSelected] = useState();
 
-  //modal 
-  const [openCreateStationModal, setOpenCreateStationModal] = React.useState(false);
-  const handleOpenCreateStationModal = () => {
-    setOpenCreateStationModal(true);
-    setIsModification(false);
-  };
-  const handleCloseCreateStationModal = () => {
-    setOpenCreateStationModal(false);
-    setNewStation({name: '', description: ''});
-    setSelectedSensorList([]);
-  };
-
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 500,
-    bgcolor: 'background.paper',
-    p: 0,
-    select: {
-      '.MuiOutlinedInput-notchedOutline': {
-        border: 'none',
-        borderBottom: '1px solid rgba(0, 0, 0, 0.5)',
-        borderRadius: '0px',
-        borderColor: 'rgba(0, 0, 0, 0.5)'
-      },
-      '&:hover .MuiOutlinedInput-notchedOutline': {
-        border: 'none',
-        borderBottom: '1px solid rgba(0, 0, 0, 0.5)',
-        borderColor: 'rgba(0, 0, 0, 0.5)'
-        
-      },
-      '&:focus .MuiOutlinedInput-notchedOutline': {
-        outline: 'none',
-        borderColor: 'rgba(0, 0, 0, 0.5)'
-      },
-      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'rgba(0, 0, 0, 0.5)',
-      },
-    },
-  };
-
-  const [stationList, setStationList] = useState([]);
-  const [selectedSensor, setSelectedSensor] = useState([]);
-  const [selectedSensorBackup, setSelectedSensorBackup] = useState([]);
-  const [damList, setDamList] = useState([]);
-  const [selectedDam, setSelectedDam] = useState({});
-
-  //select chip sensor list
-  const [sensorList, setSensorList] = useState([])
-  const [selectedSensorList, setSelectedSensorList] = useState([]);
-
   //available station
   const [rynanStationList, setRynanStationList] = useState([]); //including stations are gotten by Ryan api
-  const [visibleRynanStationDetail, setVisibleRynanStationDetail] = useState(false)
-
+  const [visibleRynanStationDetail, setVisibleRynanStationDetail] = useState(false);
   const [error, setError] = useState(false);
-
-  const handleChangeSensorsSelection = (event) => {
-    setSelectedSensor(event);
-    setNewStation(prev => ({
-      ...prev,
-      sensors: event
-    }))
-  };
-
-  const handleChangeDamSelection = (event) => {
-    setSelectedDam(event);
-    setNewStation(prev => ({
-      ...prev,
-      dam: event.value
-    }))
-  }
-
-  const [newStation, setNewStation] = useState({
-    name: '',
-    description: '',
-    node: 'test node',
-    coordination: {
-      longtitude: '',
-      latitude: ''
-    },
-    dam: '',
-    status: 'Active'
-  })
-  const [newThing, setNewThing] = useState({
-    name: '',
-    description: '',
-    locationId: 0
-  })
-  const [stationCreationLoading, setStationCreationLoading] = useState(false);
-  const [stationListLoading, setStationListLoading] = useState(true);
-  const [stationListChange, setStationListChange] = useState(false);
-
-  //delete station
-  const [deletionConfirm, setDeletionConfirm] = useState(false)
-  const handelVisibleDeletionConfirm = () => {
-    setDeletionConfirm(true);
-    setAnchorEl(null);
-  }
-  const handleDeleteStation = (station) => {
-    stationService.deleteStation(station?.station?.id)
-      .then((res) => {
-        thingService.deleteThing(station?.thingId)
-        .then(() => {
-          setDeletionConfirm(false);
-          setStationListChange(!stationListChange);
-        })
-      })
-      .catch((error) => {
-        setError(true)
-      })
-  }
-  const [multiDTSOfStation, setMultiDTSOfStation] = useState([]); 
-
-  const [isModification, setIsModification] = useState(false); //true: modify, false: create
+  const [stationListLoading, setStationListLoading] = useState();
 
   //useEffect
   useEffect(() => {
@@ -174,174 +35,7 @@ const StationList = () => {
       .catch((error) => {
         setError(true)
       })
-
-    stationService.getStationList()
-      .then((res) => {
-        setStationList(res);
-      })
-      .then(() => {
-        setStationListLoading(false);
-      })
-      .catch((error) => {
-        setError(true)
-      })
-  }, [stationListChange])
-
-  useEffect(() => {
-    //get sensor list
-    sensorService.getSensorList()
-      .then((res) => {
-        let sensorListVL = [];
-        res.map((sensor) => {
-          let sensorVL = {
-            value: sensor.id,
-            label: sensor.name
-          }
-          sensorListVL.push(sensorVL);
-          setSensorList(sensorListVL);
-        })
-      })
-      .catch((error) => {
-        setError(true)
-      })
-    //get dam list
-    setDamList([
-      {value: '1', label: "Đập 1"},
-      {value: '2', label: "Đập 2"},
-      {value: '3', label: "Đập 3"},
-      {value: '4', label: "Đập 4"},
-      {value: '5', label: "Đập 5"},
-    ])
   }, [])
-
-  const handleChangeStationCreationForm = (e) => {
-    setNewStation(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }))
-  }
-
-  const handelSubmitStationForm = (e) => { //for creation and modification
-    e.preventDefault();
-    if(isModification) {
-      handelModifyStation();
-    } else {
-      handelCreateStation();
-    }
-  }
-
-  const handelCreateStation = () => {
-    setStationCreationLoading(true);
-    //create thing
-    newThing.name = newStation.name;
-    newThing.description = newStation.description;
-
-    var newStationFormating = {
-      name: newStation.name,
-      description: newStation.description,
-      node: "Test node",
-      status: true
-    }
-
-    thingService.createThing(newThing)
-      .then((res) => {
-        //create station
-        stationService.createStation(res.data.id, newStationFormating)
-          .then((resStation) => {
-          //link sensor here
-            var dataStreamInfo = {
-              name: newStation.name,
-              description: newStation.description
-            }
-            selectedSensor.map((sensor) => {
-              multiDataStreamSerivce.createDataStream(res.data.id, sensor.value, dataStreamInfo)
-                .then((resMultiDTS) => {
-                })
-            })
-        })
-        .then(() => {
-          setStationCreationLoading(false);
-          handleCloseCreateStationModal();
-          setStationListChange(!stationListChange);
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-      })
-      .catch((error) => {
-        setError(true)
-      })
-  }
-
-  const handleDisplayModifyStation = (stationInfo) => {
-    setIsModification(true);
-    setMultiDTSOfStation([]);
-    setNewStation({
-      name: stationInfo?.station.name, 
-      description: stationInfo?.station.description
-    });
-    setSelectedDam({value: 1, label: "Đập 1"});
-    setSelectedSensor([{value: 1, label: 'Cảm biến mực nước'}, {value: 2, label: 'Cảm biến nhiệt độ'}]);
-
-    var sensorIdList = [];
-    var sensorIdListByMDTs = []; 
-    var multiDTSLIst = [];
-    stationInfo?.multiDataStreamDTOs.map((multiDTS) => {
-      var sensorMDTId = {
-        value: multiDTS?.sensor.sensorId,
-        label: multiDTS?.sensor.sensorName
-      }
-      sensorIdListByMDTs.push(sensorMDTId);
-      multiDTSLIst.push(multiDTS);
-      setMultiDTSOfStation(multiDTSLIst);
-      sensorIdList.push(multiDTS?.sensor.sensorId);
-    })
-    setSelectedSensor(sensorIdListByMDTs);
-    setSelectedSensorBackup([...sensorIdList]);
-    setOpenCreateStationModal(true);
-    setIsModification(true);
-    setAnchorEl(null);  
-  }
-
-  const handelModifyStation = async () => {
-    var selectedSensorId = await Promise.all(selectedSensor.map((sensor) => {
-      return sensor.value;
-    }))
-    //cap nhap lien ket sensor
-    //neu khong co trong backup => them
-    var thingId = stationIsSelected.thingId;
-    const x = await Promise.all(selectedSensorId.map(async(sensorId) => {
-      if (selectedSensorBackup.includes(sensorId) == 0) {
-        var multiDTSInfo = {
-          name: `sensorId ${sensorId}, thingId ${thingId}`,
-          description: 'Multi data stream description'
-        };
-        await multiDataStreamSerivce.createDataStream(thingId, sensorId, multiDTSInfo)
-          .then((res) => {});
-      }
-    })) 
-
-    //neu co trong backup nhung khong co trong mang hien tai => xoa
-    const y = await Promise.all(selectedSensorBackup.map(async(sensorId) => {
-      if(selectedSensorId.includes(sensorId)==0) {
-        var multiDataStreamId = handelFindMDTIdBySensorId(sensorId);
-        await multiDataStreamSerivce.deleteMultiDataStream(multiDataStreamId)
-          .then((res) => {})
-      }
-    })) 
-
-    setStationCreationLoading(false);
-    handleCloseCreateStationModal();
-    setStationListChange(!stationListChange);
-  }
-
-  const handelFindMDTIdBySensorId = (sensorId) => {
-    for(let i=0; i<multiDTSOfStation.length; i++) {
-      if(sensorId==multiDTSOfStation[i]?.sensor?.sensorId) {
-        return multiDTSOfStation[i].multiDataStreamId;
-      }
-    }
-  }
 
   const addZero = (no) => {
     return no < 10 ? '0' + no : no;
@@ -349,8 +43,8 @@ const StationList = () => {
 
   const [rynanStationIsSeeing, setRynanStationIsSeeing] = useState();
   const handelViewRynanStation = (serialNo) => {
-    rynanStationList.map((station) => {
-      if(station.so_serial == serialNo) {
+    rynanStationList.forEach((station) => {
+      if(station.so_serial === serialNo) {
         var currentDate = new Date();
         var dateStr = `${currentDate.getFullYear()}/${addZero(currentDate.getMonth()+1)}/${addZero(currentDate.getDate())}`;
         observation.getDataStation(serialNo, dateStr, dateStr, 1, 100000000) 
@@ -437,137 +131,6 @@ const StationList = () => {
                 </CCard>
               </CCol>
             </CRow>
-    
-        {/* create station modal */}
-        <Modal
-          disableAutoFocus={true}
-          aria-labelledby="transition-modal-title"
-          aria-describedby="transition-modal-description"
-          open={openCreateStationModal}
-          onClose={handleCloseCreateStationModal}
-          closeAfterTransition
-          slots={{ backdrop: Backdrop }}
-          slotProps={{
-            backdrop: {
-              timeout: 500,
-            },
-          }}
-        >
-          <Fade in={openCreateStationModal}>
-            <Box sx={style}>
-              <form className="station-creation" onSubmit={handelSubmitStationForm}>
-                <div className="station-creation__title">
-                  {
-                    isModification ? 
-                      <span>Chỉnh sửa trạm</span>
-                    :
-                      <span>Thêm trạm</span>
-                  }
-                </div>
-                <div className="station-creation__form">
-                  <div className="station-creation__form__name">
-                    <CForm>
-                      <CFormInput
-                        value={newStation.name} 
-                        name="name"
-                        onChange={handleChangeStationCreationForm}
-                        type="text"
-                        id="exampleFormControlInput1"
-                        label="Tên"
-                        aria-describedby="exampleFormControlInputHelpInline"
-                      />
-                    </CForm>
-                  </div>
-                  <div className="station-creation__form__description">
-                    <CForm>
-                      <CFormInput
-                        value={newStation.description} 
-                        name="description"
-                        onChange={handleChangeStationCreationForm}
-                        type="text"
-                        id="exampleFormControlInput1"
-                        label="Mô tả"
-                        aria-describedby="exampleFormControlInputHelpInline"
-                      />
-                    </CForm>
-                  </div>
-                  <div className="station-creation__form__coordination">
-                    <label>Tọa độ</label>
-                    <div className="station-creation__form__coordination__input">
-                      <div className="station-creation__form__coordination__input__longitude">
-                        <CForm>
-                          <CFormInput
-                            value={newStation.longtitude} 
-                            name="longtitude"
-                            onChange={handleChangeStationCreationForm}
-                            type="text"
-                            placeholder='Kinh độ'
-                            id="exampleFormControlInput1"
-                            aria-describedby="exampleFormControlInputHelpInline"
-                          />
-                        </CForm>
-                      </div>
-                      <div className="station-creation__form__coordination__input__latitude">
-                        <CForm>
-                          <CFormInput
-                            value={newStation.latitude} 
-                            name="latitude"
-                            onChange={handleChangeStationCreationForm}
-                            type="text"
-                            placeholder='Vĩ độ'
-                            id="exampleFormControlInput1"
-                            aria-describedby="exampleFormControlInputHelpInline"
-                          />
-                        </CForm>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="station-creation__form__sensor-selection">
-                    <label htmlFor="sensor">Cảm biến</label>
-                    <Select
-                      onChange={handleChangeSensorsSelection}
-                      closeMenuOnSelect={false}
-                      components={animatedComponents}
-                      placeholder=''
-                      isMulti
-                      options={sensorList}
-                      value={selectedSensor}
-                    />
-                  </div>
-                  <div className="station-creation__form__dam-selection">
-                    <label htmlFor="">Liên kết trạm</label>
-                    <Select
-                      onChange={handleChangeDamSelection}
-                      closeMenuOnSelect={false}
-                      components={animatedComponents}
-                      options={damList}
-                      placeholder=''
-                      value={selectedDam}
-                    />
-                  </div>
-                </div>
-                <div className="station-creation__action">
-                  <div className="station-creation__action__cancel-btn" onClick={handleCloseCreateStationModal}>
-                    Hủy
-                  </div>
-                  <button className="station-creation__action__creation-btn">
-                    {
-                      stationCreationLoading ? 
-                      <Spinner animation="border" role="status" style={{height: '15px', width: '15px', color: 'white'}}>
-                        <span className="visually-hidden">Loading...</span>
-                      </Spinner>
-                      :
-                      isModification ? 
-                        <span>Câp nhật</span>
-                      :
-                        <span>Thêm trạm</span>
-                    }
-                  </button>
-                </div>
-              </form>
-            </Box>
-          </Fade>
-        </Modal>
 
         {/* view station detail */}
         <CModal
@@ -634,28 +197,6 @@ const StationList = () => {
             <div className="view-station-detail__footer">
               <div className="view-station-detail__footer__close-btn" onClick={() =>  setVisibleRynanStationDetail(false)}>
                 Đóng
-              </div>
-            </div>
-          </div>
-        </CModal>
-
-        {/* confirm delete station */}
-        <CModal
-          backdrop="static"
-          visible={deletionConfirm}
-          onClose={() => setDeletionConfirm(false)}
-          aria-labelledby="StaticBackdropExampleLabel"
-        >
-          <div className="deletion-station-confirm">
-            <div className="deletion-station-confirm__body">
-                Xóa trạm <b>{ stationIsSelected?.station?.name }</b>?
-            </div>
-            <div className="deletion-station-confirm__action">
-              <div className="deletion-station-confirm__action__cancel-btn" onClick={() => setDeletionConfirm(false)}>
-                Hủy
-              </div>
-              <div className="deletion-station-confirm__action__accept-btn" onClick={() => handleDeleteStation(stationIsSelected)}>
-                Xóa trạm
               </div>
             </div>
           </div>
