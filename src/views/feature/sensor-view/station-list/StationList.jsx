@@ -28,12 +28,13 @@ import { Spinner } from 'react-bootstrap';
 import { CRow, CCol, CCard, CCardHeader, CCardBody } from '@coreui/react';
 import { CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilTouchApp } from '@coreui/icons'
+import {  cilTouchApp } from '@coreui/icons'
 
 //modal
 import { CModal} from '@coreui/react';
 import { useNavigate } from 'react-router-dom';
 import CustomIntroduction from 'src/views/customs/my-introduction';
+const label = { inputProps: { 'aria-label': 'Switch demo' } };
 
 const animatedComponents = makeAnimated();
 
