@@ -8,7 +8,6 @@ export default {
     getAllNews: async function() {
         try {
             const response = await axios.get(`${BASE_URL}/posts`)
-            console.log("posts: ", response.data);
             return response.data;
         } catch(error) {
             throw error;

@@ -25,20 +25,15 @@ import { generateSensorName } from 'src/tools';
 //bootstrap
 import { Spinner } from 'react-bootstrap';
 
-import { CRow, CCol, CCard, CCardHeader, CCardBody, CButton } from '@coreui/react';
+import { CRow, CCol, CCard, CCardHeader, CCardBody } from '@coreui/react';
 import { CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import {
-  cilPencil,
-  cilTrash,
-  cilTouchApp
-} from '@coreui/icons'
+import { cilTouchApp } from '@coreui/icons'
 
 //modal
 import { CModal} from '@coreui/react';
 import { useNavigate } from 'react-router-dom';
 import CustomIntroduction from 'src/views/customs/my-introduction';
-const label = { inputProps: { 'aria-label': 'Switch demo' } };
 
 const animatedComponents = makeAnimated();
 
@@ -621,7 +616,7 @@ const StationList = () => {
                     {
                       rynanStationIsSeeing?.sensor_list?.map((sensor, index) => {
                         return <>
-                          <span >{ sensor }</span>
+                          <span >{ generateSensorName(sensor) }</span>
                           {
                             rynanStationIsSeeing?.sensor_list?.length-1 !== index ? 
                             <span>, </span>

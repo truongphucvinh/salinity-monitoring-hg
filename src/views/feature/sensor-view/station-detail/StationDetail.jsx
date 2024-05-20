@@ -20,7 +20,6 @@ import {
   PointElement,
   LineElement,
   Title,
-  // Tooltip,
   Legend,
 } from 'chart.js';
 
@@ -75,6 +74,7 @@ Highcharts?.setOptions({
 const StationDetail = () => {
     const { id } = useParams();
     const [error , setError] = useState(false);
+    const [errorCode, setErrorCode] = useState();
 
     //tab
     const [activeKey, setActiveKey] = useState(0);
@@ -119,6 +119,7 @@ const StationDetail = () => {
           setIsLoadingSensorList(false);
         })
         .catch((error) => {
+          setErrorCode(error?.response?.status);
           setError(true);
         })
 
@@ -162,6 +163,12 @@ const StationDetail = () => {
       observation.getDataStation(id, startDate, endDate, 1, 10000)
         .then((res) => {
           console.log("res: ", res);
+          var now = new Date();
+          now = `${now.getFullYear()}/${addZero(now.getMonth()+1)}/${addZero(now.getDate())}`;
+          if(now!==endDate) { //test
+            res.data.pop();
+          }
+
           setResponseDataStationRynan(res);
 
           //sort/reverse
@@ -237,6 +244,7 @@ const StationDetail = () => {
           setFirstLoad(false);
         })
         .catch((error) => {
+          setErrorCode(error?.response?.status);
           setError(true);
         })
     }, [reload, selectedDateRangeSort, periodFromStartDate]) //selectingSensorRynan,    
@@ -322,8 +330,6 @@ const StationDetail = () => {
       } else {
         setSelectedSensorForDownloading(selectedSensorForDownloading.filter((item) => item !== e.target.value));
       }
-      console.log("selected sensor list for download: ", selectedSensorForDownloading);
-      console.log("dateRange: ", dateRange);
     }
 
 
@@ -756,8 +762,14 @@ const StationDetail = () => {
         </CRow>
         :
         <div className="error">
-          Lỗi kết nối. Vui lòng thử lại sau. &nbsp;
-          <span onClick={() => window.location.reload()}>Thử lại</span>
+          {
+            errorCode == 429 ? 
+              <span>Server quá tải</span>
+            :
+              <span>Lỗi kết nối</span>
+          }
+          . Vui lòng thử lại sau.&nbsp;
+          <span className="error__reload-btn" onClick={() => window.location.reload()}>Thử lại</span>
         </div>
       }
     </>)
