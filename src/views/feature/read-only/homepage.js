@@ -75,9 +75,9 @@ const HomePage = () => {
             setMapViewMode(value)
             if (value === 1) {
                 setCommonMarkers([...damMarkers, ...sensorMarkers])
-            }else if (value === 2) {
+            } else if (value === 2) {
                 setCommonMarkers([...damMarkers])
-            }else {
+            } else {
                 setCommonMarkers([...sensorMarkers])
             }
         }
@@ -483,7 +483,7 @@ const HomePage = () => {
                 }
                 sessionStorage.removeItem("openedCode");
             }
-        }, 800)
+        }, 700)
     }, [])
 
     const [newsList, setNewsList] = useState([]);

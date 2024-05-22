@@ -240,16 +240,23 @@
             &__sensor-list {
                 margin-top: 10px;
                 &__item:first-child {
-                    margin-right: 20px;
+                    margin-right: 25px;
                 }
                 &__item + &__item {
-                    margin-right: 20px;
+                    margin-right: 25px;
                 }
                 &__item {
-                    // float: left;
                     display: inline-block;
-                    label {
-                        margin-left: 8px;
+                    &__virtual {
+                        display: flex;
+                        align-items: center;
+                        input {
+                            height: 17px;
+                            width: 17px;
+                        }
+                        label {
+                            margin-left: 8px;
+                        }
                     }
                 }
             }
