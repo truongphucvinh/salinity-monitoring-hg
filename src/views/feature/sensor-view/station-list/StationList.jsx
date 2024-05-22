@@ -20,23 +20,20 @@ import thingService from 'src/services/thing';
 import sensorService from 'src/services/sensor'
 import observation from "src/services/observation";
 
+import { generateSensorName } from 'src/tools';
+
 //bootstrap
 import { Spinner } from 'react-bootstrap';
 
-import { CRow, CCol, CCard, CCardHeader, CCardBody, CButton } from '@coreui/react';
+import { CRow, CCol, CCard, CCardHeader, CCardBody } from '@coreui/react';
 import { CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import {
-  cilPencil,
-  cilTrash,
-  cilTouchApp
-} from '@coreui/icons'
+import { cilTouchApp } from '@coreui/icons'
 
 //modal
 import { CModal} from '@coreui/react';
 import { useNavigate } from 'react-router-dom';
 import CustomIntroduction from 'src/views/customs/my-introduction';
-const label = { inputProps: { 'aria-label': 'Switch demo' } };
 
 const animatedComponents = makeAnimated();
 
@@ -379,27 +376,6 @@ const StationList = () => {
     navigate(`station-detail/${thingId}`);
   }
 
-  const generateSensorName = (rawName) => {
-    var generatedName = '';
-    switch(rawName) {
-      case 'do_pH':
-        generatedName = "Độ pH";
-        break;
-      case 'muc_nuoc':
-        generatedName = "Mực nước";
-        break;
-      case 'nhiet_do':
-        generatedName = "Nhiệt độ";
-        break;
-      case 'do_man':
-        generatedName = "Độ mặn";
-        break;
-      default:
-        generatedName = rawName;
-        break;    
-    }
-    return generatedName;
-  }
     const defaultPageCode = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_station_management"
     return (
         <>
@@ -411,7 +387,7 @@ const StationList = () => {
           <CRow>
               <CCol>
                 <CCard>
-                  <CCardHeader>Danh sách trạm cảm biến</CCardHeader>
+                  <CCardHeader>Danh sách trạm quan trắc</CCardHeader>
                   <CCardBody>
 
                     {/* station list in available << */}
@@ -640,7 +616,7 @@ const StationList = () => {
                     {
                       rynanStationIsSeeing?.sensor_list?.map((sensor, index) => {
                         return <>
-                          <span >{ sensor }</span>
+                          <span >{ generateSensorName(sensor) }</span>
                           {
                             rynanStationIsSeeing?.sensor_list?.length-1 !== index ? 
                             <span>, </span>

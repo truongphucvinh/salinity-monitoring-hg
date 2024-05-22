@@ -499,7 +499,7 @@ const PostManagement = () => {
                                     type="text"
                                     placeholder="Tên bài viết"
                                     required
-                                    maxLength={50}
+                                    maxLength={500}
                                     feedbackInvalid="Ít hơn 50 ký tự"
                                     onChange={(e) => handleSetUpdatePostTitle(e.target.value)}
                                     value={updatePostTitle}

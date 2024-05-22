@@ -19,10 +19,9 @@ import damMarker from "../../../icons/dam.png"
 import station from "src/services/station"
 import observation from "src/services/observation"
 import newsService from "src/services/news-service"
-import News from "./newspage/newspage"
-import { postApi } from "src/services/global-axios"
-import { getAllPosts } from "src/services/post-services"
 import CustomAPIMap from "src/views/customs/my-google-map-api"
+
+import { generateSensorName } from "src/tools"
 
 const HomePage = () => {
     const defaultPageCode="U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_homepage"
@@ -361,6 +360,8 @@ const HomePage = () => {
     }
 
     // SENSOR STATION
+    const [error, setError] = useState(false);
+    const [errorCode, setErrorCode] = useState();
     const [rynanStationList, setRynanStationList] = useState([]);
     useEffect(() => {
         //get Rynan station list 
@@ -397,7 +398,15 @@ const HomePage = () => {
                         .then((station) => {
                             setRynanStationList([...res.data]);
                         })
+                        .catch((error) => {
+                            setErrorCode(error?.response?.status);
+                            setError(true);
+                        })
                 })
+            })
+            .catch((error) => {
+                setErrorCode(error?.response?.status);
+                setError(true);
             })
     }, [])
 
@@ -430,7 +439,7 @@ const HomePage = () => {
                             rynanStationList.map((station, stationIndex) => {
                                 return station?.sensor?.sensor?.map((sensor, sensorIndex) => {
                                     if(sensorIndex==0) {
-                                        return <CTableRow key={sensorIndex}>
+                                        return <CTableRow key={station?.so_serial+sensorIndex}>
                                             <CTableDataCell className="sensor-station-list__no" style={{'width' : '5%'}} rowSpan={station?.sensor?.sensor?.length}>{ stationIndex+1 }</CTableDataCell>
                                             <CTableDataCell style={{'width' : '30%'}} rowSpan={station?.sensor?.sensor?.length}>
                                                 <span 
@@ -441,13 +450,13 @@ const HomePage = () => {
                                                 </span> <br/>
                                                 { station.khu_vuc_lap_dat }
                                             </CTableDataCell>
-                                            <CTableDataCell style={{'width' : '25%'}}>{ sensor.name }</CTableDataCell>
+                                            <CTableDataCell style={{'width' : '25%'}}>{ generateSensorName(sensor.name) }</CTableDataCell>
                                             <CTableDataCell style={{'width' : '20%'}}>{ sensor.value }</CTableDataCell>
                                             <CTableDataCell style={{'width' : '25%'}} rowSpan={station?.sensor?.sensor?.length}>{ sensor.time }</CTableDataCell>
                                         </CTableRow>
                                     } else {
                                         return <CTableRow key={sensorIndex}>
-                                            <CTableDataCell style={{'width' : '25%'}}>{ sensor.name }</CTableDataCell>
+                                            <CTableDataCell style={{'width' : '25%'}}>{ generateSensorName(sensor.name) }</CTableDataCell>
                                             <CTableDataCell style={{'width' : '20%'}}>{ sensor.value }</CTableDataCell>
                                             {/* <CTableDataCell>{ sensor.time }</CTableDataCell> */}
                                         </CTableRow>
@@ -464,15 +473,17 @@ const HomePage = () => {
     // NEWS
     // homepage interface after back from detailed news
     useEffect(() => {
-        var openedCode = sessionStorage.getItem("openedCode");
-        if(openedCode) {
-            const element = document.getElementById("news");
-            element?.scrollIntoView({ behavior: 'smooth' });
-            if(openedCode === '1') {
-                setVisibleAllNews(true);
+        setTimeout(() => {
+            var openedCode = sessionStorage.getItem("openedCode");
+            if(openedCode) {
+                const element = document.getElementById("news");
+                element?.scrollIntoView({ behavior: 'smooth' });
+                if(openedCode === '1') {
+                    setVisibleAllNews(true);
+                }
+                sessionStorage.removeItem("openedCode");
             }
-            sessionStorage.removeItem("openedCode");
-        }
+        }, 800)
     }, [])
 
     const [newsList, setNewsList] = useState([]);
@@ -544,19 +555,20 @@ const HomePage = () => {
                                     latestNews.length !== 0 ? 
                                         <div className="news__image-list">
                                         {
-                                            latestNews.map((news) => {
+                                            latestNews.map((news, index) => {
                                                 return <>
-                                                        <div className="news__image-list__item" onClick={() => {handleDirectNewsDetail(news?.postId, 0)}}>
+                                                        <div key={index} className="news__image-list__item" onClick={() => {handleDirectNewsDetail(news?.postId, 0)}}>
                                                             <div className="news__image-list__item__image">
-                                                                <img src={news.postAvatar} alt="image error" />
+                                                                <img src={news.postAvatar} alt="Không tải được hình ảnh" />
                                                             </div>
                                                             <div className="news__image-list__item__title">
-                                                                { news?.postTitle.length > 75 ?  news?.postTitle.substring(0, 75) + "..." : news?.postTitle }
+                                                                { news?.postTitle }
                                                             </div>
                                                             <div 
-                                                                className="news__image-list__item__brief" 
-                                                                dangerouslySetInnerHTML={{__html: news?.postContent.length > 95 ? news?.postContent.substring(0, 95) + "..." : news?.postContent}}
-                                                                >
+                                                                className="news__image-list__item__brief"
+                                                                style={ news?.postTitle.length > 39 ? { WebkitLineClamp: 2 } : { WebkitLineClamp: 3 }}
+                                                                dangerouslySetInnerHTML={{__html: news?.postContent}}
+                                                            >
                                                             </div>
                                                         </div>
                                                 </>
@@ -607,19 +619,19 @@ const HomePage = () => {
                     <div className="all-news-modal__list">
                             {
                                 filterNewsList.length !== 0 ? 
-                                    filterNewsList.map((news) => {
+                                    filterNewsList.map((news, index) => {
                                         return <>
-                                            <div className="all-news-modal__list__item" onClick={() => {handleDirectNewsDetail(news?.postId, 1)}}>
+                                            <div key={index} className="all-news-modal__list__item" onClick={() => {handleDirectNewsDetail(news?.postId, 1)}}>
                                                 <div className="all-news-modal__list__item__image">
                                                     <img src={news.postAvatar} alt="image error" />
                                                 </div>
                                                 <div className="all-news-modal__list__item__info">
                                                     <div className="all-news-modal__list__item__info__title">
-                                                        { news?.postTitle.length > 75 ?  news?.postTitle.substring(0, 75) + "..." : news?.postTitle }
+                                                        { news?.postTitle }
                                                     </div>
                                                     <div 
                                                         className="all-news-modal__list__item__info__brief" 
-                                                        dangerouslySetInnerHTML={{__html: news?.postContent.length > 130 ? news?.postContent.substring(0,130) + "..." :  news?.postContent.substring(0,100)}}
+                                                        dangerouslySetInnerHTML={{ __html: news?.postContent }}
                                                     >
                                                     </div>
                                                 </div>
@@ -694,17 +706,29 @@ const HomePage = () => {
             </CCol>
         </CRow>
 
-
-
         {/* SENSOR STATION */}
         <CRow>
             <CCol xs>
                 <CCard className="mb-4">
                     <CCardHeader>
-                        Thông tin trạm cảm biến
+                        Thông tin trạm quan trắc
                     </CCardHeader>
                     <CCardBody>
-                        { showSensorStationList() }
+                        { 
+                            error ? 
+                                <div className="error">
+                                    {
+                                    errorCode == 429 ? 
+                                        <span>Server quá tải</span>
+                                    :
+                                        <span>Lỗi kết nối</span>
+                                    }
+                                    . Vui lòng thử lại sau.&nbsp;
+                                    <span className="error__reload-btn" onClick={() => window.location.reload()}>Thử lại</span>
+                                </div>
+                            :
+                                showSensorStationList()
+                        }
                     </CCardBody>
                 </CCard>
             </CCol>

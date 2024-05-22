@@ -46,6 +46,7 @@ export default {
             sessionStorage.setItem("isRynanAuthentication", response.data.token);
             return response.data;
         } catch(error) {
+            // console.log("rynan 429: ", error .response.status);
             throw error
         }
     }, 

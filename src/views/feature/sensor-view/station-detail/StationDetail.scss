@@ -306,7 +306,7 @@
 .error {
     text-align: center;
     margin-top: 200px;
-    span {
+    &__reload-btn {
         color: blue;
         cursor: pointer;
     }
