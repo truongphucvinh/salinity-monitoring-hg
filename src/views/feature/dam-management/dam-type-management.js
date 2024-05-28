@@ -228,8 +228,8 @@ const DamTypeManagement = () => {
                                 className="mt-4"
                                 type="text"
                                 placeholder="Tên loại đập"
-                                maxLength={50}
-                                feedbackInvalid="Không bỏ trống và phải ít hơn 50 ký tự"
+                                maxLength={250}
+                                feedbackInvalid="Không bỏ trống và phải ít hơn 250 ký tự"
                                 onChange={(e) => handleSetAddDamTypeName(e.target.value)}
                                 value={addDamTypeName}
                                 aria-describedby="exampleFormControlInputHelpInline"
@@ -244,7 +244,7 @@ const DamTypeManagement = () => {
                                 type="text"
                                 placeholder="Mô tả loại đập"
                                 maxLength={250}
-                                feedbackInvalid="Không bỏ trống và ít hơn 250 ký tự"
+                                feedbackInvalid="Không bỏ trống và phải ít hơn 250 ký tự"
                                 onChange={(e) => handleSetAddDamTypeDescription(e.target.value)}
                                 value={addDamTypeDescription}
                                 rows={3}
@@ -370,8 +370,8 @@ const DamTypeManagement = () => {
                                     type="text"
                                     placeholder="Tên loại đập"
                                     required
-                                    maxLength={50}
-                                    feedbackInvalid="Ít hơn 50 ký tự"
+                                    maxLength={250}
+                                    feedbackInvalid="Ít hơn 250 ký tự"
                                     onChange={(e) => handleSetUpdateDamTypeName(e.target.value)}
                                     value={updateDamTypeName}
                                     aria-describedby="exampleFormControlInputHelpInline"
@@ -387,8 +387,8 @@ const DamTypeManagement = () => {
                                     onChange={(e) => handleSetUpdateDamTypeDescription(e.target.value)}
                                     value={updateDamTypeDescription}
                                     rows={3}
-                                    maxLength={250}
-                                    feedbackInvalid="Ít hơn 250 ký tự"
+                                    maxLength={500}
+                                    feedbackInvalid="Ít hơn 500 ký tự"
                                     aria-describedby="exampleFormControlInputHelpInline"
                                 ></CFormTextarea>
                             </CCol>

@@ -1,0 +1,38 @@
+.stickyMenu {
+    padding: 15px 0;
+}
+
+.stickyMenuList {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.stickyMenuItem{
+    margin: 0 20px;
+    text-decoration: none;
+    transition: all linear 0.2s;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+
+.stickyMenuItem img{
+    width: 40px;
+    margin-right: 10px;
+    background-color: white;
+    border-radius: 50px;
+    padding: 4px;
+    border: 2px solid black;
+}
+
+.stickyMenuItem span {
+    font-weight: bold;
+}
+
+.stickyMenuItem:hover {
+    transform: scale(1.05);
+    text-decoration: underline;
+} 

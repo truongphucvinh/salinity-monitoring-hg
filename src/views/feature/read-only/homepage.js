@@ -1,7 +1,7 @@
 import { cilLocationPin, cilMagnifyingGlass, cilReload } from "@coreui/icons"
 import CIcon from "@coreui/icons-react"
 import { CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow, CSpinner, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CModal, CFormCheck } from "@coreui/react"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { getAllDamScheduleBySelectedDate, getAllDamSchedules, getAllDams } from "src/services/dam-services"
 import { convertDateFormat, damStatusConverter, damStatusConverterV2, getDamScheduleBeginAt, getDamScheduleEndAt, getDatetimeFromDB, searchRelatives } from "src/tools"
 import CustomDateTimePicker from "src/views/customs/my-datetimepicker/my-datetimepicker"
@@ -13,7 +13,14 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faXmark, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
 import './homepage.scss';
-import damMarker from "../../../icons/dam.png"
+import clsx from "clsx";
+import styles from "./homepage.module.css";
+
+// Icons for Sticky Menu
+import mapItem from "../../../icons/mapItem.png";
+import scheduleItem from "../../../icons/scheduleItem.png";
+import sensorItem from "../../../icons/sensorItem.png";
+import newsItem from "../../../icons/newsItem.png";
 
 //service 
 import station from "src/services/station"
@@ -535,7 +542,7 @@ const HomePage = () => {
 
     const renderNews = () => {
         return <>
-            <CRow >
+            <CRow ref={myMenuRef4}>
                 <CCol>
                     <CCard className="mb-4">
                         <CCardHeader className="news-header">
@@ -583,6 +590,48 @@ const HomePage = () => {
                     </CCard>
                 </CCol>
             </CRow>
+        </>
+    }
+    
+    const myMenuRef1 = useRef(null)
+    const myMenuRef2 = useRef(null)
+    const myMenuRef3 = useRef(null)
+    const myMenuRef4 = useRef(null)
+
+    const scrollToMyView = (sRef) => {
+        sRef?.current?.scrollIntoView()
+    }
+
+    const stickyMenu = () => {
+        return <>
+            <div className={clsx(styles.stickyMenu, 'sticky-top')}>
+                <div className={clsx(styles.stickyMenuList)}>
+                    <div onClick={() => scrollToMyView(myMenuRef1)} className={clsx(styles.stickyMenuItem)} >
+                        <img src={mapItem} />
+                        <span className="text-primary">
+                            Vị trí cống / đập và cảm biến
+                        </span>
+                    </div>
+                    <div onClick={() => scrollToMyView(myMenuRef2)} className={clsx(styles.stickyMenuItem)} >
+                        <img src={scheduleItem} />
+                        <span className="text-primary">
+                            Lịch đóng mở cống / đập
+                        </span>
+                    </div>
+                    <div onClick={() => scrollToMyView(myMenuRef3)} className={clsx(styles.stickyMenuItem)} >
+                        <img src={sensorItem} />
+                        <span className="text-primary">
+                            Thông tin trạm quan trắc
+                        </span>
+                    </div>
+                    <div onClick={() => scrollToMyView(myMenuRef4)} className={clsx(styles.stickyMenuItem)} >
+                        <img src={newsItem} />
+                        <span className="text-primary">
+                            Tin tức mới nhất
+                        </span>
+                    </div>
+                </div>
+            </div>
         </>
     }
 
@@ -654,8 +703,8 @@ const HomePage = () => {
             title="HỆ THỐNG GIÁM SÁT ĐỘ MẶN VÀ LỊCH ĐÓNG MỞ CỐNG / ĐẬP"
             content="Hệ thống hỗ trợ quản lý các thông tin về lịch đóng / mở của hệ thống cống / đập và cảm biến trên địa bàn tỉnh Hậu Giang"
         />
-
-        <CRow>
+        {stickyMenu()}
+        <CRow ref={myMenuRef1}>
             <CCol xs={12}>
                 <CCard className="mb-4">
                     <CCardHeader>
@@ -686,7 +735,7 @@ const HomePage = () => {
             </CCol>
         </CRow>
 
-        <CRow>
+        <CRow ref={myMenuRef2}>
             <CCol xs={12}>
                 <CCard className="mb-4">
                     <CCardHeader>
@@ -707,7 +756,7 @@ const HomePage = () => {
         </CRow>
 
         {/* SENSOR STATION */}
-        <CRow>
+        <CRow ref={myMenuRef3}>
             <CCol xs>
                 <CCard className="mb-4">
                     <CCardHeader>
@@ -733,7 +782,7 @@ const HomePage = () => {
                 </CCard>
             </CCol>
         </CRow>
-
+        
         {/* NEWS */}
         { renderNews() }
 

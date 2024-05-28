@@ -324,8 +324,8 @@ const DamManagement = () => {
                                 className="mt-4"
                                 type="text"
                                 placeholder="Tên đập"
-                                maxLength={50}
-                                feedbackInvalid="Không bỏ trống và phải ít hơn 50 ký tự"
+                                maxLength={250}
+                                feedbackInvalid="Không bỏ trống và phải ít hơn 250 ký tự"
                                 onChange={(e) => handleSetAddDamName(e.target.value)}
                                 value={addDamName}
                                 aria-describedby="exampleFormControlInputHelpInline"
@@ -651,8 +651,8 @@ const DamManagement = () => {
                                     type="text"
                                     required
                                     placeholder="Tên đập"
-                                    maxLength={50}
-                                    feedbackInvalid="Ít hơn 50 ký tự"
+                                    maxLength={250}
+                                    feedbackInvalid="Ít hơn 250 ký tự"
                                     onChange={(e) => handleSetUpdateDamName(e.target.value)}
                                     value={updateDamName}
                                     aria-describedby="exampleFormControlInputHelpInline"
