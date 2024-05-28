@@ -255,8 +255,8 @@ const RiverManagement = () => {
                                 className="mt-4"
                                 type="text"
                                 placeholder="Tên sông, kênh, rạch"
-                                maxLength={50}
-                                feedbackInvalid="Không bỏ trống và phải ít hơn 50 ký tự"
+                                maxLength={250}
+                                feedbackInvalid="Không bỏ trống và phải ít hơn 250 ký tự"
                                 onChange={(e) => handleSetAddRiverName(e.target.value)}
                                 value={addRiverName}
                                 aria-describedby="exampleFormControlInputHelpInline"

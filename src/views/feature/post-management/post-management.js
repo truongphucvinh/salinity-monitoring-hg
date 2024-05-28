@@ -285,8 +285,8 @@ const PostManagement = () => {
                                 className="mt-4"
                                 type="text"
                                 placeholder="Tên bài viết"
-                                maxLength={50}
-                                feedbackInvalid="Không bỏ trống và phải ít hơn 50 ký tự"
+                                maxLength={250}
+                                feedbackInvalid="Không bỏ trống và phải ít hơn 250 ký tự"
                                 onChange={(e) => handleSetAddPostTitle(e.target.value)}
                                 value={addPostTitle}
                                 aria-describedby="exampleFormControlInputHelpInline"
@@ -300,7 +300,7 @@ const PostManagement = () => {
                                 className="mt-4"
                                 type="text"
                                 placeholder="Tên người viết bài"
-                                maxLength={50}
+                                maxLength={250}
                                 feedbackInvalid="Không bỏ trống và phải ít hơn 50 ký tự"
                                 onChange={(e) => handleSetAddPostCreatorName(e.target.value)}
                                 value={addPostCreatorName}
@@ -315,7 +315,7 @@ const PostManagement = () => {
                                 className="mt-4"
                                 type="file"
                                 placeholder="Hình đại diện bài viết"
-                                maxLength={50}
+                                maxLength={250}
                                 feedbackInvalid="Không bỏ trống"
                                 onChange={handleSetAddPostAvatarImage}
                                 aria-describedby="exampleFormControlInputHelpInline"
@@ -514,7 +514,7 @@ const PostManagement = () => {
                                     type="text"
                                     placeholder="Tên tác giả bài viết"
                                     required
-                                    maxLength={50}
+                                    maxLength={250}
                                     feedbackInvalid="Ít hơn 50 ký tự"
                                     onChange={(e) => handleSetUpdatePostCreatorName(e.target.value)}
                                     value={updatePostCreatorName}
@@ -528,7 +528,7 @@ const PostManagement = () => {
                                     className="mt-4"
                                     type="file"
                                     placeholder="Hình đại diện bài viết"
-                                    maxLength={50}
+                                    maxLength={250}
                                     feedbackInvalid="Không bỏ trống"
                                     onChange={handleSetUpdatePostAvatarImage}
                                     aria-describedby="exampleFormControlInputHelpInline"

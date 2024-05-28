@@ -417,8 +417,8 @@ const RoleManagement = () => {
                                 className="mt-4"
                                 type="text"
                                 placeholder="Tên vai trò"
-                                maxLength={50}
-                                feedbackInvalid="Không bỏ trống và phải ít hơn 50 ký tự"
+                                maxLength={250}
+                                feedbackInvalid="Không bỏ trống và phải ít hơn 250 ký tự"
                                 onChange={(e) => handleSetAddRoleName(e.target.value)}
                                 value={addRoleName}
                                 aria-describedby="exampleFormControlInputHelpInline"
@@ -432,8 +432,8 @@ const RoleManagement = () => {
                                 className="mt-4"
                                 type="text"
                                 placeholder="Mô tả vai trò"
-                                maxLength={250}
-                                feedbackInvalid="Không bỏ trống và ít hơn 250 ký tự"
+                                maxLength={500}
+                                feedbackInvalid="Không bỏ trống và ít hơn 500 ký tự"
                                 onChange={(e) => handleSetAddRoleDescription(e.target.value)}
                                 value={addRoleDescription}
                                 rows={3}
@@ -636,8 +636,8 @@ const RoleManagement = () => {
                                     className="mt-4"
                                     type="text"
                                     placeholder="Tên vai trò"
-                                    maxLength={50}
-                                    feedbackInvalid="Ít hơn 50 ký tự"
+                                    maxLength={250}
+                                    feedbackInvalid="Ít hơn 250 ký tự"
                                     onChange={(e) => handleSetUpdateRoleName(e.target.value)}
                                     value={updateRoleName}
                                     aria-describedby="exampleFormControlInputHelpInline"
@@ -653,8 +653,8 @@ const RoleManagement = () => {
                                     onChange={(e) => handleSetUpdateRoleDescription(e.target.value)}
                                     value={updateRoleDescription}
                                     rows={3}
-                                    maxLength={250}
-                                    feedbackInvalid="Ít hơn 250 ký tự"
+                                    maxLength={500}
+                                    feedbackInvalid="Ít hơn 500 ký tự"
                                     aria-describedby="exampleFormControlInputHelpInline"
                                 ></CFormTextarea>
                             </CCol>
