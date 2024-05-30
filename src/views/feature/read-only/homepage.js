@@ -21,6 +21,7 @@ import mapItem from "../../../icons/mapItem.png";
 import scheduleItem from "../../../icons/scheduleItem.png";
 import sensorItem from "../../../icons/sensorItem.png";
 import newsItem from "../../../icons/newsItem.png";
+import menu from "../../../icons/menu.png";
 
 //service 
 import station from "src/services/station"
@@ -602,33 +603,44 @@ const HomePage = () => {
         sRef?.current?.scrollIntoView()
     }
 
+    const [activeSticky, setActiveSticky] = useState(false);
+
     const stickyMenu = () => {
         return <>
             <div className={clsx(styles.stickyMenu, 'sticky-top')}>
-                <div className={clsx(styles.stickyMenuList)}>
+                <div className={clsx(styles.stickyButton)}>
+                    <img 
+                        onClick={() => setActiveSticky(!activeSticky)}
+                        src={menu}
+                    />
+                </div>
+                <div className={clsx({
+                    [styles.stickyMenuList]: true,
+                    [styles.stickyHide]: activeSticky
+                })}>
                     <div onClick={() => scrollToMyView(myMenuRef1)} className={clsx(styles.stickyMenuItem)} >
-                        <img src={mapItem} />
                         <span className="text-primary">
-                            Vị trí cống / đập và cảm biến
+                            Vị trí
                         </span>
+                        <img src={mapItem} />
                     </div>
                     <div onClick={() => scrollToMyView(myMenuRef2)} className={clsx(styles.stickyMenuItem)} >
-                        <img src={scheduleItem} />
                         <span className="text-primary">
-                            Lịch đóng mở cống / đập
+                            Lịch mở
                         </span>
+                        <img src={scheduleItem} />
                     </div>
                     <div onClick={() => scrollToMyView(myMenuRef3)} className={clsx(styles.stickyMenuItem)} >
-                        <img src={sensorItem} />
                         <span className="text-primary">
-                            Thông tin trạm quan trắc
+                            Thông tin trạm
                         </span>
+                        <img src={sensorItem} />
                     </div>
                     <div onClick={() => scrollToMyView(myMenuRef4)} className={clsx(styles.stickyMenuItem)} >
-                        <img src={newsItem} />
                         <span className="text-primary">
-                            Tin tức mới nhất
+                            Tin tức
                         </span>
+                        <img src={newsItem} />
                     </div>
                 </div>
             </div>

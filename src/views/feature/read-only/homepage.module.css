@@ -1,27 +1,35 @@
 .stickyMenu {
     padding: 15px 0;
+    top: 100px;
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: column;
 }
 
 .stickyMenuList {
     display: flex;
     justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-wrap: nowrap;
+    height: 240px;
+    transition: all linear 0.3s;
 }
 
 .stickyMenuItem{
-    margin: 0 20px;
+    margin: 10px 0;
     text-decoration: none;
     transition: all linear 0.2s;
     flex-wrap: nowrap;
     overflow: hidden;
     cursor: pointer;
+    display: flex;
 }
 
 
 .stickyMenuItem img{
     width: 40px;
-    margin-right: 10px;
+    margin-left: 10px;
     background-color: white;
     border-radius: 50px;
     padding: 4px;
@@ -29,10 +37,42 @@
 }
 
 .stickyMenuItem span {
+    border-radius: 50px;
+    display: block;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     font-weight: bold;
+    background-color: white;
+    padding: 10px;
+    border: 2px solid rgb(20, 41, 119);
+
 }
 
 .stickyMenuItem:hover {
     transform: scale(1.05);
     text-decoration: underline;
 } 
+
+.stickyButton {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.stickyButton img{
+    width: 40px;
+    background-color: white;
+    border-radius: 50px;
+    border: 2px solid black;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all linear 0.2s;
+}
+
+.stickyButton img:hover {
+    transform: scale(1.05);
+}
+
+.stickyHide {
+    height: 0px;
+}
