@@ -199,7 +199,7 @@ const AppFooter = () => {
 
       </div>
         {
-          havingUpdateFooter && <div className='ms-3'>
+          havingUpdateFooter && <div className='ms-md-3'>
           <CButton className='btn btn-primary' onClick={openUpdateFooterModal}>
             <CIcon icon={cilPencil} className='me-2'/>
             Cập nhật
