@@ -419,7 +419,7 @@ const StationDetail = () => {
     const generateToolBar = () => {
       return <>
         <CRow>
-          <CCol xs={5}>
+          <CCol md={5} xs={7}>
             {
               // viewMode === 'table' && 
               <div className="station-detail2__body__date-range-sort">
@@ -444,7 +444,7 @@ const StationDetail = () => {
               </div>
             }
           </CCol>
-          <CCol xs={7} className="station-detail2__body__formating">
+          <CCol md={7} xs={5} className="station-detail2__body__formating">
             {
               viewMode === 'table' && 
               <button className="download-btn"
@@ -472,6 +472,42 @@ const StationDetail = () => {
               </div>
             </Tooltip>
           </CCol>
+
+          {/* responsive */}
+          <CCol md={7} xs={5} className="station-detail2__body__formating station-detail2__body__formating--responsive">
+            {
+              viewMode === 'table' && 
+              <Tooltip title="Tải xuống" arrow>
+                <button className="download-btn"
+                  onClick={() => handleShowDownloadingCard()}
+                >
+                  <FontAwesomeIcon icon={faCircleDown}/>
+                </button>
+              </Tooltip>
+            }
+            {
+              viewMode == "chart" &&
+              <Tooltip title="Bảng số liệu" arrow>
+                <div 
+                  className={viewMode === 'table' ? "station-detail2__body__formating__item station-detail2__body__formating__item--active" : "station-detail2__body__formating__item"} 
+                  onClick={() => {handleChangeViewModeRynan('table')}}
+                >
+                  <FontAwesomeIcon icon={faTableCells}/>
+                </div>
+              </Tooltip>
+            }
+            {
+              viewMode === "table" &&
+              <Tooltip title="Biểu đồ" arrow>
+                <div 
+                  className={viewMode === 'chart'? "station-detail2__body__formating__item station-detail2__body__formating__item--active" : "station-detail2__body__formating__item"} 
+                  onClick={() => {handleChangeViewModeRynan('chart')}}
+                >
+                  <FontAwesomeIcon icon={faChartLine}/>
+                </div>
+              </Tooltip>
+            }
+          </CCol>
         </CRow>
         {
           visibleDownloadCard !== undefined && <>
@@ -482,22 +518,26 @@ const StationDetail = () => {
                       Thời gian
                     </div>
                     <div className="download-card__content__time__input-group">
-                      <label htmlFor="">Từ</label>
-                      <input type="date" 
-                        value={selectedDateRange.from} 
-                        min={dateRange.startDate} 
-                        max={dateRange.endDate} 
-                        name="from"
-                        onChange={handleSelectedDateRange}
-                      />
-                      <label htmlFor="">đến</label>
-                      <input 
-                        type="date" value={selectedDateRange.to} 
-                        min={dateRange.startDate} 
-                        max={dateRange.endDate} 
-                        name="to"
-                        onChange={handleSelectedDateRange}
-                      />
+                      <div className="from">
+                        <label htmlFor="">Từ</label>
+                        <input type="date" 
+                          value={selectedDateRange.from} 
+                          min={dateRange.startDate} 
+                          max={dateRange.endDate} 
+                          name="from"
+                          onChange={handleSelectedDateRange}
+                        />
+                      </div>
+                      <div className="to">
+                        <label htmlFor="">đến</label>
+                        <input 
+                          type="date" value={selectedDateRange.to} 
+                          min={dateRange.startDate} 
+                          max={dateRange.endDate} 
+                          name="to"
+                          onChange={handleSelectedDateRange}
+                        />
+                      </div>
                     </div>
                 </div>
                 <div className="download-card__content__sensor-option">
@@ -541,7 +581,7 @@ const StationDetail = () => {
           <div className="chart">
             <CRow>
               <CCol>
-                <CNav variant="tabs" role="tablist">
+                <CNav variant="tabs" role="tablist" className="chart__nav">
                   {
                     sensorListRynan.map((sensor, index) => {
                       return <>
@@ -587,11 +627,10 @@ const StationDetail = () => {
     const generateTable = () => {
       return <>
           {
-            <div>
-              <CRow className="station-detail2__body__table" style={{position: 'relative'}}>
-                {/* <CCol xs={2}></CCol> */}
-                <CCol xs={8} style={{position: 'relative'}}>
-                  <CNav variant="tabs" role="tablist" >
+            <div className="table">
+              <CRow className="station-detail2__body__table">
+                <CCol md={8} xs={12}> 
+                  <CNav variant="tabs" role="tablist" className="chart__nav">
                     {
                       sensorListRynan.map((sensor, index) => {
                         return <>
@@ -617,7 +656,7 @@ const StationDetail = () => {
                       sensorListRynan.map((sensor, index) => {
                         return <>
                           <CTabPane role="tabpanel" aria-labelledby="profile-tab-pane" visible={activeKey === index}>
-                            <table className="sensor-value__specific-sensor">
+                            <table className="sensor-value__specific-sensor ">
                               <thead>
                                 <tr>
                                     <th className="time">Thời gian
@@ -656,7 +695,7 @@ const StationDetail = () => {
                     }
                   </CTabContent>
                 </CCol>
-                <CCol xs={4}>
+                <CCol md={4} xs={12}>
                   <div className="station-detail2__body__table__general-index">
                     <div className="station-detail2__body__table__general-index__header">
                       Chỉ số chung

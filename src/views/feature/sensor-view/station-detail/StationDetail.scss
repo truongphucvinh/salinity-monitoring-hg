@@ -95,15 +95,24 @@
             &__item + &__item {
                 margin-left: 5px;
             }
+            &--responsive {
+                display: none;
+            }
         }
         &__table {
-            margin-top: 10px;
+            .nav-tabs {
+                padding: 0;
+                padding-top: 0.6rem;
+            }
+            .tab-content {
+                padding: 0;
+            }
             .nav-link {
                 color: black !important;
             }
             table {
                 background-color: white;
-                @extend %shadow;
+                // @extend %shadow;
                 width: 100%;
                 th {
                     padding: 10px;
@@ -140,9 +149,9 @@
             &__general-index {
                 margin-top: 40px;
                 background-color: #f8f8f8;
-                // height: 300px;
                 height: auto;
                 padding: 20px;
+                @extend %shadow;
                 &__header {
                     height: 42px;
                     font-weight: bold;
@@ -210,7 +219,8 @@
     padding: 20px;
     margin-top: 85px;
     margin-right: 114px;
-    width: 430px;
+    margin-left: 10px;
+    max-width: 430px;
     position: absolute;
     z-index: 5;
     background-color: white;
@@ -222,6 +232,7 @@
                 font-weight: bold;
             }
             &__input-group {
+                display: flex;
                 margin-top: 10px;
                 input {
                     min-width: 150px;
@@ -329,3 +340,82 @@
         transform:rotate(360deg); 
     } 
 }
+
+@media only screen and (max-width: 768px) {
+    .chart, .table {
+        &__nav {
+                max-width: 100wh;
+                overflow-x: auto;
+                overflow-y: hidden;
+                white-space: nowrap;
+                display: block;
+                li {
+                    display: inline-block;
+                }
+        }
+    }
+
+    .station-detail2 {
+        &__body {
+            height: auto;
+            &__table {
+                &__general-index {
+                    margin-top: 30px;
+                    padding-top: 20px !important;
+                    border-top: 1px solid black;
+                }
+            }
+            &__formating {
+                display: none;
+                &--responsive {
+                    display: flex;
+                }
+                &__item {
+                    height: 35px;
+                    width: 35px;
+                }
+            }
+        }
+    }
+
+    .download-btn {
+        margin-right: 10px;
+        padding: 0; 
+        border: none;
+        background-color: transparent !important;
+    }
+
+    .download-card {
+        margin-right: 0px;
+        margin-top: 78px;
+    }
+  }
+
+  @media only screen and (max-width: 507px) {
+    .download-card {
+        &__content {
+            &__time {
+                &__input-group {
+                    display: block;
+                    .from, .to {
+                        label {
+                            width: 30px;
+                        }
+                    }
+                    .to {
+                        margin-top: 15px;
+                    }
+                }
+            }
+        }
+    }
+    .station-detail2 {
+        &__body {
+            &__date-range-sort {
+                input {
+                    min-width: 110px;
+                }
+            }
+        }
+    }
+  }
