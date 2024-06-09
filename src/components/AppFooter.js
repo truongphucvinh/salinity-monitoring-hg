@@ -171,7 +171,7 @@ const AppFooter = () => {
   const [toast, addToast] = useState(0)
   const toaster = useRef()
   return (
-    <CFooter className="px-4">
+    <CFooter className="px-4"  id="news">
       <CToaster ref={toaster} push={toast} placement="top-end" />
       <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateFooter} setExternalState={setHavingUpdateFooter}/>
       <CustomModal visible={updateFooterVisible} title={'Cập nhật chân trang'} body={updateFooterForm(projectState)} setVisible={(value) => setUpdateFooterVisible(value)}/>

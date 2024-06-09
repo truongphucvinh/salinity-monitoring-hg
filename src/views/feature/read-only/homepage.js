@@ -539,7 +539,8 @@ const HomePage = () => {
                             }
                         </CCardHeader>
                         <CCardBody>
-                            <div className="news" id="news">
+                            <div className="news"> 
+                            {/* id="news" */}
                                 {
                                     latestNews.length !== 0 ? 
                                         <div className="news__image-list">
@@ -555,7 +556,7 @@ const HomePage = () => {
                                                             </div>
                                                             <div 
                                                                 className="news__image-list__item__brief" 
-                                                                dangerouslySetInnerHTML={{__html: news?.postContent}}
+                                                                dangerouslySetInnerHTML={{__html: news?.postContent.length > 130 ? news?.postContent.substring(0,130) + "..." :  news?.postContent.substring(0,100)}}
                                                                 >
                                                                 {/* .replace(/\n/g,"<br />"); cut line break */}
                                                             </div>
