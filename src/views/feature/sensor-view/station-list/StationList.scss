@@ -61,11 +61,9 @@
         }
     }
     &__action {
-        // background-color: rgba(0, 0, 0, 0.08);
         padding: 20px 20px;
         display: flex;
         justify-content: right;
-        // margin-top: px;
         &__cancel-btn {
             margin-right: 10px;
             @include button(100px, 40px, white);
