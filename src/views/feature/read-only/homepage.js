@@ -607,7 +607,7 @@ const HomePage = () => {
 
     const stickyMenu = () => {
         return <>
-            <div className={clsx(styles.stickyMenu, 'sticky-top')}>
+            <div className={clsx(styles.stickyMenu)}>
                 <div className={clsx(styles.stickyButton)}>
                     <img 
                         onClick={() => setActiveSticky(!activeSticky)}
