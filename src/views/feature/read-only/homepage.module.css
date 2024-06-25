@@ -1,9 +1,14 @@
 .stickyMenu {
+    position: fixed;
+    top: 175px;
+    right: 25px;
     padding: 15px 0;
-    top: 100px;
+    width: fit-content;
     display: flex;
     justify-content: flex-end;
+    align-items: flex-end;
     flex-direction: column;
+    z-index: 9999 !important;
 }
 
 .stickyMenuList {
@@ -14,6 +19,7 @@
     flex-wrap: nowrap;
     height: 240px;
     transition: all linear 0.3s;
+    width: fit-content;
 }
 
 .stickyMenuItem{
@@ -24,6 +30,7 @@
     overflow: hidden;
     cursor: pointer;
     display: flex;
+    width: fit-content;
 }
 
 
