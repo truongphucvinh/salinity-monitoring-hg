@@ -130,13 +130,51 @@ export const  convertDateFormat = (dateString) => {
     return day + '/' + month + '/' + year;
 }
 
+// export const getDamScheduleBeginAt = (damSchedule) => {
+//     return `${damSchedule?.damScheduleBeginAt[3]}:${damSchedule?.damScheduleBeginAt[4] ? damSchedule?.damScheduleBeginAt[4] : '00'}:${damSchedule?.damScheduleBeginAt[5] ? damSchedule?.damScheduleBeginAt[5] : '00'} ${damSchedule?.damScheduleBeginAt[2]}/${damSchedule?.damScheduleBeginAt[1]}/${damSchedule?.damScheduleBeginAt[0]}`
+// }
 export const getDamScheduleBeginAt = (damSchedule) => {
-    return `${damSchedule?.damScheduleBeginAt[3]}:${damSchedule?.damScheduleBeginAt[4] ? damSchedule?.damScheduleBeginAt[4] : '00'}:${damSchedule?.damScheduleBeginAt[5] ? damSchedule?.damScheduleBeginAt[5] : '00'} ${damSchedule?.damScheduleBeginAt[2]}/${damSchedule?.damScheduleBeginAt[1]}/${damSchedule?.damScheduleBeginAt[0]}`
+    const hour = damSchedule?.damScheduleBeginAt[3];
+    const minute = damSchedule?.damScheduleBeginAt[4] || '00';
+    const second = damSchedule?.damScheduleBeginAt[5] || '00';
+    const day = damSchedule?.damScheduleBeginAt[2];
+    const month = damSchedule?.damScheduleBeginAt[1];
+    const year = damSchedule?.damScheduleBeginAt[0];
+
+    // Pad single-digit values with leading zeros
+    const formattedHour = hour < 10 ? `0${hour}` : hour;
+    const formattedMinute = minute < 10 ? `0${minute}` : minute;
+    const formattedSecond = second < 10 ? `0${second}` : second;
+    const formattedDay = day < 10 ? `0${day}` : day;
+    const formattedMonth = month < 10 ? `0${month}` : month;
+
+    return `${formattedHour}h${formattedMinute} ngày ${formattedDay}/${formattedMonth}/${year}`;
 }
 
+
+// export const getDamScheduleEndAt = (damSchedule) => {
+//     return `${damSchedule?.damScheduleEndAt[3]}:${damSchedule?.damScheduleEndAt[4] ? damSchedule?.damScheduleEndAt[4] : '00'}:${damSchedule?.damScheduleEndAt[5] ? damSchedule?.damScheduleEndAt[5] : '00'} ${damSchedule?.damScheduleEndAt[2]}/${damSchedule?.damScheduleEndAt[1]}/${damSchedule?.damScheduleEndAt[0]}`
+// }
+
 export const getDamScheduleEndAt = (damSchedule) => {
-    return `${damSchedule?.damScheduleEndAt[3]}:${damSchedule?.damScheduleEndAt[4] ? damSchedule?.damScheduleEndAt[4] : '00'}:${damSchedule?.damScheduleEndAt[5] ? damSchedule?.damScheduleEndAt[5] : '00'} ${damSchedule?.damScheduleEndAt[2]}/${damSchedule?.damScheduleEndAt[1]}/${damSchedule?.damScheduleEndAt[0]}`
+    const hour = damSchedule?.damScheduleEndAt[3];
+    const minute = damSchedule?.damScheduleEndAt[4] || '00';
+    const second = damSchedule?.damScheduleEndAt[5] || '00';
+    const day = damSchedule?.damScheduleEndAt[2];
+    const month = damSchedule?.damScheduleEndAt[1];
+    const year = damSchedule?.damScheduleEndAt[0];
+
+    // Pad single-digit values with leading zeros
+    const formattedHour = hour < 10 ? `0${hour}` : hour;
+    const formattedMinute = minute < 10 ? `0${minute}` : minute;
+    const formattedSecond = second < 10 ? `0${second}` : second;
+    const formattedDay = day < 10 ? `0${day}` : day;
+    const formattedMonth = month < 10 ? `0${month}` : month;
+
+    return `${formattedHour}h${formattedMinute} ngày ${formattedDay}/${formattedMonth}/${year}`;
 }
+
+
 
 export const getDatetimeFromDB = (response) => {
     return `${response[2]}/${response[1]}/${response[0]}`

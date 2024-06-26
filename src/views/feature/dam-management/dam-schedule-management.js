@@ -30,7 +30,7 @@ import CustomPagination from "src/views/customs/my-pagination"
 import CustomModal from "src/views/customs/my-modal"
 import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
-import { createDamSchedule,  defaultDamStatusId, deleteDamSchedule,  getAllDamSchedules,  getDamScheduleId,  updateDamSchedule } from "src/services/dam-services"
+import { createDamSchedule,  getAllDamSchedules,  getDamScheduleId,  updateDamSchedule } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
 import CustomDateTimePickerV2 from "src/views/customs/my-datetimepicker/my-datetimepicker-time"
 import { formatDate, getDamScheduleBeginAt, getDamScheduleEndAt } from "src/tools"
@@ -251,8 +251,8 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
                 setAddVisible(false)
                 rebaseAllData()
                 addToast(createToast({
-                    title: 'Thêm lịch mở đập',
-                    content: 'Thêm lịch mở đập thành công',
+                    title: 'Thêm lịch đóng đập',
+                    content: 'Thêm lịch đóng đập thành công',
                     icon: createSuccessIcon()
                 }))
                 rebaseDetailPage()
@@ -260,8 +260,8 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
             })
             .catch(err => {
                 addToast(createToast({
-                    title: 'Thêm lịch mở đập',
-                    content: err?.response?.data?.message ? err?.response?.data?.message : "Thêm lịch mở đập không thành công",
+                    title: 'Thêm lịch đóng đập',
+                    content: err?.response?.data?.message ? err?.response?.data?.message : "Thêm lịch đóng đập không thành công",
                     icon: createFailIcon()
                 }))
             })
@@ -282,7 +282,7 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
                             <CustomDateTimePickerV2 
                                 value={addDamScheduleBeginAt}
                                 setValue={handleSetAddDamScheduleBeginAt}
-                                placeholder={'Ngày mở'}
+                                placeholder={'Ngày đóng'}
                             /> 
                         </CCol>
                     </CRow>
@@ -301,7 +301,7 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
                             <CFormTextarea
                                 className="mt-4"
                                 type="text"
-                                placeholder="Mô tả lịch mở đập"
+                                placeholder="Mô tả lịch đóng đập"
                                 maxLength={250}
                                 feedbackInvalid="Không bỏ trống và ít hơn 250 ký tự"
                                 onChange={(e) => handleSetAddDamScheduleDescription(e.target.value)}
@@ -359,16 +359,16 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
                     rebaseDetailPage()
                 }else {
                     addToast(createToast({
-                        title: 'Cập nhật lịch mở đập',
-                        content: "Thông tin lịch mở đập không đúng",
+                        title: 'Cập nhật lịch đóng đập',
+                        content: "Thông tin lịch đóng đập không đúng",
                         icon: createFailIcon()
                     }))
                 }
             })
             .catch(err => {
                 addToast(createToast({
-                    title: 'Cập nhật lịch mở đập',
-                    content: "Thông tin lịch mở đập không đúng",
+                    title: 'Cập nhật lịch đóng đập',
+                    content: "Thông tin lịch đóng đập không đúng",
                     icon: createFailIcon()
                 }))
             })
@@ -419,16 +419,16 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
                 setUpdateVisible(false)
                 rebaseAllData()
                 addToast(createToast({
-                    title: 'Cập nhật lịch mở đập',
-                    content: 'Cập nhật lịch mở đập thành công',
+                    title: 'Cập nhật lịch đóng đập',
+                    content: 'Cập nhật lịch đóng đập thành công',
                     icon: createSuccessIcon()
                 }))
                 setUpdateValidated(false)
             })
             .catch(err => {
                 addToast(createToast({
-                    title: 'Cập nhật lịch mở đập',
-                    content: err?.response?.data?.message ? err?.response?.data?.message : "Cập nhật lịch mở đập không thành công",
+                    title: 'Cập nhật lịch đóng đập',
+                    content: err?.response?.data?.message ? err?.response?.data?.message : "Cập nhật lịch đóng đập không thành công",
                     icon: createFailIcon()
                 }))
             })  
@@ -450,7 +450,7 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
                                 <CustomDateTimePickerV2 
                                     value={updateDamScheduleBeginAt}
                                     setValue={handleSetUpdateDamScheduleBeginAt}
-                                    placeholder={'Ngày mở'}
+                                    placeholder={'Ngày đóng'}
                                 /> 
                             </CCol>
                         </CRow>
@@ -469,7 +469,7 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
                                 <CFormTextarea
                                     className="mt-4"
                                     type="text"
-                                    placeholder="Mô tả lịch mở đập"
+                                    placeholder="Mô tả lịch đóng đập"
                                     maxLength={250}
                                     feedbackInvalid="Không bỏ trống và ít hơn 250 ký tự"
                                     onChange={(e) => handleSetUpdateDamScheduleDescription(e.target.value)}
@@ -502,8 +502,8 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
                 setDeleteVisible(false)
                 rebaseAllData()
                 addToast(createToast({
-                    title: 'Vô hiệu lịch mở đập',
-                    content: 'Vô hiệu lịch mở đập thành công',
+                    title: 'Vô hiệu lịch đóng đập',
+                    content: 'Vô hiệu lịch đóng đập thành công',
                     icon: createSuccessIcon()
                 }))
                 setUpdateValidated(false)
@@ -511,8 +511,8 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
             })
             .catch(err => {
                 addToast(createToast({
-                    title: 'Vô hiệu lịch mở đập',
-                    content: "Vô hiệu lịch mở đập không thành công",
+                    title: 'Vô hiệu lịch đóng đập',
+                    content: "Vô hiệu lịch đóng đập không thành công",
                     icon: createFailIcon()
                 }))
             })
@@ -531,7 +531,7 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
                     }}>
                         <CRow>
                             <CCol md={12}>
-                                <p>Bạn có chắc muốn xóa lịch mở đập này ?</p>
+                                <p>Bạn có chắc muốn xóa lịch đóng đập này ?</p>
                             </CCol>
                             <CCol md={12} className="d-flex justify-content-end">
                                 <CButton color="primary" type="submit">Xác nhận</CButton>
@@ -578,9 +578,9 @@ const DamScheduleManagement = ({damInstance, rebaseDetailPage}) => {
         <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateFeature} setExternalState={setHaveUpdating}/>
         <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleDeleteFeature} setExternalState={setHaveDeleting}/>
         <CCardBody>
-            <CustomModal visible={addVisible} title={'Thêm lịch mở đập'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
-            <CustomModal visible={updateVisible} title={'Cập nhật lịch mở đập'} body={updateForm(updateDamScheduleBeginAt)} setVisible={(value) => setUpdateVisible(value)}/>
-            <CustomModal visible={deleteVisible} title={'Xóa người lịch mở đập'} body={deleteForm(deleteDamScheduleId)} setVisible={(value) => setDeleteVisible(value)}/>
+            <CustomModal visible={addVisible} title={'Thêm lịch đóng đập'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
+            <CustomModal visible={updateVisible} title={'Cập nhật lịch đóng đập'} body={updateForm(updateDamScheduleBeginAt)} setVisible={(value) => setUpdateVisible(value)}/>
+            <CustomModal visible={deleteVisible} title={'Xóa người lịch đóng đập'} body={deleteForm(deleteDamScheduleId)} setVisible={(value) => setDeleteVisible(value)}/>
             <CForm onSubmit={(e)=>{
                 e.preventDefault()
                 onFilter()
