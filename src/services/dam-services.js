@@ -1,7 +1,5 @@
 import { damApi } from "./global-axios"
 
-export const defaultDamStatusId = process.env.DAM_STATUS_OPEN_ID || 'fb6b6286-d66b-4746-afc2-7e6f3140066f'
-
 export const getAllDamTypes = () => damApi.get('/dam-types')
 export const getDamTypeById = (damTypeId) => damApi.get(`/dam-types/${damTypeId}`)
 export const createDamType = (damType) => damApi.post('/dam-types', damType)

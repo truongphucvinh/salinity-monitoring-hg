@@ -210,7 +210,7 @@ const HomePage = () => {
             <CTable>
                 <CTableHead>
                     <CTableRow>
-                        <CTableHeaderCell>Lịch mở cống / đập</CTableHeaderCell>
+                        <CTableHeaderCell>Lịch đóng mở cống / đập</CTableHeaderCell>
                     </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -547,7 +547,11 @@ const HomePage = () => {
                 <CCol>
                     <CCard className="mb-4">
                         <CCardHeader className="news-header">
-                            <div className="news-header__title">Tin tức mới nhất</div>
+                            <div className="news-header__title">Tin tức mới nhất
+                                <a className="ms-3" href="http://khuyennonghaugiang.com.vn/" target="__blank">
+                                    Website Trung tâm khuyến nông tỉnh Hậu Giang
+                                </a>
+                            </div>
                             {
                                 newsList.length > 4 && 
                                     <div className="news-header__view-more" 
@@ -751,7 +755,7 @@ const HomePage = () => {
             <CCol xs={12}>
                 <CCard className="mb-4">
                     <CCardHeader>
-                        Lịch mở cống / đập
+                        Lịch đóng mở cống / đập
                     </CCardHeader>
                     <CCardBody>
                         <CustomModal visible={damVisible} title={'Thông tin cống / đập'} body={damInfo()} setVisible={(value) => setDamVisible(value)}/>

@@ -151,7 +151,7 @@ const DamDetail = () => {
                             {
                                 isSchedule && <CRow>
                                     <CCol lg={12}>
-                                        <h4 className="text-center my-4 fw-bold" style={{'color': 'black'}}>Lịch mở đập</h4>
+                                        <h4 className="text-center my-4 fw-bold" style={{'color': 'black'}}>Lịch đóng đập</h4>
                                         <DamScheduleManagement damInstance={dam} rebaseDetailPage={rebaseAllData}/>
                                     </CCol>
                                 </CRow>
