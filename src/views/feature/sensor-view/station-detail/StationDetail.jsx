@@ -140,7 +140,6 @@ const StationDetail = () => {
       startDate = selectedDateRangeSort.from.replaceAll("-", "/");
       observation.getDataStation(id, startDate, endDate, 1, 10000)
         .then((res) => {
-          console.log("res: ", res);
           var now = new Date();
           now = `${now.getFullYear()}/${addZero(now.getMonth()+1)}/${addZero(now.getDate())}`;
           if(now!==endDate) { //test
@@ -152,7 +151,6 @@ const StationDetail = () => {
           // get sensor list
           var sensorList = [];
           var ltsValue = [];
-          console.log("firstLoad: ", firstLoad);
           for(const sensor in res.data[0]) {
             if(sensor !== "trang_thai" && !isNaN(res.data[0][sensor]) && res.data[0][sensor] !== null) {
               sensorList.push(sensor);

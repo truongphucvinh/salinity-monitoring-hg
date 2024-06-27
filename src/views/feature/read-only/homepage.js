@@ -428,33 +428,26 @@ const HomePage = () => {
             <CTable bordered align="middle" className="mb-0 border sensor-station-list" responsive>
                 <CTableHead  className="text-nowrap">
                     <CTableRow>
-                        <CTableHeaderCell className="bg-body-tertiary sensor-station-list__no" style={{'width' : '5%'}}>STT</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary sensor-station-list__no" style={{'width' : '5%'}}>#</CTableHeaderCell>
                         <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Trạm</CTableHeaderCell>
                         <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Cảm biến</CTableHeaderCell>
                         <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Giá trị </CTableHeaderCell>
                         <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Thời gian</CTableHeaderCell>
-                        {
-                            rynanStationList?.length > 3 && 
-                            <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15px'}}></CTableHeaderCell>
-                        }
                     </CTableRow>
                 </CTableHead>
-            </CTable>
-            <div className="sensor-station-list__table-content">
-                <CTable bordered align="middle" className="mb-0 border sensor-station-list" responsive>
-                    <CTableBody>
+                <CTableBody>
                         {
                             rynanStationList.map((station, stationIndex) => {
                                 return station?.sensor?.sensor?.map((sensor, sensorIndex) => {
                                     if(sensorIndex==0) {
                                         return <CTableRow key={station?.so_serial+sensorIndex}>
                                             <CTableDataCell className="sensor-station-list__no" style={{'width' : '5%'}} rowSpan={station?.sensor?.sensor?.length}>{ stationIndex+1 }</CTableDataCell>
-                                            <CTableDataCell style={{'width' : '30%'}} rowSpan={station?.sensor?.sensor?.length}>
+                                            <CTableDataCell className="sensor-station-list__name" style={{'width' : '30%'}} rowSpan={station?.sensor?.sensor?.length}>
                                                 <span 
                                                     style={{cursor: 'pointer'}}
                                                     onClick={() => handelDirectToDetail(station?.so_serial)}
                                                 >
-                                                    <b>{ station.ten_thiet_bi }</b>
+                                                    <span className="name">{ station.ten_thiet_bi }</span>
                                                 </span> <br/>
                                                 { station.khu_vuc_lap_dat }
                                             </CTableDataCell>
@@ -466,15 +459,13 @@ const HomePage = () => {
                                         return <CTableRow key={sensorIndex}>
                                             <CTableDataCell style={{'width' : '25%'}}>{ generateSensorName(sensor.name) }</CTableDataCell>
                                             <CTableDataCell style={{'width' : '20%'}}>{ sensor.value }</CTableDataCell>
-                                            {/* <CTableDataCell>{ sensor.time }</CTableDataCell> */}
                                         </CTableRow>
                                     }
                                 })
                             })
                         }
                     </CTableBody>
-                </CTable>
-            </div>
+            </CTable>
         </>
     }
 
