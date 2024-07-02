@@ -67,8 +67,10 @@ const StationList = () => {
   }
 
   const navigate = useNavigate()
-  const handelDirectToDetail = (thingId) => {
-    navigate(`station-detail/${thingId}`);
+  const handelDirectToDetail = (thingId, status) => {
+    if(status!==0) {
+      navigate(`station-detail/${thingId}`);
+    }
   }
 
     const defaultPageCode = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_station_management"
@@ -90,7 +92,7 @@ const StationList = () => {
                     <CTable bordered align="middle" className="mb-0 border" hover responsive>
                       <CTableHead className="text-nowrap">
                         <CTableRow>
-                          <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>STT</CTableHeaderCell>
+                          <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
                           <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Tên trạm</CTableHeaderCell>
                           <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '35%'}}>Địa chỉ</CTableHeaderCell>
                           <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Trạng thái</CTableHeaderCell>
@@ -103,14 +105,14 @@ const StationList = () => {
                             return <>
                               <CTableRow onClick={() => setStationIsSelected(station)} key={index}>
                                 <CTableDataCell>{ index+1 }</CTableDataCell>
-                                <CTableDataCell style={{'cursor': 'pointer'}} onClick={() => handelDirectToDetail(station?.so_serial)}>
+                                <CTableDataCell style={{'cursor': 'pointer', 'color': '#5856dd', 'textDecoration': 'underline'}} onClick={() => handelDirectToDetail(station?.so_serial, station?.trang_thai)}>
                                   { station.ten_thiet_bi }
                                 </CTableDataCell>
                                 <CTableDataCell>{ station.khu_vuc_lap_dat }</CTableDataCell>
                                 <CTableDataCell style={{display: "flex", alignItem: 'center'}}>
-                                  <div className={station.trang_thai ? "station-status station-status--active" : "station-status station-status--inactive"}></div>
+                                  <div className={station.trang_thai === 1 ? "station-status station-status--active" : "station-status station-status--inactive"}></div>
                                   {
-                                    station.trang_thai ? <span>Đang hoạt động</span> : <span>Trạm đang khóa</span>
+                                    station.trang_thai === 1 ? <span>Đang hoạt động</span> : <span>Trạm đang khóa</span>
                                   }
                                 </CTableDataCell>
                                 <CTableDataCell>

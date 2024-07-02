@@ -148,9 +148,9 @@
             }
             &__general-index {
                 margin-top: 40px;
-                background-color: #f8f8f8;
+                background-color: #f8f8f8 !important;
                 height: auto;
-                padding: 20px;
+                padding: 20px !important;
                 @extend %shadow;
                 &__header {
                     height: 42px;
@@ -359,8 +359,9 @@
             height: auto;
             &__table {
                 &__general-index {
+                    background-color: white !important;
                     margin-top: 30px;
-                    padding-top: 20px !important;
+                    padding: 20px 0 !important;
                     border-top: 1px solid black;
                 }
             }
