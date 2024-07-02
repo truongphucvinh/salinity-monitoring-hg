@@ -1,10 +1,9 @@
 .sensor-station-list {
-    &__no, th {
-        text-align: center;
-    }
-    &__table-content {
-        height: 495px;
-        overflow-y: auto;
+    &__name {
+        .name {
+            color: #5856dd;
+            text-decoration: underline;
+        }
     }
 }
 
