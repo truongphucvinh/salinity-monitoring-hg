@@ -441,6 +441,7 @@ const DamTypeManagement = () => {
                         <CRow>
                             <CCol md={12}>
                                 <p>Bạn có chắc muốn xóa loại đập này ?</p>
+                                <p><strong>Lưu ý: </strong>Các con cống / đập thuộc loại đập này sẽ bị xóa theo, nếu bạn không muốn xóa các thông tin trên, vui lòng cập nhật loại đập cho tất cả con đập thuộc loại này rồi mới thực hiện thao tác xóa!</p>
                             </CCol>
                             <CCol md={12} className="d-flex justify-content-end">
                                 <CButton color="primary" type="submit">Xác nhận</CButton>
