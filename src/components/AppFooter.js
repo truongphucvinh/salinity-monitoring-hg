@@ -178,7 +178,7 @@ const AppFooter = () => {
       <div>
         {
           projectState?.projectFooterLeftLink ? <>
-            <a href={`https://${projectState?.projectFooterLeftLink}`} target="_blank" rel="noopener noreferrer">
+            <a href={`${projectState?.projectFooterLeftLink}`} target="_blank" rel="noopener noreferrer">
               {projectState?.projectFooterLeft}
             </a>
           </> : <>
@@ -189,7 +189,7 @@ const AppFooter = () => {
       <div className="ms-auto">
         {
           projectState?.projectFooterRightLink ? <>
-            <a href={`https://${projectState?.projectFooterRightLink}`} target="_blank" rel="noopener noreferrer">
+            <a href={`${projectState?.projectFooterRightLink}`} target="_blank" rel="noopener noreferrer">
               {projectState?.projectFooterRight}
             </a>
           </> : <>
