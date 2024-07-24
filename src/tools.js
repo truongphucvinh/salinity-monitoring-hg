@@ -1,5 +1,12 @@
 import { cilLockLocked, cilLockUnlocked } from "@coreui/icons";
 
+export const getPostStatus = (post) => {
+    if (post?.postApproved === true) {
+        return "Đã duyệt"
+    }
+    return "Chưa duyệt"
+}
+
 export const getSpecificGeneralInformation = (projectCode, pageCode, projects) => {
     if (projects) {
         let filteredProjects = projects?.filter(project => {
@@ -305,9 +312,13 @@ export const googleMapLink = (lat, lng) => {
 }
 
 export const checkInitElement = (code) => {
-    const defaultInitCode = process.env.REACT_APP_HG_CODE || "init"
-    console.log(code);
-    return code === defaultInitCode
+    const damTypeDefault = process.env.REACT_APP_HG_DAM_TYPE_DEFAULT || 'dms-dam-type-default-code-1';
+    const riverDefault = process.env.REACT_APP_HG_RIVER_DEFAULT || 'dms-river-default-code-1';
+    let isValid = false
+    if (code === damTypeDefault || code === riverDefault) {
+        isValid = true
+    }
+    return isValid
 }
 
 export const generateSensorName = (rawName) => {
