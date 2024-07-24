@@ -35,11 +35,12 @@ import createToast from "src/views/customs/my-toast"
 import { createFailIcon, createSuccessIcon } from "src/views/customs/my-icon"
 import { createRiver,  deleteRiver,  getAllRivers,  getRiverById,  updateRiver } from "src/services/dam-services"
 import CustomSpinner from "src/views/customs/my-spinner"
-import { checkInitElement, googleMapLink, removeVietnameseAccents, searchRelatives, splitCoordinates } from "src/tools"
+import { addZeroToDate, checkInitElement, convertDateFormat, googleMapLink, removeVietnameseAccents, searchRelatives, splitCoordinates } from "src/tools"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthChecker from "src/views/customs/my-authchecker"
 import CustomIntroduction from "src/views/customs/my-introduction"
+import CustomDateTimePicker from "src/views/customs/my-datetimepicker/my-datetimepicker"
 
 const RiverManagement = () => {
 
@@ -134,9 +135,14 @@ const RiverManagement = () => {
                     <CTableHead className="text-nowrap">
                     <CTableRow>
                         <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
-                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Tên sông, kênh, rạch</CTableHeaderCell>
-                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '50%'}}>Mô tả</CTableHeaderCell>
-                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Thao tác</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Tên sông, kênh, rạch</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Mô tả</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '10%'}}>Dài</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '10%'}}>Rộng</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '10%'}}>Nạo vét gần nhất</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '10%'}}>Địa điểm</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '10%'}}>Cấp kênh</CTableHeaderCell>
+                        <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '10%'}}>Thao tác</CTableHeaderCell>
                     </CTableRow>
                     </CTableHead>
                 <CTableBody>
@@ -147,6 +153,11 @@ const RiverManagement = () => {
                                     <CTableDataCell>{index + 1 + duration}</CTableDataCell>
                                     <CTableDataCell>{river?.riverName}</CTableDataCell>
                                     <CTableDataCell>{river?.riverLocation}</CTableDataCell>
+                                    <CTableDataCell>{river?.riverLength} (m)</CTableDataCell>
+                                    <CTableDataCell>{river?.riverWidth} (m)</CTableDataCell>
+                                    <CTableDataCell>{convertDateFormat(river?.riverNearestProcessingAt)}</CTableDataCell>
+                                    <CTableDataCell>{river?.riverAddress}</CTableDataCell>
+                                    <CTableDataCell>{river?.riverLevel}</CTableDataCell>
                                     {
                                         checkInitElement(river?.riverCode) ? <CTableDataCell>Thông tin mặc định</CTableDataCell> : <CTableDataCell>
                                             <a href={googleMapLink(river?.riverLatitude, river?.riverLongitude)} rel="noopener noreferrer" target="_blank">
@@ -159,7 +170,7 @@ const RiverManagement = () => {
                                 </CTableRow>    
                             )
                         }) : <CTableRow>
-                            <CTableDataCell colSpan={4}><p className="text-center">{'Không có dữ liệu'}</p></CTableDataCell>
+                            <CTableDataCell colSpan={9}><p className="text-center">{'Không có dữ liệu'}</p></CTableDataCell>
                         </CTableRow>
                     }
                 </CTableBody>
@@ -174,11 +185,41 @@ const RiverManagement = () => {
         addRiverName: "",
         addRiverLocation: "",
         addRiverLatitude: "",
-        addRiverLongitude: ""
+        addRiverLongitude: "",
+        addRiverNearestProcessingAt: "",
+        addRiverLevel: "",
+        addRiverLength: "",
+        addRiverWidth: "",
+        addRiverAddress: ""
     }
     const [addState, setAddState] = useState(addData)
-    const { addRiverName, addRiverLocation, addRiverLatitude, addRiverLongitude } = addState
+    const { addRiverName, addRiverLocation, addRiverLatitude, addRiverLongitude,addRiverNearestProcessingAt,addRiverLevel,addRiverLength, addRiverWidth, addRiverAddress  } = addState
     const [addValidated, setAddValidated] = useState(false)
+    const handleSetAddRiverAddress = (value) => {
+        setAddState(prev => {
+            return { ...prev, addRiverAddress: value }
+        })
+    }
+    const handleSetAddRiverLevel = (value) => {
+        setAddState(prev => {
+            return { ...prev, addRiverLevel: value }
+        })
+    }
+    const handleSetAddRiverLength = (value) => {
+        setAddState(prev => {
+            return { ...prev, addRiverLength: value }
+        })
+    }
+    const handleSetAddRiverWidth = (value) => {
+        setAddState(prev => {
+            return { ...prev, addRiverWidth: value }
+        })
+    }
+    const handleSetAddRiverNearestProcessingAt = (value) => {
+        setAddState(prev => {
+            return { ...prev, addRiverNearestProcessingAt: value }
+        })
+    }
     const handleSetAddRiverName = (value) => {
         setAddState(prev => {
             return { ...prev, addRiverName: value }
@@ -217,7 +258,12 @@ const RiverManagement = () => {
                 riverName: addRiverName.trim(),
                 riverLocation: addRiverLocation.trim(),
                 riverLatitude: addRiverLatitude,
-                riverLongitude: addRiverLongitude
+                riverLongitude: addRiverLongitude,
+                riverAddress: addRiverAddress.trim(),
+                riverLevel: addRiverLevel.trim(),
+                riverLength: addRiverLength,
+                riverWidth: addRiverWidth,
+                riverNearestProcessingAt: addRiverNearestProcessingAt
             }
             createRiver(river)
             .then(res => {
@@ -327,6 +373,75 @@ const RiverManagement = () => {
                         </CCol>
                     </CRow>
                     <CRow>
+                        <CCol lg={12}>
+                            <CFormInput
+                                className="mt-4"
+                                type="text"
+                                placeholder="Địa điểm"
+                                maxLength={250}
+                                feedbackInvalid="Không bỏ trống và phải ít hơn 250 ký tự"
+                                onChange={(e) => handleSetAddRiverAddress(e.target.value)}
+                                value={addRiverAddress}
+                                aria-describedby="exampleFormControlInputHelpInline"
+                                required
+                            />
+                            
+                        </CCol>
+                    </CRow>
+                    <CRow>
+                        <CCol lg={6}>
+                            <CFormInput
+                                className="mt-4"
+                                type="text"
+                                placeholder="Cấp kênh"
+                                maxLength={250}
+                                feedbackInvalid="Không bỏ trống và phải ít hơn 250 ký tự"
+                                onChange={(e) => handleSetAddRiverLevel(e.target.value)}
+                                value={addRiverLevel}
+                                aria-describedby="exampleFormControlInputHelpInline"
+                                required
+                            />
+                        </CCol>
+                        <CCol lg={6}>
+                            <CustomDateTimePicker 
+                                classes='mt-4' 
+                                placeholder={'Lần nạo vét gần nhất'}
+                                value={addRiverNearestProcessingAt}
+                                setValue={handleSetAddRiverNearestProcessingAt}
+                            />
+                        </CCol>
+                    </CRow>
+                    <CRow>
+                        <CCol xs={12} lg={6}>
+                            <CFormInput
+                                className="mt-4"
+                                type="number"
+                                placeholder="Chiều dài"
+                                min={0}
+                                feedbackInvalid="Không bỏ trống và phải là số lớn hơn 0"
+                                onChange={(e) => handleSetAddRiverLength(e.target.value)}
+                                value={addRiverLength}
+                                aria-describedby="exampleFormControlInputHelpInline"
+                                required
+                                step={0.01}
+                            />
+                        </CCol>
+                        <CCol xs={12} lg={6}>
+                            <CFormInput
+                                className="mt-4"
+                                type="number"
+                                placeholder="Chiều rộng"
+                                min={0}
+                                feedbackInvalid="Không bỏ trống và phải là số lớn hơn 0"
+                                onChange={(e) => handleSetAddRiverWidth(e.target.value)}
+                                value={addRiverWidth}
+                                aria-describedby="exampleFormControlInputHelpInline"
+                                required
+                                step={0.01}
+                            />
+                        </CCol>
+                    </CRow>
+                    <CRow>
                         <CCol lg={12} className="d-flex justify-content-end">
                             <CButton type="submit" className="mt-4" color="primary">Hoàn tất</CButton>
                         </CCol>
@@ -343,10 +458,15 @@ const RiverManagement = () => {
         updateRiverName: '',
         updateRiverLocation: '',
         updateRiverLatitude: '',
-        updateRiverLongitude: ''
+        updateRiverLongitude: '',
+        updateRiverLength: '',
+        updateRiverWidth: '',
+        updateRiverNearestProcessingAt: '',
+        updateRiverAddress: '',
+        updateRiverLevel: ''
     }
     const [updateState, setUpdateState] = useState(updateData)
-    const { updateRiverId, updateRiverName, updateRiverLocation, updateRiverLatitude, updateRiverLongitude } = updateState
+    const { updateRiverId, updateRiverName, updateRiverLocation, updateRiverLatitude, updateRiverLongitude, updateRiverAddress, updateRiverLength, updateRiverWidth, updateRiverLevel, updateRiverNearestProcessingAt } = updateState
     const [updateValidated, setUpdateValidated] = useState(false)
     const geRiverDataById = (riverId) => {
         if (riverId) {
@@ -354,12 +474,21 @@ const RiverManagement = () => {
             .then(res => {
                 const river = res?.data
                 if (river) {
+                    let year = river?.riverNearestProcessingAt[2].toString()
+                    let month = river?.riverNearestProcessingAt[1].toString()
+                    let day = river?.riverNearestProcessingAt[0].toString()
+                    const riverNearestProcessingAt = addZeroToDate(year, month, day)
                     const updateRiverFetchData = {
                         updateRiverId: river?.riverId,
                         updateRiverName: river?.riverName,
                         updateRiverLocation: river?.riverLocation,
                         updateRiverLatitude: river?.riverLatitude,
-                        updateRiverLongitude: river?.riverLongitude
+                        updateRiverLongitude: river?.riverLongitude,
+                        updateRiverAddress: river?.riverAddress,
+                        updateRiverNearestProcessingAt: riverNearestProcessingAt,
+                        updateRiverLength: river?.riverLength,
+                        updateRiverLevel: river?.riverLevel,
+                        updateRiverWidth: river?.riverWidth
                     }
                     setUpdateState(updateRiverFetchData)
                 }else {
@@ -389,6 +518,31 @@ const RiverManagement = () => {
         geRiverDataById(riverId)
         setUpdateVisible(true)
     }
+    const handleSetUpdateRiverNearestProcessingAt = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateRiverNearestProcessingAt: value }
+        })
+    }
+    const handleSetUpdateRiverAddress = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateRiverAddress: value }
+        })
+    }
+    const handleSetUpdateRiverLength = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateRiverLength: value }
+        })
+    }
+    const handleSetUpdateRiverWidth = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateRiverWidth: value }
+        })
+    }
+    const handleSetUpdateRiverLevel = (value) => {
+        setUpdateState(prev => {
+            return { ...prev, updateRiverLevel: value }
+        })
+    }
     const handleSetUpdateRiverName = (value) => {
         setUpdateState(prev => {
             return { ...prev, updateRiverName: value }
@@ -417,7 +571,12 @@ const RiverManagement = () => {
                 riverName: updateRiverName,
                 riverLocation: updateRiverLocation,
                 riverLatitude: updateRiverLatitude,
-                riverLongitude: updateRiverLongitude
+                riverLongitude: updateRiverLongitude,
+                riverNearestProcessingAt: updateRiverNearestProcessingAt,
+                riverLevel: updateRiverLevel,
+                riverLength: updateRiverLength,
+                riverWidth: updateRiverWidth,
+                riverAddress: updateRiverAddress
             }
             updateRiver(river)
             .then(res => {
@@ -441,7 +600,7 @@ const RiverManagement = () => {
         setUpdateValidated(true)
     }
     const [updateVisible, setUpdateVisible] = useState(false)
-    const updateForm = (isLoaded) => { 
+    const updateForm = (isLoaded) => {
         return (
             <>
                 {  isLoaded ? 
@@ -471,7 +630,6 @@ const RiverManagement = () => {
                                     placeholder="Mô tả vị trí sông, kênh, rạch"
                                     onChange={(e) => handleSetUpdateRiverLocation(e.target.value)}
                                     value={updateRiverLocation}
-                                    // feedbackInvalid="Phải ít hơn 250 ký tự"
                                     maxLength={250}
                                     rows={3}
                                     aria-describedby="exampleFormControlInputHelpInline"
@@ -516,6 +674,75 @@ const RiverManagement = () => {
                                     feedbackInvalid="Là một số"
                                     value={updateRiverLongitude}
                                     aria-describedby="exampleFormControlInputHelpInline"
+                                />
+                            </CCol>
+                        </CRow>
+                        <CRow>
+                            <CCol lg={12}>
+                                <CFormInput
+                                    className="mt-4"
+                                    type="text"
+                                    placeholder="Địa điểm"
+                                    maxLength={250}
+                                    feedbackInvalid="Không bỏ trống và phải ít hơn 250 ký tự"
+                                    onChange={(e) => handleSetUpdateRiverAddress(e.target.value)}
+                                    value={updateRiverAddress}
+                                    aria-describedby="exampleFormControlInputHelpInline"
+                                    required
+                                />
+                                
+                            </CCol>
+                        </CRow>
+                        <CRow>
+                            <CCol lg={6}>
+                                <CFormInput
+                                    className="mt-4"
+                                    type="text"
+                                    placeholder="Cấp kênh"
+                                    maxLength={250}
+                                    feedbackInvalid="Không bỏ trống và phải ít hơn 250 ký tự"
+                                    onChange={(e) => handleSetUpdateRiverLevel(e.target.value)}
+                                    value={updateRiverLevel}
+                                    aria-describedby="exampleFormControlInputHelpInline"
+                                    required
+                                />
+                            </CCol>
+                            <CCol lg={6}>
+                                <CustomDateTimePicker 
+                                    classes='mt-4' 
+                                    placeholder={'Lần nạo vét gần nhất'}
+                                    value={updateRiverNearestProcessingAt}
+                                    setValue={handleSetUpdateRiverNearestProcessingAt}
+                                />
+                            </CCol>
+                        </CRow>
+                        <CRow>
+                            <CCol xs={12} lg={6}>
+                                <CFormInput
+                                    className="mt-4"
+                                    type="number"
+                                    placeholder="Chiều dài"
+                                    min={0}
+                                    feedbackInvalid="Không bỏ trống và phải là số lớn hơn 0"
+                                    onChange={(e) => handleSetUpdateRiverLength(e.target.value)}
+                                    value={updateRiverLength}
+                                    aria-describedby="exampleFormControlInputHelpInline"
+                                    required
+                                    step={0.01}
+                                />
+                            </CCol>
+                            <CCol xs={12} lg={6}>
+                                <CFormInput
+                                    className="mt-4"
+                                    type="number"
+                                    placeholder="Chiều rộng"
+                                    min={0}
+                                    feedbackInvalid="Không bỏ trống và phải là số lớn hơn 0"
+                                    onChange={(e) => handleSetUpdateRiverWidth(e.target.value)}
+                                    value={updateRiverWidth}
+                                    aria-describedby="exampleFormControlInputHelpInline"
+                                    required
+                                    step={0.01}
                                 />
                             </CCol>
                         </CRow>
