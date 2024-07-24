@@ -25,7 +25,8 @@ import {
     cilTrash,
     cilMagnifyingGlass,
     cilReload,
-    cilPlus
+    cilPlus,
+    cilTask
   } from '@coreui/icons'
 import "./post-management.css"
 import CustomPagination from "src/views/customs/my-pagination"
@@ -36,10 +37,10 @@ import { createDamType, deleteDamType, getAllDamTypes, getDamTypeById, updateDam
 import CustomSpinner from "src/views/customs/my-spinner"
 import CustomAuthorizationChecker from "src/views/customs/my-authorizationchecker"
 import CustomAuthorizationCheckerChildren from "src/views/customs/my-authorizationchecker-children"
-import { checkInitElement, formatDate, formatDateToDay, getPostCreatedAt, searchRelatives } from "src/tools"
+import { checkInitElement, formatDate, formatDateToDay, getPostCreatedAt, getPostStatus, searchRelatives } from "src/tools"
 import CustomAuthChecker from "src/views/customs/my-authchecker"
 import CustomIntroduction from "src/views/customs/my-introduction"
-import { createPost, deletePost, getAllPosts, getPostById, updatePost } from "src/services/post-services"
+import { createPost, decidePost, deletePost, getAllPosts, getPostById, updatePost } from "src/services/post-services"
 import { CKEditor } from "@ckeditor/ckeditor5-react"
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic"
 import CustomEditor from "src/views/customs/my-editor"
@@ -51,9 +52,11 @@ const PostManagement = () => {
     const defaultModuleAddFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_post_management_add_post"
     const defaultModuleUpdateFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_post_management_update_post"
     const defaultModuleDeleteFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_post_management_delete_post"
+    const defaultModuleDecideFeature = "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_post_management_decide_post"
     const [haveAdding, setHaveAdding] = useState(false)
     const [haveUpdating, setHaveUpdating] = useState(false)
     const [haveDeleting, setHaveDeleting] = useState(false)
+    const [haveDeciding, setHaveDeciding] = useState(false)
     const [listPosts, setListPosts] = useState([])
     const [isLoadedPosts, setIsLoadedPosts] = useState(false)
     const handleSetIsLoadedPosts = (value) => {
@@ -141,9 +144,10 @@ const PostManagement = () => {
                 <CTableHead className="text-nowrap">
                   <CTableRow>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '5%'}}>#</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '30%'}}>Tiêu đề</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Tác giả</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Ngày tạo</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '25%'}}>Tiêu đề</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Tác giả</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '20%'}}>Ngày tạo</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Trạng thái</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{'width' : '15%'}}>Thao tác</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
@@ -156,7 +160,9 @@ const PostManagement = () => {
                                     <CTableDataCell>{post?.postTitle}</CTableDataCell>
                                     <CTableDataCell>{post?.postCreatorName}</CTableDataCell>
                                     <CTableDataCell>{getPostCreatedAt(post)}</CTableDataCell>
+                                    <CTableDataCell>{getPostStatus(post)}</CTableDataCell>
                                     <CTableDataCell>
+                                        {haveDeciding && <CIcon icon={cilTask} onClick={() => openDecideModal(post?.postId)}  className="text-info" role="button"/>}
                                         {haveUpdating && <CIcon icon={cilPencil} onClick={() => openUpdateModal(post?.postId)} className="text-success mx-1" role="button"/>}
                                         {haveDeleting && <CIcon icon={cilTrash} onClick={() => openDeleteModal(post?.postId)}  className="text-danger" role="button"/>}
                                     </CTableDataCell>
@@ -607,6 +613,85 @@ const PostManagement = () => {
         setDeleteVisible(true)
     }
 
+    // Decide
+    
+    const [decideVisible, setDecideVisible] = useState(false)
+    const [decidePostId, setDecidePostId] = useState(0)
+    const [decidePostApproved, setDecidePostApproved] = useState(false)
+    const getAPostApprovedById = (postId) => {
+        if (postId) {
+            getPostById(postId)
+            .then(res => {
+                const post = res?.data
+                if (post) {
+                    setDecidePostApproved(post?.postApproved)
+                }
+            })
+            .catch(err => {
+                addToast(createToast({
+                    title: 'Truy cập bài viết',
+                    content: "Thông tin bài viết không đúng",
+                    icon: createFailIcon()
+                }))
+            })
+        }
+    }
+    const decideAPost = (postId, postApproved) => {
+        if (postId) {
+            const post = {
+                postId: postId,
+                postApproved: !postApproved
+            }
+            decidePost(post)
+            .then(res => {
+                setDeleteVisible(false)
+                rebaseAllData()
+                addToast(createToast({
+                    title: `${!postApproved ? 'Duyệt bài viết' : 'Bỏ duyệt bài viết'}`,
+                    content: `${!postApproved ? 'Duyệt bài viết thành công' : 'Bỏ duyệt bài viết thành công'}`,
+                    icon: createSuccessIcon()
+                }))
+                setUpdateValidated(false)
+            })
+            .catch(err => {
+                addToast(createToast({
+                    title: `${!postApproved ? 'Duyệt bài viết' : 'Bỏ duyệt bài viết'}`,
+                    content: `${!postApproved ? 'Duyệt bài viết không thành công' : 'Bỏ duyệt bài viết không thành công'}`,
+                    icon: createFailIcon()
+                }))
+            })
+            setDecideVisible(false)
+        }
+    }
+    const decideForm = (postId, postApproved) => {
+        return (
+            <>
+                {   
+                    postId ? 
+                    <CForm onSubmit={(e) => {
+                        e.preventDefault()
+                        decideAPost(postId, postApproved)
+                    }}>
+                        <CRow>
+                            <CCol md={12}>
+                                <p>Bạn có chắc muốn {`${!postApproved ? 'duyệt bài viết' : 'bỏ duyệt bài viết'}`} này ?</p>
+                            </CCol>
+                            <CCol md={12} className="d-flex justify-content-end">
+                                <CButton color="primary" type="submit">Xác nhận</CButton>
+                                <CButton color="danger" onClick={() => setDecideVisible(false)} className="text-white ms-3">Hủy</CButton>
+                            </CCol>
+                        </CRow>
+                    </CForm> : <CSpinner />
+                }
+            </>
+        )
+    }
+    const openDecideModal = (postId) => {
+        setDecidePostId(postId)
+        getAPostApprovedById(postId)
+        setDecideVisible(true)
+    }
+
     useEffect(() => {
         // To reset all add state
         setAddState(addData)
@@ -627,6 +712,7 @@ const PostManagement = () => {
         <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleAddFeature} setExternalState={setHaveAdding}/>
         <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateFeature} setExternalState={setHaveUpdating}/>
         <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleDeleteFeature} setExternalState={setHaveDeleting}/>
+        <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleDecideFeature} setExternalState={setHaveDeciding}/>
         <CCol xs>
           <CCard className="mb-4">
             <CToaster ref={toaster} push={toast} placement="top-end" />
@@ -635,6 +721,7 @@ const PostManagement = () => {
                 <CustomModal isLarge={true} visible={addVisible} title={'Thêm bài viết'} body={addForm()} setVisible={(value) => setAddVisible(value)}/>
                 <CustomModal isLarge={true} visible={updateVisible} title={'Cập nhật bài viết'} body={updateForm(updatePostId)} setVisible={(value) => setUpdateVisible(value)}/>
                 <CustomModal visible={deleteVisible} title={'Xóa bài viết'} body={deleteForm(deletePostId)} setVisible={(value) => setDeleteVisible(value)}/>
+                <CustomModal visible={decideVisible} title={'Duyệt bài viết'} body={decideForm(decidePostId, decidePostApproved)} setVisible={(value) => setDecideVisible(value)}/>
                 <CForm onSubmit={(e)=>{
                     e.preventDefault()
                     onFilter()

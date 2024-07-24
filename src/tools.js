@@ -1,5 +1,12 @@
 import { cilLockLocked, cilLockUnlocked } from "@coreui/icons";
 
+export const getPostStatus = (post) => {
+    if (post?.postApproved === true) {
+        return "Đã duyệt"
+    }
+    return "Chưa duyệt"
+}
+
 export const getSpecificGeneralInformation = (projectCode, pageCode, projects) => {
     if (projects) {
         let filteredProjects = projects?.filter(project => {
