@@ -96,7 +96,10 @@ export const AppSidebarNav = ({ items }) => {
   return (
     <React.Fragment>
       {
-        items && navItem(items[0], 0) // Home page
+        items && navItem(items[1], 1) // Home page
+      }
+      {
+        items && navItem(items[0], 0) // About Us
       }
       {filteredItems &&
         filteredItems.map((item, index) => (item.items ? navGroup(item, index) : navItem(item, index)))}

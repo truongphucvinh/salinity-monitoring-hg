@@ -62,6 +62,7 @@ const DamTypeManagement = React.lazy(() => import('./views/feature/dam-managemen
 const RiverManagement = React.lazy(() => import('./views/feature/dam-management/river-management'))
 const DamManagement = React.lazy(() => import('./views/feature/dam-management/dam-management'))
 const DamDetail = React.lazy(() => import('./views/feature/dam-management/dam-detail'))
+const AboutUs = React.lazy(() => import('./views/feature/read-only/aboutus/aboutus'))
 
 const routes = [
   { path: '/', exact: true, name: 'Trang chủ' },
@@ -73,6 +74,7 @@ const routes = [
   { path: '/role-management', name: 'Quản lý vai trò', element: RoleManagement }, 
   { path: '/user-management', name: 'Quản lý người dùng', element: UserManagement },
   { path: '/post-management', name: 'Quản lý bài viết', element: PostManagement },
+  { path: '/about-us', name: 'Giới thiệu', element: AboutUs }, 
   // { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/dashboard', name: 'Dashboard', element: HomePage },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
