@@ -17,11 +17,18 @@ import {
   cilStar,
   cilStream,
   cilTask,
-  cilEqualizer
+  cilEqualizer,
+  cilInfo
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
 const _nav = [
+  {
+    component: CNavItem,
+    name: 'Giới thiệu',
+    to: '/about-us',
+    icon: <CIcon icon={cilInfo} customClassName="nav-icon" />
+  },
   {
     component: CNavItem,
     name: 'Trang chủ',
