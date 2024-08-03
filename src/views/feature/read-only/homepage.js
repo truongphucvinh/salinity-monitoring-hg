@@ -230,7 +230,7 @@ const HomePage = () => {
                                 </CTableDataCell>
                             </CTableRow>
                         }) : <CTableRow>
-                            <CTableDataCell>Không có</CTableDataCell>
+                            <CTableDataCell>Chưa có</CTableDataCell>
                         </CTableRow>
                     }
                 </CTableBody>
@@ -341,7 +341,7 @@ const HomePage = () => {
                                             }) 
                                         }
                                         {
-                                            dam?.damSchedulesAtThisDate?.length === 0 ? "Không có" : ""
+                                            dam?.damSchedulesAtThisDate?.length === 0 ? "Chưa có" : ""
                                         }
                                     </CTableDataCell>
                                     <CTableDataCell>
