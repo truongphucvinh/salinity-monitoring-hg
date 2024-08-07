@@ -29,9 +29,18 @@ const AppSidebar = () => {
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
 
+  const styles = {
+    ctuLogo: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center"
+    }
+  }
+
   return (
     <CSidebar
-      className="border-end"
+      // className="border-end"
+      style={{borderRight: "1px solid red"}}
       colorScheme="dark"
       position="fixed"
       unfoldable={unfoldable}
@@ -40,11 +49,13 @@ const AppSidebar = () => {
         dispatch({ type: 'set', sidebarShow: visible })
       }}
     >
-      <CSidebarHeader className="border-bottom">
-        <CSidebarBrand to="/">
+      <CSidebarHeader className="border-bottom" style={styles.ctuLogo}>
+        <CSidebarBrand to="/" >
           {/* <span className='d-flex align-items-center'><CIcon customClassName="sidebar-brand-full me-2" icon={cilAudio} height={32} />Giám sát độ mặn</span> */}
           {/* <CIcon customClassName="sidebar-brand-full me-2" icon={cilAudio} height={32} /> */}
           {/* <CIcon customClassName="sidebar-brand-narrow" icon={cilAudio} height={32} /> */}
+          <img src={require('../assets/images/SHG.png')} height="80px" width="80px"/>
+          <img src={require('../assets/images/CTU.png')} height="60px" width="60px" style={{marginLeft: "20px"}}/>
         </CSidebarBrand>
         <CCloseButton
           className="d-lg-none"
@@ -58,7 +69,7 @@ const AppSidebar = () => {
           <AppSidebarNav items={navigation} />
         </SimpleBar>
       </CSidebarNav>
-      <CSidebarFooter className="border-top d-none d-lg-flex">
+      <CSidebarFooter className="d-none d-lg-flex" style={{borderBottom: "1px solid rgba(128, 128, 128, 0.3)"}}>
         <CSidebarToggler
           onClick={() => dispatch({ type: 'set', sidebarUnfoldable: !unfoldable })}
         />

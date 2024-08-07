@@ -27,7 +27,7 @@ const _nav = [
     component: CNavItem,
     name: 'Giới thiệu',
     to: '/about-us',
-    icon: <CIcon icon={cilInfo} customClassName="nav-icon" />
+    icon: <CIcon icon={cilInfo} customClassName="nav-icon"/>
   },
   {
     component: CNavItem,
