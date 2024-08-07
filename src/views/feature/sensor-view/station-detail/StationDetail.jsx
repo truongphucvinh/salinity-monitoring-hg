@@ -172,7 +172,7 @@ const StationDetail = () => {
             var point = {
               x: new Date(multi.ngay_gui).getTime(),
               y: Number(selectingSensorRynan === "" ? multi[sensorList[0]] : multi[selectingSensorRynan]),
-              color: '#1a2848'
+              color: '#21409d'
             }
             pointArray.push(point);
             if(selectingSensorRynan === "") {
@@ -190,7 +190,7 @@ const StationDetail = () => {
               },
               plotOptions: {
                 series: {
-                    color: '#1a2848'
+                    color: '#21409d'
                 }
               },
               tooltip: {
@@ -236,7 +236,7 @@ const StationDetail = () => {
         var point = {
           x: new Date(multi.ngay_gui).getTime(),
           y: Number(selectingSensorRynan === "" ? multi[sensorListRynan[0]] : multi[selectingSensorRynan]),
-          color: '#1a2848'
+          color: '#21409d'
         }
         pointArray.push(point);
         if(selectingSensorRynan === "") {
@@ -257,7 +257,7 @@ const StationDetail = () => {
           },
           plotOptions: {
             series: {
-                color: '#1a2848'
+                color: '#21409d'
             }
           },
           tooltip: {

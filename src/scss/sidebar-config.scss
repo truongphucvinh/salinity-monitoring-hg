@@ -1,0 +1,64 @@
+$ctu-blue: #21409d;
+.sidebar {
+    background-color: white !important;
+    border-top-color: rgba(128, 128, 128, 0.3) !important;
+    a {
+        color: $ctu-blue !important;
+        background-color: white !important;
+        &:hover {
+            background-color: #21409d27 !important;
+        }
+        svg path, rect {
+            fill: $ctu-blue !important;
+        }
+    }
+    .active {
+        background-color: #21409d27 !important;
+        font-weight: bold;
+        svg path, rect {
+            stroke: $ctu-blue;
+            stroke-width: 10px !important;
+        }
+    }
+    .sidebar-header {
+        border-bottom-color: rgba(128, 128, 128, 0.3) !important;
+        height: 112px !important;
+        display: flex !important;
+        justify-content: center !important;
+        .ctu-logo {
+            height: 60px;
+            width: 60px;
+            margin-left: 20px;
+        }
+        .shg-logo {
+            height: 80px;
+            width: 80px;
+        }
+        }
+        .sidebar-toggler::before { 
+         background-color: $ctu-blue !important;
+        }
+  }
+  
+  .sidebar-narrow-unfoldable {
+    .shg-logo {
+      display: none;
+    }
+    .ctu-logo {
+        margin-left: 0 !important;
+        height: 40px !important;
+        width: 40px !important;
+        transition: all 0.2s ease;
+    }
+    &:hover{
+        .shg-logo, .ctu-logo {
+            display: inline-block;
+      }
+        .ctu-logo {
+            margin-left: 20px !important;
+            height: 60px !important;
+            width: 60px !important;
+            transition: all 0.2s ease;
+      }
+    }
+  }

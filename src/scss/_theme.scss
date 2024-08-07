@@ -62,28 +62,3 @@ body {
     }
   }
 }
-
-.sidebar {
-  background-color: white !important;
-  border-right-color: rgba(128, 128, 128, 0.3) !important;
-  border-top-color: rgba(128, 128, 128, 0.3) !important;
-  a {
-    color: #21409d !important;
-    background-color: white !important;
-    &:hover {
-      background-color: #21409d27 !important;
-    }
-  }
-
-  .active {
-    background-color: #21409d27 !important;
-  }
-
-  .sidebar-header {
-    border-bottom-color: rgba(128, 128, 128, 0.3) !important;
-  }
-
-  svg path, rect {
-    fill: #21409d !important;
-  }
-}
