@@ -3,13 +3,15 @@ $ctu-blue: #21409d;
     background-color: white !important;
     border-top-color: rgba(128, 128, 128, 0.3) !important;
     a {
-        color: $ctu-blue !important;
+        color: black !important;
         background-color: white !important;
         &:hover {
             background-color: #21409d27 !important;
         }
         svg path, rect {
             fill: $ctu-blue !important;
+            stroke: $ctu-blue;
+            stroke-width: 5px !important;
         }
     }
     .active {
