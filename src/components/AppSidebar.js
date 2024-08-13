@@ -24,14 +24,24 @@ import 'simplebar-react/dist/simplebar.min.css'
 import navigation from '../_nav'
 import { cilAudio } from '@coreui/icons'
 
+import '../scss/sidebar-config.scss'
+
 const AppSidebar = () => {
   const dispatch = useDispatch()
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
 
+  const styles = {
+    ctuLogo: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center"
+    }
+  }
+
   return (
     <CSidebar
-      className="border-end"
+      style={{borderRight: "1px solid rgba(128, 128, 128, 0.3)"}}
       colorScheme="dark"
       position="fixed"
       unfoldable={unfoldable}
@@ -40,11 +50,10 @@ const AppSidebar = () => {
         dispatch({ type: 'set', sidebarShow: visible })
       }}
     >
-      <CSidebarHeader className="border-bottom">
-        <CSidebarBrand to="/">
-          {/* <span className='d-flex align-items-center'><CIcon customClassName="sidebar-brand-full me-2" icon={cilAudio} height={32} />Giám sát độ mặn</span> */}
-          {/* <CIcon customClassName="sidebar-brand-full me-2" icon={cilAudio} height={32} /> */}
-          {/* <CIcon customClassName="sidebar-brand-narrow" icon={cilAudio} height={32} /> */}
+      <CSidebarHeader>
+        <CSidebarBrand to="/" >
+          <img src={require('../assets/images/SHG.png')} className='shg-logo'/>
+          <img src={require('../assets/images/CTU.png')} className='ctu-logo'/>
         </CSidebarBrand>
         <CCloseButton
           className="d-lg-none"
@@ -58,7 +67,7 @@ const AppSidebar = () => {
           <AppSidebarNav items={navigation} />
         </SimpleBar>
       </CSidebarNav>
-      <CSidebarFooter className="border-top d-none d-lg-flex">
+      <CSidebarFooter className="d-none d-lg-flex">
         <CSidebarToggler
           onClick={() => dispatch({ type: 'set', sidebarUnfoldable: !unfoldable })}
         />
