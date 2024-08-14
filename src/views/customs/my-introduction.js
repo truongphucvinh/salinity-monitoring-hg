@@ -258,7 +258,7 @@ const CustomIntroduction = ({title = "Tiêu đề",content = "Lời giới thi�
                 <CToaster ref={toaster} push={toast} placement="top-end" />
                 <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateHeader} setExternalState={setHavingUpdateHeader}/>
                 <CustomModal visible={updateHeaderVisible} title={'Cập nhật tiêu đề'} body={updateHeaderForm(page)} setVisible={(value) => setUpdateHeaderVisible(value)}/>
-                <CRow>
+                <CRow className="mb-4">
                     <CCol xs>
                         <CCard>
                             <CCardBody>
@@ -296,7 +296,7 @@ const CustomIntroduction = ({title = "Tiêu đề",content = "Lời giới thi�
                 {
                     havingUpdateHeader && <CRow>
                         <CCol sx={12}>
-                            <div className="d-flex justify-content-center m-4">
+                            <div className="d-flex justify-content-center mb-4">
                                 <CButton className="btn btn-primary" onClick={openUpdateHeaderModal}>
                                     <CIcon icon={cilPencil} className="me-2"/>
                                     Cập nhật
