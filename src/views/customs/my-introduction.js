@@ -1,6 +1,6 @@
 import { cilPencil } from "@coreui/icons"
 import CIcon from "@coreui/icons-react"
-import { CButton, CCol, CForm, CFormInput, CRow, CSpinner, CToaster } from "@coreui/react"
+import { CButton, CCard, CCardBody, CCol, CForm, CFormInput, CImage, CRow, CSpinner, CToaster } from "@coreui/react"
 import React, { useEffect, useRef, useState } from "react"
 import CustomAuthorizationCheckerChildren from "./my-authorizationchecker-children"
 import { createPage, getAllProjects, updatePageById } from "src/services/general-services"
@@ -8,6 +8,8 @@ import { getProjectByCode, getSpecificGeneralInformation } from "src/tools"
 import CustomModal from "./my-modal"
 import createToast from "./my-toast"
 import { createFailIcon, createSuccessIcon } from "./my-icon"
+import ttkn from "./images/TTKN.jpg"
+import myi from "./images/MYI.jpg"
 
 const CustomIntroduction = ({title = "Tiêu đề",content = "Lời giới thiệu", pageCode}) => {
     const defaultProjectCode = process.env.HG_GENERAL_PROJECT || "U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_project"
@@ -256,11 +258,40 @@ const CustomIntroduction = ({title = "Tiêu đề",content = "Lời giới thi�
                 <CToaster ref={toaster} push={toast} placement="top-end" />
                 <CustomAuthorizationCheckerChildren parentCode={defaultAuthorizationCode} checkingCode={defaultModuleUpdateHeader} setExternalState={setHavingUpdateHeader}/>
                 <CustomModal visible={updateHeaderVisible} title={'Cập nhật tiêu đề'} body={updateHeaderForm(page)} setVisible={(value) => setUpdateHeaderVisible(value)}/>
-                <CRow>
+                <CRow className="mb-4">
                     <CCol xs>
-                        <p className="text-center fs-2 fw-bold">{page ? page?.pageHeaderTitle : title}</p>
-                        <p className="text-center fs-5">{page ? page?.pageHeaderBody : content}</p>
+                        <CCard>
+                            <CCardBody>
+                                <CRow>
+                                    <CCol xs={3} className="d-flex justify-content-center flex-column">
+                                        <a href="http://khuyennonghaugiang.com.vn/" target="__blank">
+                                            <CImage 
+                                                src={ttkn}
+                                                width={'100%'}
+                                                height={'auto'}
+                                                className="d-block mb-4"
+                                            />
+                                        </a>
+                                    </CCol>
+                                    <CCol xs={6}>
+                                        <p className="text-center fs-2 fw-bold">{page ? page?.pageHeaderTitle : title}</p>
+                                        <p className="text-center fs-5">{page ? page?.pageHeaderBody : content}</p>
+                                    </CCol>
+                                    <CCol xs={3} className="d-flex justify-content-center flex-column">
+                                        <a href="https://www.facebook.com/merryyearinternational.vn?mibextid=ZbWKwL" target="__blank">
+                                            <CImage 
+                                                src={myi}
+                                                width={'100%'}
+                                                height={'auto'}
+                                                className="d-block mb-4"
+                                            />
+                                        </a>
+                                    </CCol>
+                                </CRow>
+                            </CCardBody>
+                        </CCard>
                     </CCol>
+                    
                 </CRow>
                 {
                     havingUpdateHeader && <CRow>
@@ -277,9 +308,38 @@ const CustomIntroduction = ({title = "Tiêu đề",content = "Lời giới thi�
             </> : <>
                 <CRow>
                     <CCol xs>
-                        <p className="text-center fs-2 fw-bold">{title}</p>
-                        <p className="text-center fs-5">{content}</p>
+                        <CCard>
+                            <CCardBody>
+                                <CRow>
+                                    <CCol xs={3} className="d-flex justify-content-center flex-column">
+                                        <a href="http://khuyennonghaugiang.com.vn/" target="__blank">
+                                            <CImage 
+                                                src={ttkn}
+                                                width={'100%'}
+                                                height={'auto'}
+                                                className="d-block mb-4"
+                                            />
+                                        </a>
+                                    </CCol>
+                                    <CCol xs={6}>
+                                        <p className="text-center fs-2 fw-bold">{title}</p>
+                                        <p className="text-center fs-5">{content}</p>
+                                    </CCol>
+                                    <CCol xs={3} className="d-flex justify-content-center flex-column">
+                                        <a href="https://www.facebook.com/merryyearinternational.vn?mibextid=ZbWKwL" target="__blank">
+                                            <CImage 
+                                                src={myi}
+                                                width={'100%'}
+                                                height={'auto'}
+                                                className="d-block mb-4"
+                                            />
+                                        </a>
+                                    </CCol>
+                                </CRow>
+                            </CCardBody>
+                        </CCard>
                     </CCol>
+                    
                 </CRow>
             </>}
         </>

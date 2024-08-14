@@ -25,7 +25,7 @@ import {
 import CIcon from '@coreui/icons-react'
 import * as CryptoJS from 'crypto-js'
 
-import avatar8 from './../../assets/images/avatars/user.jpg'
+import avatar8 from './../../assets/images/avatars/user.png'
 import { useNavigate } from 'react-router-dom'
 import { getLoggedUserInformation } from 'src/tools'
 import CustomModal from 'src/views/customs/my-modal'
@@ -35,10 +35,14 @@ import { createFailIcon, createSuccessIcon } from 'src/views/customs/my-icon'
 
 const AppHeaderDropdown = () => {
   const [isAuthenticated, setIsAuthencticated] = useState(false)
+  const [fullName, setFullName] = useState('') 
   const navigate = useNavigate()
   const onUpdateAuthStatus = () => {
     if (localStorage.getItem('_isAuthenticated')) {
       setIsAuthencticated(true)
+      // account full name
+      let parsedObject = JSON.parse(localStorage.getItem('_authenticatedUser'))
+      setFullName(parsedObject?.fullName)
     }else {
       setIsAuthencticated(false)
     }
@@ -279,6 +283,7 @@ const AppHeaderDropdown = () => {
           <CToaster ref={toaster} push={toast} placement="top-end" />
           <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
             <CAvatar src={avatar8} size="md" />
+            { fullName && <span className='fw-bold text-black ms-2'>{fullName}</span> }
           </CDropdownToggle>
           <CDropdownMenu className="pt-0" placement="bottom-end">
             {/* <CDropdownHeader className="bg-body-secondary fw-semibold mb-2">Account</CDropdownHeader>
