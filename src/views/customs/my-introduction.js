@@ -278,7 +278,7 @@ const CustomIntroduction = ({title = "Tiêu đề",content = "Lời giới thi�
                                         <p className="text-center fs-5">{page ? page?.pageHeaderBody : content}</p>
                                     </CCol>
                                     <CCol xs={3} className="d-flex justify-content-center flex-column">
-                                        <a href="https://myi.or.kr/en-Vietnam" target="__blank">
+                                        <a href="https://www.facebook.com/merryyearinternational.vn?mibextid=ZbWKwL" target="__blank">
                                             <CImage 
                                                 src={myi}
                                                 width={'100%'}
@@ -308,9 +308,38 @@ const CustomIntroduction = ({title = "Tiêu đề",content = "Lời giới thi�
             </> : <>
                 <CRow>
                     <CCol xs>
-                        <p className="text-center fs-2 fw-bold">{title}</p>
-                        <p className="text-center fs-5">{content}</p>
+                        <CCard>
+                            <CCardBody>
+                                <CRow>
+                                    <CCol xs={3} className="d-flex justify-content-center flex-column">
+                                        <a href="http://khuyennonghaugiang.com.vn/" target="__blank">
+                                            <CImage 
+                                                src={ttkn}
+                                                width={'100%'}
+                                                height={'auto'}
+                                                className="d-block mb-4"
+                                            />
+                                        </a>
+                                    </CCol>
+                                    <CCol xs={6}>
+                                        <p className="text-center fs-2 fw-bold">{title}</p>
+                                        <p className="text-center fs-5">{content}</p>
+                                    </CCol>
+                                    <CCol xs={3} className="d-flex justify-content-center flex-column">
+                                        <a href="https://www.facebook.com/merryyearinternational.vn?mibextid=ZbWKwL" target="__blank">
+                                            <CImage 
+                                                src={myi}
+                                                width={'100%'}
+                                                height={'auto'}
+                                                className="d-block mb-4"
+                                            />
+                                        </a>
+                                    </CCol>
+                                </CRow>
+                            </CCardBody>
+                        </CCard>
                     </CCol>
+                    
                 </CRow>
             </>}
         </>
