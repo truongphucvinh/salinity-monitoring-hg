@@ -30,6 +30,7 @@ import newsService from "src/services/news-service"
 import CustomAPIMap from "src/views/customs/my-google-map-api"
 
 import { generateSensorName } from "src/tools"
+import useCamera from "src/hooks/useCamera"
 
 const HomePage = () => {
     const defaultPageCode="U2FsdGVkX1/CWjVqRRnlyitZ9vISoCgx/rEeZbKMiLQ=_dms_page_homepage"
@@ -422,6 +423,25 @@ const HomePage = () => {
     const handelDirectToDetail = (serialStation) => {
         navigate(`/station-list/station-detail/${serialStation}`);
     }
+    const { addCamera, camera } = useCamera()
+    const [matchStationWithCamera, setMatchStationWithCamera] = useState([])
+    useEffect(() => {
+      const combinedArray = [];
+  
+      rynanStationList?.forEach(station => {
+        camera?.forEach(cam => {
+          // if (station?.ma_thiet_bi === cam?.deviceId) {
+          const combinedObject = {
+            ...station,
+            url: station?.ma_thiet_bi === cam?.deviceId ? cam?.url : ""
+          };
+          combinedArray.push(combinedObject);
+          // }
+        });
+      });
+  
+      setMatchStationWithCamera(combinedArray);
+    }, [rynanStationList, camera]);
 
     const showSensorStationList = () => {
         return <>
@@ -437,7 +457,7 @@ const HomePage = () => {
                 </CTableHead>
                 <CTableBody>
                         {
-                            rynanStationList.map((station, stationIndex) => {
+                            matchStationWithCamera.map((station, stationIndex) => {
                                 return station?.sensor?.sensor?.map((sensor, sensorIndex) => {
                                     if(sensorIndex==0) {
                                         return <CTableRow key={station?.so_serial+sensorIndex}>
@@ -450,6 +470,10 @@ const HomePage = () => {
                                                     <span className="name">{ station.ten_thiet_bi }</span>
                                                 </span> <br/>
                                                 { station.khu_vuc_lap_dat }
+                                                <br/>
+                                                
+                                                <a href={`http://${station?.url}`} target="_blank" rel="noopener noreferrer">{station?.url}</a>
+                                                
                                             </CTableDataCell>
                                             <CTableDataCell style={{'width' : '25%'}}>{ generateSensorName(sensor.name) }</CTableDataCell>
                                             <CTableDataCell style={{'width' : '20%'}}>{ sensor.value }</CTableDataCell>
