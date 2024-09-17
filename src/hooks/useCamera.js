@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createCamera, getAllCamera } from "src/services/camera-services";
+import { createCamera, deleteCameraApi, getAllCamera } from "src/services/camera-services";
 
 function useCamera() {
     const [camera, setCamera] = useState(null);
@@ -7,7 +7,7 @@ function useCamera() {
     useEffect(() => {
         const fetchDataCamera = async () => {
             try {
-                const response = await getAllCamera("CAMERA",0,6);
+                const response = await getAllCamera("CAMERA", 0, 6);
 
                 // Log the data to the console
                 console.log("camera", response.data);
@@ -23,7 +23,7 @@ function useCamera() {
     }, []);
     const fetchDataCamera = async () => {
         try {
-            const response = await getAllCamera();
+            const response = await getAllCamera("CAMERA", 0, 6);
 
             // Log the data to the console
             console.log("camera", response.data);
@@ -36,15 +36,31 @@ function useCamera() {
     };
     const addCamera = async (camera) => {
         try {
-             // Log the data to the console
-             console.log("addCamera-1", camera);
+            // Log the data to the console
+            console.log("addCamera-1", camera);
             const response = await createCamera(camera);
 
             // Log the data to the console
             console.log("addCamera-2", response);
 
             // setCamera(response)
-            fetchDataCamera()
+            await fetchDataCamera()
+
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    };
+    const deleteCamera = async (cameraId) => {
+        try {
+            // Log the data to the console
+            console.log("addCamera-1", cameraId);
+            const response = await deleteCameraApi(cameraId);
+
+            // Log the data to the console
+            console.log("addCamera-2", response);
+
+            // setCamera(response)
+            await fetchDataCamera()
 
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -52,7 +68,8 @@ function useCamera() {
     };
     return {
         camera,
-        addCamera
+        addCamera,
+        deleteCamera
     }
 }
 

@@ -9,15 +9,16 @@ import { generateSensorName } from 'src/tools';
 //bootstrap
 import { CRow, CCol, CCard, CCardHeader, CCardBody, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CModal } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilPlus, cilTouchApp } from '@coreui/icons'
+import { cilPlus, cilTouchApp, cilTrash } from '@coreui/icons'
 //modal
 import { useNavigate } from 'react-router-dom';
 import CustomIntroduction from 'src/views/customs/my-introduction';
 import CustomModal from 'src/views/customs/my-modal';
 import useCamera from 'src/hooks/useCamera';
+import { deleteCameraApi } from 'src/services/camera-services';
 
 const StationList = () => {
-
+  const { addCamera, deleteCamera, camera } = useCamera()
   const [stationIsSelected, setStationIsSelected] = useState();
 
   //available station
@@ -38,7 +39,7 @@ const StationList = () => {
       .catch((error) => {
         setError(true)
       })
-  }, [])
+  }, [camera])
 
   const addZero = (no) => {
     return no < 10 ? '0' + no : no;
@@ -96,7 +97,7 @@ const StationList = () => {
       return { ...prev, deviceId: value }
     })
   }
-  const { addCamera, camera } = useCamera()
+
   const createCamera = (e) => {
     // validation
     const form = e.currentTarget
@@ -111,7 +112,7 @@ const StationList = () => {
         username: "admin",
         password: "c123456789c"
       })
-
+      setIsAddCamera(false)
     }
   }
   console.log("rynanStationList", rynanStationList);
@@ -126,7 +127,7 @@ const StationList = () => {
           ...station,
           url: station?.ma_thiet_bi === cam?.deviceId ? cam?.url : ""
         };
-        combinedArray.push(combinedObject);
+        if (station?.ma_thiet_bi === cam?.deviceId) combinedArray.push(combinedObject);
         // }
       });
     });
@@ -134,7 +135,12 @@ const StationList = () => {
     setMatchStationWithCamera(combinedArray);
   }, [rynanStationList, camera]);
   console.log("matchStationWithCamera", matchStationWithCamera);
+  const handleDeleteCamera = (cameraId) => {
+    deleteCamera(cameraId)
+    // setRynanStationList(camera)
+    // console.log("cameraId",cameraId);
 
+  }
 
   return (
     <>
@@ -201,7 +207,7 @@ const StationList = () => {
           <div className="d-flex justify-content-center my-4">
             <CButton className="btn btn-primary" onClick={openAddModal} >
               <CIcon icon={cilPlus} className="me-2" />
-              Thêm
+              Thêm camera
             </CButton>
           </div>
         </CCol>
@@ -219,7 +225,8 @@ const StationList = () => {
                   <CTableRow>
                     <CTableHeaderCell className="bg-body-tertiary" style={{ 'width': '5%' }}>#</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary" style={{ 'width': '25%' }}>Tên trạm</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary" style={{ 'width': '75%' }}>Link camera</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{ 'width': '55%' }}>Link camera</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary" style={{ 'width': '25%' }}>Thao tác</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -232,9 +239,11 @@ const StationList = () => {
                             {station.ten_thiet_bi}
                           </CTableDataCell>
                           <CTableDataCell>
-                          <a href={`http://${station?.url}`} target="_blank" rel="noopener noreferrer">{station?.url}</a>
+                            <a href={`http://${station?.url}`} target="_blank" rel="noopener noreferrer">{station?.url}</a>
                           </CTableDataCell>
-
+                          <CTableDataCell>
+                            <CButton type="button" color="secondary" onClick={() => handleDeleteCamera(station?.ma_thiet_bi)}><CIcon icon={cilTrash} /></CButton>
+                          </CTableDataCell>
                         </CTableRow>
                       </>
                     })
