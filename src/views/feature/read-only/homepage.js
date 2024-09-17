@@ -439,7 +439,9 @@ const HomePage = () => {
             // if (station?.ma_thiet_bi === cam?.deviceId) {
             const combinedObject = {
                 ...station,
-                url: isAuthenticated && station?.ma_thiet_bi === cam?.deviceId ? cam?.url : ''
+                url: isAuthenticated && station?.ma_thiet_bi === cam?.deviceId ? cam?.url : '',
+                username: isAuthenticated && station?.ma_thiet_bi === cam?.deviceId ? cam?.username : '',
+                password: isAuthenticated && station?.ma_thiet_bi === cam?.deviceId ? cam?.password : '',
             };
             // if(station?.ma_thiet_bi === cam?.deviceId) 
             console.log("combined", combinedObject);
@@ -482,7 +484,12 @@ const HomePage = () => {
                                             <br />
 
                                             <a href={`http://${station?.url}`} target="_blank" rel="noopener noreferrer">{station?.url ? "Xem camera" : ""}</a>
-
+                                            {station?.url &&
+                                                <span>
+                                                    <strong>Tên đăng nhập:</strong> {station?.username}<br />
+                                                    <strong>Mật khẩu</strong>: {station?.password}
+                                                </span>
+                                            }
                                         </CTableDataCell>
                                         <CTableDataCell style={{ 'width': '25%' }}>{generateSensorName(sensor.name)}</CTableDataCell>
                                         <CTableDataCell style={{ 'width': '20%' }}>{sensor.value}</CTableDataCell>
