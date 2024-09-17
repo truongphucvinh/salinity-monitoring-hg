@@ -482,14 +482,17 @@ const HomePage = () => {
                                             </span> <br />
                                             {station.khu_vuc_lap_dat}
                                             <br />
-
-                                            <a href={`http://${station?.url}`} target="_blank" rel="noopener noreferrer">{station?.url ? "Xem camera" : ""}</a>
+                                            <br />
+                                            
                                             {station?.url &&
                                                 <span>
-                                                    <strong>Tên đăng nhập:</strong> {station?.username}<br />
-                                                    <strong>Mật khẩu</strong>: {station?.password}
+                                                    <i>- Tên đăng nhập: {station?.username}</i><br />
+                                                    <i>- Mật khẩu: {station?.password}</i>
                                                 </span>
                                             }
+                                            <br />
+                                            <a href={`http://${station?.url}`} target="_blank" rel="noopener noreferrer">{station?.url ? "Xem camera" : ""}</a>
+                                            
                                         </CTableDataCell>
                                         <CTableDataCell style={{ 'width': '25%' }}>{generateSensorName(sensor.name)}</CTableDataCell>
                                         <CTableDataCell style={{ 'width': '20%' }}>{sensor.value}</CTableDataCell>
