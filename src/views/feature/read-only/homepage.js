@@ -428,21 +428,24 @@ const HomePage = () => {
     }
     const { addCamera, camera } = useCamera()
     const [matchStationWithCamera, setMatchStationWithCamera] = useState([])
+
+    console.log("camera",camera);
+    
     useEffect(() => {
         const combinedArray = [];
         const isAuthenticated = localStorage.getItem('_isAuthenticated')
         rynanStationList?.forEach(station => {
-            // camera?.forEach(cam => {
+            camera?.forEach(cam => {
             // if (station?.ma_thiet_bi === cam?.deviceId) {
             const combinedObject = {
                 ...station,
-                url: isAuthenticated ? "http://cameraquantrachg.smartddns.tv/" : ''
+                url: isAuthenticated && station?.ma_thiet_bi === cam?.deviceId ? cam?.url : ''
             };
             // if(station?.ma_thiet_bi === cam?.deviceId) 
             console.log("combined", combinedObject);
             combinedArray.push(combinedObject);
             // }
-            // });
+            });
         });
 
 

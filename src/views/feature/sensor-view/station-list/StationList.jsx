@@ -84,12 +84,24 @@ const StationList = () => {
   console.log("addTest", isAddCamera);
   const cameraDevice = {
     link: "",
-    deviceId: ""
+    deviceId: "",
+    username:"",
+    password:""
   }
   const [addLink, setAddLink] = useState(cameraDevice)
   const handleSetLink = (value) => {
     setAddLink((prev) => {
       return { ...prev, link: value }
+    })
+  }
+  const handleSetUsername = (value) => {
+    setAddLink((prev) => {
+      return { ...prev, username: value }
+    })
+  }
+  const handleSetPassword = (value) => {
+    setAddLink((prev) => {
+      return { ...prev, password: value }
     })
   }
   const handleSetAddDeviceId = (value) => {
@@ -109,8 +121,8 @@ const StationList = () => {
         deviceId: addLink?.deviceId,
         type: "CAMERA",
         url: addLink?.link,
-        username: "admin",
-        password: "c123456789c"
+        username: addLink?.username,
+        password: addLink?.password
       })
       setIsAddCamera(false)
     }
@@ -303,6 +315,36 @@ const StationList = () => {
                   feedbackInvalid="Chưa nhập!"
                   onChange={(e) => handleSetLink(e.target.value)}
                   value={addLink?.link}
+                  aria-describedby="exampleFormControlInputHelpInline"
+                />
+              </CCol>
+            </CRow>
+
+            <CRow>
+              <CCol lg={12}>
+                <CFormInput
+                  className="mt-4"
+                  type="text"
+                  required
+                  placeholder="Tên đăng nhập"
+                  feedbackInvalid="Chưa nhập!"
+                  onChange={(e) => handleSetUsername(e.target.value)}
+                  value={addLink?.username}
+                  aria-describedby="exampleFormControlInputHelpInline"
+                />
+              </CCol>
+            </CRow>
+
+            <CRow>
+              <CCol lg={12}>
+                <CFormInput
+                  className="mt-4"
+                  type="text"
+                  required
+                  placeholder="Mật khẩu"
+                  feedbackInvalid="Chưa nhập!"
+                  onChange={(e) => handleSetPassword(e.target.value)}
+                  value={addLink?.password}
                   aria-describedby="exampleFormControlInputHelpInline"
                 />
               </CCol>
